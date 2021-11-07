@@ -15,6 +15,7 @@ export declare class AuthController {
             id: number;
             createdAt: Date;
             updatedAt: Date;
+            role: import("../enums/role.enum").UserRole[];
         };
         token: string;
     }>;

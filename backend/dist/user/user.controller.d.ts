@@ -11,7 +11,11 @@ export declare class UserController {
         users: import("./entities/user.entity").User[];
         number: number;
     }>;
-    findOne(id: string): Promise<import("./entities/user.entity").User>;
+    findOne(id: string): Promise<{
+        id: number;
+        name: string;
+        createdAt: Date;
+    }>;
     update(req: any, updateUserDto: UpdateUserDto): Promise<import("typeorm").UpdateResult>;
     updatePassword(req: any, updateUserPasswordDto: UpdateUserPasswordDto): Promise<import("typeorm").UpdateResult>;
 }

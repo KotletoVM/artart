@@ -32,12 +32,12 @@ __decorate([
     __metadata("design:type", Date)
 ], Comment.prototype, "updatedAt", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, { nullable: false }),
+    (0, typeorm_1.ManyToOne)(type => user_entity_1.User, user => user.id, { eager: true, cascade: true, nullable: false }),
     (0, typeorm_1.JoinColumn)({ name: 'userid' }),
     __metadata("design:type", user_entity_1.User)
 ], Comment.prototype, "user", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => person_entity_1.Person, { nullable: false }),
+    (0, typeorm_1.ManyToOne)(type => person_entity_1.Person, { nullable: false }),
     (0, typeorm_1.JoinColumn)({ name: 'personid' }),
     __metadata("design:type", person_entity_1.Person)
 ], Comment.prototype, "person", void 0);

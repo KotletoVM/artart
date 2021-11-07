@@ -1,5 +1,6 @@
 import { IsEmail, Length, IsString, IsNotEmpty, Matches, IsOptional } from "class-validator";
-import { UserRole } from "../entities/user.entity";
+import { UserRole } from "src/enums/role.enum";
+
 
 export class CreateUserDto {
     id: number;
@@ -16,6 +17,6 @@ export class CreateUserDto {
         { message: 'Weak password' },)
     password: string;
     @IsOptional()
-    role: UserRole;
+    role: UserRole[];
     //hash?: string;
 }

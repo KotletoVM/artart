@@ -23,14 +23,17 @@ export class PaintingService {
   }
 
   findOne(id: number) {
-    return this.paintingRepository.findOne(id, {relations: ["person"]});
+    return this.paintingRepository.findOne(id, {relations: ["personid"]});
   }
 
+  //ограничение на админа
   update(id: number, updatePaintingDto: UpdatePaintingDto) {
     return this.paintingRepository.update(id, updatePaintingDto);
   }
 
+  //ограничение на админа
   remove(id: number) {
     return this.paintingRepository.delete(id);
   }
+
 }

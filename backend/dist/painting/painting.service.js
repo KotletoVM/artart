@@ -28,7 +28,7 @@ let PaintingService = class PaintingService {
         return this.paintingRepository.find({ where: { personid: personid } });
     }
     findOne(id) {
-        return this.paintingRepository.findOne(id, { relations: ["person"] });
+        return this.paintingRepository.findOne(id, { relations: ["personid"] });
     }
     update(id, updatePaintingDto) {
         return this.paintingRepository.update(id, updatePaintingDto);

@@ -1,10 +1,8 @@
 import {Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn} from 'typeorm'
 import {Contains, IsInt, Length, IsEmail, IsFQDN, IsDate, Min, Max} from "class-validator";
+import { UserRole } from 'src/enums/role.enum';
 
-export enum UserRole {
-    ADMIN = "admin",
-    USER = "user"
-}
+
 
 @Entity()
 export class User {
@@ -27,5 +25,5 @@ export class User {
         enum: UserRole,
         default: UserRole.USER
     })
-    role: UserRole
+    role: UserRole[]
 }

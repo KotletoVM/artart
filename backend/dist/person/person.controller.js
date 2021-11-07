@@ -72,7 +72,6 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], PersonController.prototype, "create", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),

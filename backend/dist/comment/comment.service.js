@@ -25,7 +25,7 @@ let CommentService = class CommentService {
         return this.commentRepository.save({
             text: createCommentDto.text,
             person: { id: createCommentDto.personid },
-            user: { id: 1 }
+            user: { id: 2 }
         });
     }
     findAll() {
@@ -33,6 +33,9 @@ let CommentService = class CommentService {
     }
     findOne(id) {
         return this.commentRepository.findOne(id);
+    }
+    findAllforPerson(personid) {
+        return this.commentRepository.find({ where: { person: { id: personid } } });
     }
     update(id, updateCommentDto) {
         return this.commentRepository.update(id, updateCommentDto);

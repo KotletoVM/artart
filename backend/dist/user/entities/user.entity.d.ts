@@ -1,3 +1,4 @@
+import { UserRole } from 'src/enums/role.enum';
 export declare class User {
     id: number;
     name: string;
@@ -5,4 +6,5 @@ export declare class User {
     hash: string;
     createdAt: Date;
     updatedAt: Date;
+    role: UserRole[];
 }

@@ -16,6 +16,7 @@ export declare class CommentService {
     } & Comment>;
     findAll(): Promise<Comment[]>;
     findOne(id: number): Promise<Comment>;
+    findAllforPerson(personid: number): Promise<Comment[]>;
     update(id: number, updateCommentDto: UpdateCommentDto): Promise<import("typeorm").UpdateResult>;
     remove(id: number): Promise<import("typeorm").DeleteResult>;
 }

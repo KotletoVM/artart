@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const painting_service_1 = require("./painting.service");
 const create_painting_dto_1 = require("./dto/create-painting.dto");
 const update_painting_dto_1 = require("./dto/update-painting.dto");
+const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 let PaintingController = class PaintingController {
     constructor(paintingService) {
         this.paintingService = paintingService;
@@ -38,6 +39,7 @@ let PaintingController = class PaintingController {
     }
 };
 __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -59,6 +61,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], PaintingController.prototype, "findOne", null);
 __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
@@ -67,6 +70,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], PaintingController.prototype, "update", null);
 __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),

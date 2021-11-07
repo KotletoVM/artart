@@ -11,6 +11,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
@@ -19,6 +30,7 @@ const update_user_dto_1 = require("./dto/update-user.dto");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const search_user_dto_1 = require("./dto/search-user.dto");
 const update_user_password_dto_1 = require("./dto/update-user-password.dto");
+const role_enum_1 = require("../enums/role.enum");
 let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
@@ -33,7 +45,7 @@ let UserController = class UserController {
         return this.userService.search(searchUserDto);
     }
     async findOne(id) {
-        const find = await this.userService.findById(+id);
+        const _a = await this.userService.findById(+id), { hash, role, updatedAt, email } = _a, find = __rest(_a, ["hash", "role", "updatedAt", "email"]);
         if (!find) {
             throw new common_1.NotFoundException('User not found.');
         }

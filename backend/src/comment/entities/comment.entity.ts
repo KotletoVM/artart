@@ -13,10 +13,10 @@ export class Comment {
     createdAt: Date;
     @UpdateDateColumn({type: 'timestamp'})
     updatedAt: Date;
-    @ManyToOne(() => User, {nullable: false})
+    @ManyToOne(type => User , user => user.id, { eager: true, cascade: true, nullable: false})
     @JoinColumn({name: 'userid'})
     user: User;
-    @ManyToOne(() => Person, {nullable: false})
+    @ManyToOne(type => Person, {nullable: false})
     @JoinColumn({name: 'personid'})
     person: Person;
 

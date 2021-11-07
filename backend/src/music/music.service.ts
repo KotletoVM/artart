@@ -23,7 +23,7 @@ export class MusicService {
   }
 
   findOne(id: number) {
-    return this.musicRepository.findOne(id, {relations: ["person"]});
+    return this.musicRepository.findOne(id, {relations: ["personid"]});
   }
 
   async update(id: number, updateMusicDto: UpdateMusicDto) {

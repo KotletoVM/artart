@@ -28,7 +28,7 @@ let MusicService = class MusicService {
         return this.musicRepository.find({ where: { personid: personid } });
     }
     findOne(id) {
-        return this.musicRepository.findOne(id, { relations: ["person"] });
+        return this.musicRepository.findOne(id, { relations: ["personid"] });
     }
     async update(id, updateMusicDto) {
         return this.musicRepository.update(id, updateMusicDto);

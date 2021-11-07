@@ -1,12 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { MusicService } from './music.service';
 import { CreateMusicDto } from './dto/create-music.dto';
 import { UpdateMusicDto } from './dto/update-music.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('music')
 export class MusicController {
   constructor(private readonly musicService: MusicService) {}
 
+  //ограничение на админа
+  //возможность сделать/изменить/удалить музыку со странички персоны
+  @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() createMusicDto: CreateMusicDto) {
     return this.musicService.create(createMusicDto);
@@ -22,11 +26,15 @@ export class MusicController {
     return this.musicService.findOne(+id);
   }
 
+  //ограничение на админа
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateMusicDto: UpdateMusicDto) {
     return this.musicService.update(+id, updateMusicDto);
   }
 
+  //ограничение на админа
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.musicService.remove(+id);

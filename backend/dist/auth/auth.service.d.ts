@@ -24,6 +24,7 @@ export declare class AuthService {
             id: number;
             createdAt: Date;
             updatedAt: Date;
+            role: import("../enums/role.enum").UserRole[];
         };
         token: string;
     }>;

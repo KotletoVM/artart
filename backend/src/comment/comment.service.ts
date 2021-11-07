@@ -17,7 +17,7 @@ export class CommentService {
     return this.commentRepository.save({
       text: createCommentDto.text,
       person: {id: createCommentDto.personid},
-      user: {id: 1}
+      user: {id: 2}
     });
   }
 
@@ -27,6 +27,11 @@ export class CommentService {
 
   findOne(id: number) {
     return this.commentRepository.findOne(id);
+  }
+
+  //доделать вывод юзера без лишних параметров (использовать QueryBuilder)
+  findAllforPerson(personid: number){
+    return this.commentRepository.find({where: {person: {id: personid}}});
   }
 
   update(id: number, updateCommentDto: UpdateCommentDto) {

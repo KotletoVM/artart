@@ -9,12 +9,14 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 export class PersonController {
   constructor(private readonly personService: PersonService) {}
 
+  //ограничение на админа
   @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() createPersonDto: CreatePersonDto) {
     return this.personService.create(createPersonDto);
   }
-  @UseGuards(JwtAuthGuard)
+
+
   @Get()
   findAll() {
     return this.personService.findAll();
@@ -47,6 +49,7 @@ export class PersonController {
     return find;
   }
 
+  //ограничение на админа
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updatePersonDto: UpdatePersonDto) {
@@ -55,6 +58,7 @@ export class PersonController {
     return this.personService.update(+id, updatePersonDto);
   }
 
+  //ограничение на админа
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: string) {
