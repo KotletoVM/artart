@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, UseGuards, Query, Request } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
@@ -11,11 +11,11 @@ export class CommentController {
   //создание и просмотр комментов только на странице конкретной персоны
   //инструмент для админа - все комменты одного пользователя
 
-  //доделать отправку комментария от лица только текущего юзера
+  //✔ - доделать отправку комментария от лица только текущего юзера
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createCommentDto: CreateCommentDto) {
-    return this.commentService.create(createCommentDto);
+  create(@Request() req, @Body() createCommentDto: CreateCommentDto) {
+    return this.commentService.create(createCommentDto, req.user.id);
   }
 
   //ограничение на админа (интерфейс для подчистки гадких комментов,

@@ -22,8 +22,8 @@ let CommentController = class CommentController {
     constructor(commentService) {
         this.commentService = commentService;
     }
-    create(createCommentDto) {
-        return this.commentService.create(createCommentDto);
+    create(req, createCommentDto) {
+        return this.commentService.create(createCommentDto, req.user.id);
     }
     findAll() {
         return this.commentService.findAll();
@@ -56,9 +56,10 @@ let CommentController = class CommentController {
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_comment_dto_1.CreateCommentDto]),
+    __metadata("design:paramtypes", [Object, create_comment_dto_1.CreateCommentDto]),
     __metadata("design:returntype", void 0)
 ], CommentController.prototype, "create", null);
 __decorate([

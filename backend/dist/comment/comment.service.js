@@ -21,18 +21,20 @@ let CommentService = class CommentService {
     constructor(commentRepository) {
         this.commentRepository = commentRepository;
     }
-    create(createCommentDto) {
+    create(createCommentDto, userid) {
         return this.commentRepository.save({
             text: createCommentDto.text,
             person: { id: createCommentDto.personid },
-            user: { id: 2 }
+            user: { id: userid }
         });
     }
     findAll() {
         return this.commentRepository.find();
     }
     findOne(id) {
-        return this.commentRepository.findOne(id);
+        const qb = this.commentRepository.createQueryBuilder('comment');
+        const comment = qb.innerJoinAndSelect('comment.user', 'user').select('comment').addSelect('user.id').addSelect('user.name').where('comment.id = :id', { id: id }).getOne();
+        return comment;
     }
     findAllforPerson(personid) {
         return this.commentRepository.find({ where: { person: { id: personid } } });

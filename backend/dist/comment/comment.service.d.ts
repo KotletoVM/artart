@@ -5,7 +5,7 @@ import { Comment } from './entities/comment.entity';
 export declare class CommentService {
     private commentRepository;
     constructor(commentRepository: Repository<Comment>);
-    create(createCommentDto: CreateCommentDto): Promise<{
+    create(createCommentDto: CreateCommentDto, userid: number): Promise<{
         text: string;
         person: {
             id: number;

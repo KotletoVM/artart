@@ -4,7 +4,7 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 export declare class CommentController {
     private readonly commentService;
     constructor(commentService: CommentService);
-    create(createCommentDto: CreateCommentDto): Promise<{
+    create(req: any, createCommentDto: CreateCommentDto): Promise<{
         text: string;
         person: {
             id: number;

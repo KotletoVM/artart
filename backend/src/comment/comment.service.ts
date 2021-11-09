@@ -13,11 +13,11 @@ export class CommentService {
       private commentRepository: Repository<Comment>,
   ) {}
 
-  create(createCommentDto: CreateCommentDto) {
+  create(createCommentDto: CreateCommentDto, userid: number) {
     return this.commentRepository.save({
       text: createCommentDto.text,
       person: {id: createCommentDto.personid},
-      user: {id: 2}
+      user: {id: userid}
     });
   }
 
@@ -26,7 +26,10 @@ export class CommentService {
   }
 
   findOne(id: number) {
-    return this.commentRepository.findOne(id);
+    //return this.commentRepository.findOne(id);
+    const qb = this.commentRepository.createQueryBuilder('comment');
+    const comment = qb.innerJoinAndSelect('comment.user', 'user').select('comment').addSelect('user.id').addSelect('user.name').where('comment.id = :id', {id: id}).getOne();
+    return comment;
   }
 
   //доделать вывод юзера без лишних параметров (использовать QueryBuilder)
