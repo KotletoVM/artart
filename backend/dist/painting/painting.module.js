@@ -10,13 +10,11 @@ exports.PaintingModule = void 0;
 const common_1 = require("@nestjs/common");
 const painting_service_1 = require("./painting.service");
 const painting_controller_1 = require("./painting.controller");
-const typeorm_1 = require("@nestjs/typeorm");
-const painting_entity_1 = require("./entities/painting.entity");
 let PaintingModule = class PaintingModule {
 };
 PaintingModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([painting_entity_1.Painting])],
+        imports: [],
         controllers: [painting_controller_1.PaintingController],
         providers: [painting_service_1.PaintingService],
         exports: [painting_service_1.PaintingService]

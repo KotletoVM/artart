@@ -18,10 +18,10 @@ const person_entity_1 = require("./person/entities/person.entity");
 const comment_module_1 = require("./comment/comment.module");
 const comment_entity_1 = require("./comment/entities/comment.entity");
 const auth_module_1 = require("./auth/auth.module");
-const painting_module_1 = require("./painting/painting.module");
-const painting_entity_1 = require("./painting/entities/painting.entity");
 const music_module_1 = require("./music/music.module");
 const music_entity_1 = require("./music/entities/music.entity");
+const art_module_1 = require("./art/art.module");
+const art_entity_1 = require("./art/entities/art.entity");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -33,15 +33,15 @@ AppModule = __decorate([
                 username: 'artart',
                 password: 'misteries',
                 database: 'ArtArt',
-                entities: [user_entity_1.User, person_entity_1.Person, comment_entity_1.Comment, painting_entity_1.Painting, music_entity_1.Music],
+                entities: [user_entity_1.User, person_entity_1.Person, comment_entity_1.Comment, art_entity_1.Art, music_entity_1.Music],
                 synchronize: true
             }),
             user_module_1.UserModule,
             person_module_1.PersonModule,
             comment_module_1.CommentModule,
             auth_module_1.AuthModule,
-            painting_module_1.PaintingModule,
-            music_module_1.MusicModule],
+            music_module_1.MusicModule,
+            art_module_1.ArtModule],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })

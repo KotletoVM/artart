@@ -15,7 +15,7 @@ export declare class PersonController {
         persons: import("./entities/person.entity").Person[];
         number: number;
     }>;
-    findPainters(): Promise<import("./entities/person.entity").Person[]>;
+    findArtists(): Promise<import("./entities/person.entity").Person[]>;
     findMusicians(): Promise<import("./entities/person.entity").Person[]>;
     findOne(id: string): Promise<import("./entities/person.entity").Person>;
     update(id: string, updatePersonDto: UpdatePersonDto): Promise<import("typeorm").UpdateResult>;

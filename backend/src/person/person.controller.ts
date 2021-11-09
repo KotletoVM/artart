@@ -32,9 +32,9 @@ export class PersonController {
     return this.personService.search(searchPersonDto);
   }
 
-  @Get('painters')
-  findPainters(){
-    return this.personService.findPainters();
+  @Get('artists')
+  findArtists(){
+    return this.personService.findArtists();
   }
 
   @Get('musicians')

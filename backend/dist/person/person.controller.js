@@ -35,8 +35,8 @@ let PersonController = class PersonController {
     search(searchPersonDto) {
         return this.personService.search(searchPersonDto);
     }
-    findPainters() {
-        return this.personService.findPainters();
+    findArtists() {
+        return this.personService.findArtists();
     }
     findMusicians() {
         return this.personService.findMusicians();
@@ -91,11 +91,11 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], PersonController.prototype, "search", null);
 __decorate([
-    (0, common_1.Get)('painters'),
+    (0, common_1.Get)('artists'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
-], PersonController.prototype, "findPainters", null);
+], PersonController.prototype, "findArtists", null);
 __decorate([
     (0, common_1.Get)('musicians'),
     __metadata("design:type", Function),

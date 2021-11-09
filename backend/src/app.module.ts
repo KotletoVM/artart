@@ -9,10 +9,10 @@ import { Person } from './person/entities/person.entity';
 import { CommentModule } from './comment/comment.module';
 import { Comment } from './comment/entities/comment.entity';
 import { AuthModule } from './auth/auth.module';
-import { PaintingModule } from './painting/painting.module';
-import { Painting } from './painting/entities/painting.entity';
 import { MusicModule } from './music/music.module';
 import { Music } from './music/entities/music.entity';
+import { ArtModule } from './art/art.module';
+import { Art } from './art/entities/art.entity';
 @Module({
   imports: [ TypeOrmModule.forRoot({
       type: 'postgres',
@@ -22,15 +22,15 @@ import { Music } from './music/entities/music.entity';
       password: 'misteries',
       //extra: { trustServerCertificate: true },
       database: 'ArtArt',
-      entities: [User, Person, Comment, Painting,Music],
+      entities: [User, Person, Comment, Art,Music],
       synchronize: true
   }),
   UserModule,
   PersonModule,
   CommentModule,
   AuthModule,
-  PaintingModule,
-  MusicModule],
+  MusicModule,
+  ArtModule],
   controllers: [AppController],
   providers: [AppService],
 })

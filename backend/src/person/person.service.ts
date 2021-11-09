@@ -6,7 +6,7 @@ import { Person } from './entities/person.entity';
 import { Repository, Not  } from 'typeorm';
 import { SearchPersonDto } from './dto/search-person.dto';
 import { Music } from 'src/music/entities/music.entity';
-import { Painting } from 'src/painting/entities/painting.entity';
+import { Art } from 'src/art/entities/art.entity';
 
 @Injectable()
 export class PersonService {
@@ -14,8 +14,8 @@ export class PersonService {
   constructor(
       @InjectRepository(Person)
       private personRepository: Repository<Person>,
-      @InjectRepository(Painting)
-      private paintingRepository: Repository<Painting>,
+      @InjectRepository(Art)
+      private artRepository: Repository<Art>,
       @InjectRepository(Music)
       private musicRepository: Repository<Music>
 
@@ -34,9 +34,9 @@ export class PersonService {
     });
   }
 
-  async findPainters() {
+  async findArtists() {
     const qb = this.personRepository.createQueryBuilder('person');
-    return qb.innerJoinAndSelect("person.personPaintings", "painting").getMany()
+    return qb.innerJoinAndSelect("person.personArt", "art").getMany()
   }
 
   async findMusicians() {
@@ -48,7 +48,7 @@ export class PersonService {
     //const qb = this.personRepository.createQueryBuilder('person');
     //qb.innerJoinAndSelect("person.personPaintings", "painting").innerJoinAndSelect("person.personMusic", "music").where("person.id = :id", { id: id });
     //let onePerson = await qb.getOne();
-    let onePerson = await this.personRepository.findOne(id, {relations: ["personPaintings", "personMusic"]});
+    let onePerson = await this.personRepository.findOne(id, {relations: ["personArt", "personMusic"]});
     if(onePerson)this.personRepository.update(id, {views: onePerson.views + 1});
     return onePerson;
   }
@@ -89,7 +89,7 @@ export class PersonService {
   }
 
   remove(id: number) {
-    this.paintingRepository.delete({personid: id});
+    this.artRepository.delete({personid: id});
     this.musicRepository.delete({personid: id});
     return this.personRepository.delete(id);
   }

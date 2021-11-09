@@ -1,5 +1,5 @@
-import { Painting } from 'src/painting/entities/painting.entity';
 import { Music } from 'src/music/entities/music.entity';
+import { Art } from 'src/art/entities/art.entity';
 export declare class Person {
     id: number;
     fullname?: string;
@@ -14,6 +14,6 @@ export declare class Person {
         vk: string;
         site: string;
     };
-    personPaintings?: Painting[];
+    personArt?: Art[];
     personMusic?: Music[];
 }

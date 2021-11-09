@@ -3,7 +3,7 @@ import {Contains, IsInt, Length, IsEmail, IsFQDN, IsDate, Min, Max} from "class-
 import { Person } from 'src/person/entities/person.entity';
 
 @Entity()
-export class Painting {
+export class Art {
     @PrimaryGeneratedColumn()
     id: number;
     @Column()

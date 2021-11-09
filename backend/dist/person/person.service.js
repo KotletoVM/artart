@@ -18,11 +18,11 @@ const typeorm_1 = require("@nestjs/typeorm");
 const person_entity_1 = require("./entities/person.entity");
 const typeorm_2 = require("typeorm");
 const music_entity_1 = require("../music/entities/music.entity");
-const painting_entity_1 = require("../painting/entities/painting.entity");
+const art_entity_1 = require("../art/entities/art.entity");
 let PersonService = class PersonService {
-    constructor(personRepository, paintingRepository, musicRepository) {
+    constructor(personRepository, artRepository, musicRepository) {
         this.personRepository = personRepository;
-        this.paintingRepository = paintingRepository;
+        this.artRepository = artRepository;
         this.musicRepository = musicRepository;
     }
     create(createPersonDto) {
@@ -35,16 +35,16 @@ let PersonService = class PersonService {
             },
         });
     }
-    async findPainters() {
+    async findArtists() {
         const qb = this.personRepository.createQueryBuilder('person');
-        return qb.innerJoinAndSelect("person.personPaintings", "painting").getMany();
+        return qb.innerJoinAndSelect("person.personArt", "art").getMany();
     }
     async findMusicians() {
         const qb = this.personRepository.createQueryBuilder('person');
         return qb.innerJoinAndSelect("person.personMusic", "music").getMany();
     }
     async findOne(id) {
-        let onePerson = await this.personRepository.findOne(id, { relations: ["personPaintings", "personMusic"] });
+        let onePerson = await this.personRepository.findOne(id, { relations: ["personArt", "personMusic"] });
         if (onePerson)
             this.personRepository.update(id, { views: onePerson.views + 1 });
         return onePerson;
@@ -82,7 +82,7 @@ let PersonService = class PersonService {
         return this.personRepository.update(id, updatePersonDto);
     }
     remove(id) {
-        this.paintingRepository.delete({ personid: id });
+        this.artRepository.delete({ personid: id });
         this.musicRepository.delete({ personid: id });
         return this.personRepository.delete(id);
     }
@@ -94,7 +94,7 @@ let PersonService = class PersonService {
 PersonService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(person_entity_1.Person)),
-    __param(1, (0, typeorm_1.InjectRepository)(painting_entity_1.Painting)),
+    __param(1, (0, typeorm_1.InjectRepository)(art_entity_1.Art)),
     __param(2, (0, typeorm_1.InjectRepository)(music_entity_1.Music)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         typeorm_2.Repository,

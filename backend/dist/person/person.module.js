@@ -13,14 +13,13 @@ const person_controller_1 = require("./person.controller");
 const typeorm_1 = require("@nestjs/typeorm");
 const person_entity_1 = require("./entities/person.entity");
 const music_entity_1 = require("../music/entities/music.entity");
-const painting_entity_1 = require("../painting/entities/painting.entity");
-const painting_service_1 = require("../painting/painting.service");
+const art_entity_1 = require("../art/entities/art.entity");
 const music_service_1 = require("../music/music.service");
 let PersonModule = class PersonModule {
 };
 PersonModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([painting_entity_1.Painting]), typeorm_1.TypeOrmModule.forFeature([music_entity_1.Music]), typeorm_1.TypeOrmModule.forFeature([person_entity_1.Person])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([art_entity_1.Art]), typeorm_1.TypeOrmModule.forFeature([music_entity_1.Music]), typeorm_1.TypeOrmModule.forFeature([person_entity_1.Person])],
         controllers: [person_controller_1.PersonController],
         providers: [person_service_1.PersonService]
     })

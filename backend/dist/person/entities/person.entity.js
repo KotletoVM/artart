@@ -11,8 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Person = void 0;
 const typeorm_1 = require("typeorm");
-const painting_entity_1 = require("../../painting/entities/painting.entity");
 const music_entity_1 = require("../../music/entities/music.entity");
+const art_entity_1 = require("../../art/entities/art.entity");
 let Person = class Person {
 };
 __decorate([
@@ -52,9 +52,9 @@ __decorate([
     __metadata("design:type", Object)
 ], Person.prototype, "socNetworks", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(type => painting_entity_1.Painting, painting => painting.personid),
+    (0, typeorm_1.OneToMany)(type => art_entity_1.Art, art => art.personid),
     __metadata("design:type", Array)
-], Person.prototype, "personPaintings", void 0);
+], Person.prototype, "personArt", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(type => music_entity_1.Music, music => music.personid),
     __metadata("design:type", Array)

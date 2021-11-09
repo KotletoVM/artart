@@ -1,8 +1,7 @@
 import {Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne} from 'typeorm'
 import {Contains, IsInt, Length, IsEmail, IsFQDN, IsDate, Min, Max} from "class-validator";
-import { Painting } from 'src/painting/entities/painting.entity';
 import { Music } from 'src/music/entities/music.entity';
-
+import { Art } from 'src/art/entities/art.entity';
 
 
 @Entity()
@@ -25,9 +24,9 @@ export class Person {
     likes: number;
     @Column("simple-json", {nullable: true})
     socNetworks: {instagram: string, vk: string, site: string};
-    @OneToMany(type => Painting, painting => painting.personid,
+    @OneToMany(type => Art, art => art.personid,
         /*{ eager: true, cascade: true}*/)
-    personPaintings?: Painting[]
+    personArt?: Art[]
     @OneToMany(type => Music, music => music.personid,
         /*{ eager: true, cascade: true}*/)
     personMusic?: Music[]
