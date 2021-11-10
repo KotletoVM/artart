@@ -33,5 +33,10 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Array)
 ], UpdateUserDto.prototype, "role", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsUrl)(),
+    __metadata("design:type", String)
+], UpdateUserDto.prototype, "userpic", void 0);
 exports.UpdateUserDto = UpdateUserDto;
 //# sourceMappingURL=update-user.dto.js.map

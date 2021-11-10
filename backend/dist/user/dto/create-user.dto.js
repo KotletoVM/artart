@@ -26,6 +26,10 @@ __decorate([
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "email", void 0);
 __decorate([
+    (0, class_validator_1.IsUrl)(),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "userpic", void 0);
+__decorate([
     (0, class_validator_1.Length)(6),
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.Matches)(/^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})/, { message: 'Weak password' }),

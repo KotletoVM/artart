@@ -25,11 +25,11 @@ let CommentController = class CommentController {
     create(req, createCommentDto) {
         return this.commentService.create(createCommentDto, req.user.id);
     }
-    findAll() {
-        return this.commentService.findAll();
-    }
     findAllforPerson(personid) {
         return this.commentService.findAllforPerson(personid);
+    }
+    findAll() {
+        return this.commentService.findAll();
     }
     async findOne(id) {
         const find = await this.commentService.findOne(+id);
@@ -63,19 +63,19 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], CommentController.prototype, "create", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.Get)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], CommentController.prototype, "findAll", null);
-__decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)('personid')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], CommentController.prototype, "findAllforPerson", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], CommentController.prototype, "findAll", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Get)(':id'),

@@ -20,15 +20,17 @@ export class CommentController {
 
   //ограничение на админа (интерфейс для подчистки гадких комментов,
   // поэтому выводятся сразу все из всех персон)
-  @UseGuards(JwtAuthGuard)
-  @Get()
-  findAll() {
-    return this.commentService.findAll();
-  }
+
 
   @Get()
   findAllforPerson(@Query('personid') personid: number) {
     return this.commentService.findAllforPerson(personid);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  findAll() {
+    return this.commentService.findAll();
   }
 
   //ограничение на админа

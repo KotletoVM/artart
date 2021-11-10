@@ -7,4 +7,5 @@ export declare class User {
     createdAt: Date;
     updatedAt: Date;
     role: UserRole[];
+    userpic: string;
 }

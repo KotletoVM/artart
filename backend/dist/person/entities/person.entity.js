@@ -32,6 +32,10 @@ __decorate([
     __metadata("design:type", String)
 ], Person.prototype, "description", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ default: 'https://cdn4.vectorstock.com/i/1000x1000/84/68/hipster-man-in-glasses-avatar-profile-userpic-vector-8988468.jpg' }),
+    __metadata("design:type", String)
+], Person.prototype, "personpic", void 0);
+__decorate([
     (0, typeorm_1.CreateDateColumn)({ type: 'timestamp' }),
     __metadata("design:type", Date)
 ], Person.prototype, "createdAt", void 0);

@@ -28,13 +28,16 @@ export class CommentService {
   findOne(id: number) {
     //return this.commentRepository.findOne(id);
     const qb = this.commentRepository.createQueryBuilder('comment');
-    const comment = qb.innerJoinAndSelect('comment.user', 'user').select('comment').addSelect('user.id').addSelect('user.name').where('comment.id = :id', {id: id}).getOne();
+    const comment = qb.innerJoinAndSelect('comment.user', 'user').select('comment').addSelect('user.id').addSelect('user.name').addSelect('user.userpic').where('comment.id = :id', {id: id}).getOne();
     return comment;
   }
 
-  //доделать вывод юзера без лишних параметров (использовать QueryBuilder)
+  //✔ - доделать вывод юзера без лишних параметров (использовать QueryBuilder)
   findAllforPerson(personid: number){
-    return this.commentRepository.find({where: {person: {id: personid}}});
+    //return this.commentRepository.find({where: {person: {id: personid}}});
+    const qb = this.commentRepository.createQueryBuilder('comment');
+    const comments = qb.innerJoinAndSelect('comment.user', 'user').select('comment').addSelect('user.id').addSelect('user.name').addSelect('user.userpic').where('comment.person.id = :personid', {personid: personid}).getMany();
+    return comments;
   }
 
   update(id: number, updateCommentDto: UpdateCommentDto) {

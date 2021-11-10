@@ -5,6 +5,7 @@ export declare class Person {
     fullname?: string;
     pseudonym?: string;
     description?: string;
+    personpic: string;
     createdAt: Date;
     updatedAt: Date;
     views: number;

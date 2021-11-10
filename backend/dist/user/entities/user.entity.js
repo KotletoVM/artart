@@ -46,6 +46,10 @@ __decorate([
     }),
     __metadata("design:type", Array)
 ], User.prototype, "role", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 'https://lowcars.net/wp-content/uploads/2017/02/userpic.png' }),
+    __metadata("design:type", String)
+], User.prototype, "userpic", void 0);
 User = __decorate([
     (0, typeorm_1.Entity)()
 ], User);

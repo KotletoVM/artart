@@ -3,4 +3,5 @@ export declare class CreatePersonDto {
     fullname: string;
     pseudonym: string;
     description: string;
+    personpic: string;
 }

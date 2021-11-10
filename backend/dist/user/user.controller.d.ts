@@ -15,6 +15,7 @@ export declare class UserController {
         id: number;
         name: string;
         createdAt: Date;
+        userpic: string;
     }>;
     update(req: any, updateUserDto: UpdateUserDto): Promise<import("typeorm").UpdateResult>;
     updatePassword(req: any, updateUserPasswordDto: UpdateUserPasswordDto): Promise<import("typeorm").UpdateResult>;

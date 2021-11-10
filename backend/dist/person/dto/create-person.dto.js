@@ -28,5 +28,10 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreatePersonDto.prototype, "description", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsUrl)(),
+    __metadata("design:type", String)
+], CreatePersonDto.prototype, "personpic", void 0);
 exports.CreatePersonDto = CreatePersonDto;
 //# sourceMappingURL=create-person.dto.js.map

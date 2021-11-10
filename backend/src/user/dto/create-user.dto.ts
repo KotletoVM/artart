@@ -1,4 +1,4 @@
-import { IsEmail, Length, IsString, IsNotEmpty, Matches, IsOptional } from "class-validator";
+import { IsEmail, Length, IsString, IsNotEmpty, Matches, IsOptional, IsUrl } from "class-validator";
 import { UserRole } from "src/enums/role.enum";
 
 
@@ -11,6 +11,8 @@ export class CreateUserDto {
     @IsEmail()
     @IsNotEmpty()
     email: string;
+    @IsUrl()
+    userpic: string;
     @Length(6)
     @IsNotEmpty()
     @Matches(/^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})/,

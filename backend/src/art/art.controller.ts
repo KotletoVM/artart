@@ -16,6 +16,8 @@ export class ArtController {
     return this.artService.create(createArtDto);
   }
 
+  //добавить @Get() с выводом запрета при попытке получить все арты
+
   @Get()
   findAllforPerson(@Query('personid') personid: number) {
     return this.artService.findAllforPerson(+personid);

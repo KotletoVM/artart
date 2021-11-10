@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from "class-validator";
+import { IsOptional, IsString, IsUrl } from "class-validator";
 
 export class CreatePersonDto {
      id: number;
@@ -11,4 +11,7 @@ export class CreatePersonDto {
      @IsOptional()
      @IsString()
      description: string;
+     @IsOptional()
+     @IsUrl()
+     personpic: string;
 }

@@ -26,4 +26,6 @@ export class User {
         default: UserRole.USER
     })
     role: UserRole[]
+    @Column({default: 'https://lowcars.net/wp-content/uploads/2017/02/userpic.png'})
+    userpic: string;
 }
