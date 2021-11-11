@@ -22,6 +22,10 @@ const music_module_1 = require("./music/music.module");
 const music_entity_1 = require("./music/entities/music.entity");
 const art_module_1 = require("./art/art.module");
 const art_entity_1 = require("./art/entities/art.entity");
+const event_entity_1 = require("./event/entities/event.entity");
+const event_module_1 = require("./event/event.module");
+const tag_module_1 = require("./tag/tag.module");
+const tag_entity_1 = require("./tag/entities/tag.entity");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -33,7 +37,7 @@ AppModule = __decorate([
                 username: 'artart',
                 password: 'misteries',
                 database: 'ArtArt',
-                entities: [user_entity_1.User, person_entity_1.Person, comment_entity_1.Comment, art_entity_1.Art, music_entity_1.Music],
+                entities: [user_entity_1.User, person_entity_1.Person, comment_entity_1.Comment, art_entity_1.Art, music_entity_1.Music, event_entity_1.Event, tag_entity_1.Tag],
                 synchronize: true
             }),
             user_module_1.UserModule,
@@ -41,7 +45,9 @@ AppModule = __decorate([
             comment_module_1.CommentModule,
             auth_module_1.AuthModule,
             music_module_1.MusicModule,
-            art_module_1.ArtModule],
+            art_module_1.ArtModule,
+            event_module_1.EventModule,
+            tag_module_1.TagModule],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })

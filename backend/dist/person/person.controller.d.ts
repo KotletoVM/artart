@@ -5,8 +5,10 @@ import { SearchPersonDto } from './dto/search-person.dto';
 export declare class PersonController {
     private readonly personService;
     constructor(personService: PersonService);
-    create(createPersonDto: CreatePersonDto): Promise<CreatePersonDto & import("./entities/person.entity").Person>;
-    findAll(): Promise<import("./entities/person.entity").Person[]>;
+    create(createPersonDto: CreatePersonDto): Promise<{
+        generatedMaps: import("typeorm").ObjectLiteral[];
+    }>;
+    findAll(): Promise<(number | import("./entities/person.entity").Person[])[]>;
     getPopular(): Promise<{
         persons: import("./entities/person.entity").Person[];
         number: number;

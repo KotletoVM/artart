@@ -7,6 +7,7 @@ import { Repository, Not  } from 'typeorm';
 import { SearchPersonDto } from './dto/search-person.dto';
 import { Music } from 'src/music/entities/music.entity';
 import { Art } from 'src/art/entities/art.entity';
+import { Tag } from 'src/tag/entities/tag.entity';
 
 @Injectable()
 export class PersonService {
@@ -21,17 +22,24 @@ export class PersonService {
 
   ) {}
 
-  create(createPersonDto: CreatePersonDto) {
-    return this.personRepository.save(createPersonDto);
+  async create(createPersonDto: CreatePersonDto) {
+    /*return this.personRepository.save(createPersonDto);*/
+    const qb = this.personRepository.createQueryBuilder('person');
+    const {identifiers, raw, ...person} = await qb.insert().values(createPersonDto).execute();
+    const tags = await qb.relation(Person, "tags").of(identifiers).add(createPersonDto.tags);
+    return person;
   }
 
-  findAll() {
-    return this.personRepository.find({
+  async findAll() {
+    /*return this.personRepository.find({
       order: {
         createdAt: 'DESC'
       },
 
-    });
+    });*/
+    const qb = this.personRepository.createQueryBuilder('person');
+    const [persons, count] =await qb.take(3).orderBy("person.createdAt", "DESC").getManyAndCount();
+    return [persons, count];
   }
 
   async findArtists() {
@@ -48,7 +56,7 @@ export class PersonService {
     //const qb = this.personRepository.createQueryBuilder('person');
     //qb.innerJoinAndSelect("person.personPaintings", "painting").innerJoinAndSelect("person.personMusic", "music").where("person.id = :id", { id: id });
     //let onePerson = await qb.getOne();
-    let onePerson = await this.personRepository.findOne(id, {relations: ["personArt", "personMusic"]});
+    let onePerson = await this.personRepository.findOne(id, {relations: ["personArt", "personMusic", "tags"]});
     if(onePerson)this.personRepository.update(id, {views: onePerson.views + 1});
     return onePerson;
   }

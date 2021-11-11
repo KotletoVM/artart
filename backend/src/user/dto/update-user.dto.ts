@@ -12,9 +12,6 @@ export class UpdateUserDto /*extends PartialType(CreateUserDto)*/ {
     @IsString()
     name?: string;
     @IsOptional()
-    @IsEmail()
-    email?: string;
-    @IsOptional()
     role: UserRole[];
     @IsOptional()
     @IsUrl()

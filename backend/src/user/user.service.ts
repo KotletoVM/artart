@@ -8,6 +8,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { SearchUserDto } from './dto/search-user.dto';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
+import { UpdateUserEmailDto } from './dto/update-user-email.dto';
 
 @Injectable()
 export class UserService {
@@ -60,6 +61,10 @@ export class UserService {
   async updatePassword(id: number, updateUserPasswordDto: UpdateUserPasswordDto){
     const hash = await bcrypt.hash(updateUserPasswordDto.password, 10);
     return this.usersRepository.update(id, {hash: hash});
+  }
+
+  async updateEmail(id: number, updateUserEmailDto: UpdateUserEmailDto){
+    return this.usersRepository.update(id, {email: updateUserEmailDto.email});
   }
   /*remove(id: number) {
     return this.usersRepository.delete(id);

@@ -13,6 +13,10 @@ import { MusicModule } from './music/music.module';
 import { Music } from './music/entities/music.entity';
 import { ArtModule } from './art/art.module';
 import { Art } from './art/entities/art.entity';
+import { Event } from './event/entities/event.entity';
+import { EventModule } from './event/event.module';
+import { TagModule } from './tag/tag.module';
+import { Tag } from './tag/entities/tag.entity';
 @Module({
   imports: [ TypeOrmModule.forRoot({
       type: 'postgres',
@@ -22,7 +26,7 @@ import { Art } from './art/entities/art.entity';
       password: 'misteries',
       //extra: { trustServerCertificate: true },
       database: 'ArtArt',
-      entities: [User, Person, Comment, Art,Music],
+      entities: [User, Person, Comment, Art,Music, Event, Tag],
       synchronize: true
   }),
   UserModule,
@@ -30,7 +34,9 @@ import { Art } from './art/entities/art.entity';
   CommentModule,
   AuthModule,
   MusicModule,
-  ArtModule],
+  ArtModule,
+  EventModule,
+  TagModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsUrl, IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsUrl, IsOptional, IsString, IsNumber } from "class-validator";
 
 export class CreateMusicDto {
     id: number;
@@ -12,5 +12,6 @@ export class CreateMusicDto {
     @IsString()
     title?: string;
     @IsNotEmpty()
+    @IsNumber()
     personid: number;
 }

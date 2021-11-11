@@ -1,4 +1,5 @@
-import { IsOptional, IsString, IsUrl } from "class-validator";
+import { IsOptional, IsString, IsUrl, IsNotEmpty, IsArray } from "class-validator";
+import { Tag } from "src/tag/entities/tag.entity";
 
 export class CreatePersonDto {
      id: number;
@@ -14,4 +15,7 @@ export class CreatePersonDto {
      @IsOptional()
      @IsUrl()
      personpic: string;
+     @IsNotEmpty()
+     @IsArray()
+     tags: Tag[]
 }

@@ -1,8 +1,8 @@
-import {Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne, ManyToMany, JoinColumn, JoinTable} from 'typeorm'
 import {Contains, IsInt, Length, IsEmail, IsFQDN, IsDate, Min, Max} from "class-validator";
 import { Music } from 'src/music/entities/music.entity';
 import { Art } from 'src/art/entities/art.entity';
-
+import { Tag } from 'src/tag/entities/tag.entity';
 
 @Entity()
 export class Person {
@@ -28,8 +28,13 @@ export class Person {
     socNetworks: {instagram: string, vk: string, site: string};
     @OneToMany(type => Art, art => art.personid,
         /*{ eager: true, cascade: true}*/)
-    personArt?: Art[]
+    personArt?: Art[];
     @OneToMany(type => Music, music => music.personid,
         /*{ eager: true, cascade: true}*/)
-    personMusic?: Music[]
+    personMusic?: Music[];
+    @ManyToMany(() => Tag, {nullable: true, eager: true, cascade: true})
+    @JoinTable({
+        name: "person_tags"
+    })
+    tags: Tag[];
 }

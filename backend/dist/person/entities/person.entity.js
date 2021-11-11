@@ -13,6 +13,7 @@ exports.Person = void 0;
 const typeorm_1 = require("typeorm");
 const music_entity_1 = require("../../music/entities/music.entity");
 const art_entity_1 = require("../../art/entities/art.entity");
+const tag_entity_1 = require("../../tag/entities/tag.entity");
 let Person = class Person {
 };
 __decorate([
@@ -63,6 +64,13 @@ __decorate([
     (0, typeorm_1.OneToMany)(type => music_entity_1.Music, music => music.personid),
     __metadata("design:type", Array)
 ], Person.prototype, "personMusic", void 0);
+__decorate([
+    (0, typeorm_1.ManyToMany)(() => tag_entity_1.Tag, { nullable: true, eager: true, cascade: true }),
+    (0, typeorm_1.JoinTable)({
+        name: "person_tags"
+    }),
+    __metadata("design:type", Array)
+], Person.prototype, "tags", void 0);
 Person = __decorate([
     (0, typeorm_1.Entity)()
 ], Person);

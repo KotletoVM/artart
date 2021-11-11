@@ -33,11 +33,11 @@ export class CommentService {
   }
 
   //✔ - доделать вывод юзера без лишних параметров (использовать QueryBuilder)
-  findAllforPerson(personid: number){
+  async findAllforPerson(personid: number){
     //return this.commentRepository.find({where: {person: {id: personid}}});
     const qb = this.commentRepository.createQueryBuilder('comment');
-    const comments = qb.innerJoinAndSelect('comment.user', 'user').select('comment').addSelect('user.id').addSelect('user.name').addSelect('user.userpic').where('comment.person.id = :personid', {personid: personid}).getMany();
-    return comments;
+    const [comments, number] = await qb.innerJoinAndSelect('comment.user', 'user').select('comment').addSelect('user.id').addSelect('user.name').addSelect('user.userpic').where('comment.person.id = :personid', {personid: personid}).take(3).getManyAndCount();
+    return [comments, number];
   }
 
   update(id: number, updateCommentDto: UpdateCommentDto) {

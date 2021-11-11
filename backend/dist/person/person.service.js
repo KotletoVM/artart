@@ -11,6 +11,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PersonService = void 0;
 const common_1 = require("@nestjs/common");
@@ -19,21 +30,23 @@ const person_entity_1 = require("./entities/person.entity");
 const typeorm_2 = require("typeorm");
 const music_entity_1 = require("../music/entities/music.entity");
 const art_entity_1 = require("../art/entities/art.entity");
+const tag_entity_1 = require("../tag/entities/tag.entity");
 let PersonService = class PersonService {
     constructor(personRepository, artRepository, musicRepository) {
         this.personRepository = personRepository;
         this.artRepository = artRepository;
         this.musicRepository = musicRepository;
     }
-    create(createPersonDto) {
-        return this.personRepository.save(createPersonDto);
+    async create(createPersonDto) {
+        const qb = this.personRepository.createQueryBuilder('person');
+        const _a = await qb.insert().values(createPersonDto).execute(), { identifiers, raw } = _a, person = __rest(_a, ["identifiers", "raw"]);
+        const tags = await qb.relation(person_entity_1.Person, "tags").of(identifiers).add(createPersonDto.tags);
+        return person;
     }
-    findAll() {
-        return this.personRepository.find({
-            order: {
-                createdAt: 'DESC'
-            },
-        });
+    async findAll() {
+        const qb = this.personRepository.createQueryBuilder('person');
+        const [persons, count] = await qb.take(3).orderBy("person.createdAt", "DESC").getManyAndCount();
+        return [persons, count];
     }
     async findArtists() {
         const qb = this.personRepository.createQueryBuilder('person');
@@ -44,7 +57,7 @@ let PersonService = class PersonService {
         return qb.innerJoinAndSelect("person.personMusic", "music").getMany();
     }
     async findOne(id) {
-        let onePerson = await this.personRepository.findOne(id, { relations: ["personArt", "personMusic"] });
+        let onePerson = await this.personRepository.findOne(id, { relations: ["personArt", "personMusic", "tags"] });
         if (onePerson)
             this.personRepository.update(id, { views: onePerson.views + 1 });
         return onePerson;

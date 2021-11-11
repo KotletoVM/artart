@@ -36,10 +36,10 @@ let CommentService = class CommentService {
         const comment = qb.innerJoinAndSelect('comment.user', 'user').select('comment').addSelect('user.id').addSelect('user.name').addSelect('user.userpic').where('comment.id = :id', { id: id }).getOne();
         return comment;
     }
-    findAllforPerson(personid) {
+    async findAllforPerson(personid) {
         const qb = this.commentRepository.createQueryBuilder('comment');
-        const comments = qb.innerJoinAndSelect('comment.user', 'user').select('comment').addSelect('user.id').addSelect('user.name').addSelect('user.userpic').where('comment.person.id = :personid', { personid: personid }).getMany();
-        return comments;
+        const [comments, number] = await qb.innerJoinAndSelect('comment.user', 'user').select('comment').addSelect('user.id').addSelect('user.name').addSelect('user.userpic').where('comment.person.id = :personid', { personid: personid }).take(3).getManyAndCount();
+        return [comments, number];
     }
     update(id, updateCommentDto) {
         return this.commentRepository.update(id, updateCommentDto);

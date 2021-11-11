@@ -10,8 +10,10 @@ export declare class PersonService {
     private artRepository;
     private musicRepository;
     constructor(personRepository: Repository<Person>, artRepository: Repository<Art>, musicRepository: Repository<Music>);
-    create(createPersonDto: CreatePersonDto): Promise<CreatePersonDto & Person>;
-    findAll(): Promise<Person[]>;
+    create(createPersonDto: CreatePersonDto): Promise<{
+        generatedMaps: import("typeorm").ObjectLiteral[];
+    }>;
+    findAll(): Promise<(number | Person[])[]>;
     findArtists(): Promise<Person[]>;
     findMusicians(): Promise<Person[]>;
     findOne(id: number): Promise<Person>;

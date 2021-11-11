@@ -13,7 +13,7 @@ export declare class CommentController {
             id: number;
         };
     } & import("./entities/comment.entity").Comment>;
-    findAllforPerson(personid: number): Promise<import("./entities/comment.entity").Comment[]>;
+    findAllforPerson(personid: number): Promise<(number | import("./entities/comment.entity").Comment[])[]>;
     findAll(): Promise<import("./entities/comment.entity").Comment[]>;
     findOne(id: string): Promise<import("./entities/comment.entity").Comment>;
     update(id: string, updateCommentDto: UpdateCommentDto): Promise<import("typeorm").UpdateResult>;

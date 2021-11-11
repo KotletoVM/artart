@@ -1,5 +1,6 @@
 import { Music } from 'src/music/entities/music.entity';
 import { Art } from 'src/art/entities/art.entity';
+import { Tag } from 'src/tag/entities/tag.entity';
 export declare class Person {
     id: number;
     fullname?: string;
@@ -17,4 +18,5 @@ export declare class Person {
     };
     personArt?: Art[];
     personMusic?: Music[];
+    tags: Tag[];
 }
