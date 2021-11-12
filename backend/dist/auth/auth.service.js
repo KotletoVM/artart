@@ -56,18 +56,29 @@ let AuthService = class AuthService {
         const hash = await bcrypt.hash(password, 10);
         return hash;
     }
-    async login(user) {
+    async login(user, response) {
         const payload = { email: user.email, sub: user.id };
-        return Object.assign(Object.assign({}, payload), { token: this.generateJwtToken(user) });
+        const token = this.generateJwtToken(user);
+        response.cookie('access_token', token, {
+            httpOnly: true,
+            domain: 'localhost',
+            expires: new Date(Date.now() + 20000 * 60 * 60 * 24),
+        })
+            .send({ success: payload });
+        return payload;
+        ;
     }
-    async register(createUserDto) {
+    async register(createUserDto, response) {
         try {
             createUserDto.password = await this.generateHash(createUserDto.password);
             const _a = await this.userService.create(createUserDto), { hash } = _a, user = __rest(_a, ["hash"]);
-            return {
-                user,
-                token: this.generateJwtToken(user)
-            };
+            const token = this.generateJwtToken(user);
+            response.cookie('access_token', token, {
+                httpOnly: true,
+                domain: 'localhost',
+                expires: new Date(Date.now() + 20000 * 60 * 60 * 24),
+            })
+                .send({ success: user });
         }
         catch (e) {
             throw new common_1.ForbiddenException(e);

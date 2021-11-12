@@ -17,8 +17,14 @@ import { Event } from './event/entities/event.entity';
 import { EventModule } from './event/event.module';
 import { TagModule } from './tag/tag.module';
 import { Tag } from './tag/entities/tag.entity';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { config } from './config/configuration';
+import { DatabaseConfig } from './config/database.config';
+
+
 @Module({
-  imports: [ TypeOrmModule.forRoot({
+  imports: [ ConfigModule.forRoot({isGlobal: true, load: [config]}),
+      /*TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
       port: 8000,
@@ -28,7 +34,11 @@ import { Tag } from './tag/entities/tag.entity';
       database: 'ArtArt',
       entities: [User, Person, Comment, Art,Music, Event, Tag],
       synchronize: true
-  }),
+  }),*/
+      TypeOrmModule.forRootAsync({
+          imports: [ConfigModule],
+          useClass: DatabaseConfig,
+      }),
   UserModule,
   PersonModule,
   CommentModule,
@@ -40,4 +50,9 @@ import { Tag } from './tag/entities/tag.entity';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+    constructor(private configService: ConfigService) {
+    }
+
+
+}

@@ -15,14 +15,17 @@ const class_transformer_1 = require("class-transformer");
 class CreateEventDto {
 }
 __decorate([
+    (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateEventDto.prototype, "title", void 0);
 __decorate([
+    (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateEventDto.prototype, "description", void 0);
 __decorate([
+    (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsDate)(),
     (0, class_transformer_1.Type)(() => Date),
     __metadata("design:type", Date)
@@ -34,6 +37,7 @@ __decorate([
     __metadata("design:type", Date)
 ], CreateEventDto.prototype, "endDate", void 0);
 __decorate([
+    (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsArray)(),
     __metadata("design:type", Array)
 ], CreateEventDto.prototype, "pics", void 0);

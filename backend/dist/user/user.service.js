@@ -60,6 +60,9 @@ let UserService = class UserService {
         const hash = await bcrypt.hash(updateUserPasswordDto.password, 10);
         return this.usersRepository.update(id, { hash: hash });
     }
+    async updateEmail(id, updateUserEmailDto) {
+        return this.usersRepository.update(id, { email: updateUserEmailDto.email });
+    }
 };
 UserService = __decorate([
     (0, common_1.Injectable)(),

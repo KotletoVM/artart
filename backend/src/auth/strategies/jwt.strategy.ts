@@ -9,7 +9,10 @@ import { jwtSecret } from '../constants/jwt-secret.constant';
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(private readonly  userService: UserService) {
         super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+            jwtFromRequest: (req) => {
+                if (!req || !req.cookies) return null;
+                return req.cookies['access_token'];
+            }/*ExtractJwt.fromAuthHeaderAsBearerToken()*/,
             ignoreExpiration: false,
             secretOrKey: jwtSecret.secret,
         });

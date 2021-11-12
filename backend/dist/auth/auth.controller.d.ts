@@ -1,23 +1,12 @@
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { Response } from 'express';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
-    login(req: any): Promise<{
-        token: string;
+    login(req: any, response: Response): Promise<{
         email: string;
         sub: number;
     }>;
-    register(createUserDto: CreateUserDto): Promise<{
-        user: {
-            name: string;
-            email: string;
-            id: number;
-            createdAt: Date;
-            updatedAt: Date;
-            role: import("../enums/role.enum").UserRole[];
-            userpic: string;
-        };
-        token: string;
-    }>;
+    register(createUserDto: CreateUserDto, response: Response): Promise<void>;
 }

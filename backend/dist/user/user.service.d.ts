@@ -5,6 +5,7 @@ import { User } from './entities/user.entity';
 import { LoginUserDto } from './dto/login-user.dto';
 import { SearchUserDto } from './dto/search-user.dto';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
+import { UpdateUserEmailDto } from './dto/update-user-email.dto';
 export declare class UserService {
     private usersRepository;
     constructor(usersRepository: Repository<User>);
@@ -22,4 +23,5 @@ export declare class UserService {
     findByCond(cond: LoginUserDto): Promise<User>;
     update(id: number, updateUserDto: UpdateUserDto): Promise<import("typeorm").UpdateResult>;
     updatePassword(id: number, updateUserPasswordDto: UpdateUserPasswordDto): Promise<import("typeorm").UpdateResult>;
+    updateEmail(id: number, updateUserEmailDto: UpdateUserEmailDto): Promise<import("typeorm").UpdateResult>;
 }

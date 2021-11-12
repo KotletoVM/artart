@@ -10,10 +10,13 @@ exports.TagModule = void 0;
 const common_1 = require("@nestjs/common");
 const tag_service_1 = require("./tag.service");
 const tag_controller_1 = require("./tag.controller");
+const tag_entity_1 = require("./entities/tag.entity");
+const typeorm_1 = require("@nestjs/typeorm");
 let TagModule = class TagModule {
 };
 TagModule = __decorate([
     (0, common_1.Module)({
+        imports: [typeorm_1.TypeOrmModule.forFeature([tag_entity_1.Tag])],
         controllers: [tag_controller_1.TagController],
         providers: [tag_service_1.TagService]
     })

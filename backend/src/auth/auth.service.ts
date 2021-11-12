@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/user/entities/user.entity';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -43,25 +44,36 @@ export class AuthService {
         return hash;
     }
 
-    async login(user: User) {
+    async login(user: User, response: Response) {
         const payload = { email: user.email, sub: user.id};
-        return {
+        const token = this.generateJwtToken(user);
+        response.cookie('access_token', token, {
+                httpOnly: true,
+                domain: 'localhost', // your domain here!
+                expires: new Date(Date.now() + 20000 * 60 * 60 * 24),
+            })
+            .send({ success: payload });
+        return payload;/* {
             ...payload,
             token: this.generateJwtToken(user),
-        };
+        }*/;
     }
 
-    async register(createUserDto: CreateUserDto){
+    async register(createUserDto: CreateUserDto, response: Response){
       try {
           createUserDto.password = await this.generateHash(createUserDto.password);
           const {hash, ...user} = await this.userService.create(createUserDto);
           //const user = await this.userService.create(createUserDto);
-          return {
-              user,
-              token: this.generateJwtToken(user)
-          }
+          const token = this.generateJwtToken(user);
+          response.cookie('access_token', token, {
+              httpOnly: true,
+              domain: 'localhost', // your domain here!
+              expires: new Date(Date.now() + 20000 * 60 * 60 * 24),
+          })
+              .send({ success: user });
       }
       catch (e) {
+          /*УМЕНЬШИТЬ КОЛИЧЕСТВО ВЫВОДИМЫХ ДАННЫХ*/
           throw new ForbiddenException(e);
       }
     }

@@ -11,6 +11,7 @@ export class CreateUserDto {
     @IsEmail()
     @IsNotEmpty()
     email: string;
+    @IsOptional()
     @IsUrl()
     userpic: string;
     @Length(6)

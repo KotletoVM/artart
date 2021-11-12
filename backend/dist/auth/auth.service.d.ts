@@ -2,6 +2,7 @@ import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/user/entities/user.entity';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { Response } from 'express';
 export declare class AuthService {
     private userService;
     private jwtService;
@@ -12,21 +13,9 @@ export declare class AuthService {
         email: string;
     }): string;
     generateHash(password: string): Promise<string>;
-    login(user: User): Promise<{
-        token: string;
+    login(user: User, response: Response): Promise<{
         email: string;
         sub: number;
     }>;
-    register(createUserDto: CreateUserDto): Promise<{
-        user: {
-            name: string;
-            email: string;
-            id: number;
-            createdAt: Date;
-            updatedAt: Date;
-            role: import("../enums/role.enum").UserRole[];
-            userpic: string;
-        };
-        token: string;
-    }>;
+    register(createUserDto: CreateUserDto, response: Response): Promise<void>;
 }
