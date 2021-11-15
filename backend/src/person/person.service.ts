@@ -8,6 +8,10 @@ import { SearchPersonDto } from './dto/search-person.dto';
 import { Music } from 'src/music/entities/music.entity';
 import { Art } from 'src/art/entities/art.entity';
 import { Tag } from 'src/tag/entities/tag.entity';
+import { Comment } from 'src/comment/entities/comment.entity';
+import { Request as Req} from 'express';
+import jwtDecode, { JwtPayload } from 'jwt-decode';
+import {CommentService} from  '../comment/comment.service';
 
 @Injectable()
 export class PersonService {
@@ -18,8 +22,8 @@ export class PersonService {
       @InjectRepository(Art)
       private artRepository: Repository<Art>,
       @InjectRepository(Music)
-      private musicRepository: Repository<Music>
-
+      private musicRepository: Repository<Music>,
+      private readonly commentService: CommentService
   ) {}
 
   async create(createPersonDto: CreatePersonDto) {
@@ -30,45 +34,58 @@ export class PersonService {
     return person;
   }
 
-  async findAll() {
-    /*return this.personRepository.find({
-      order: {
-        createdAt: 'DESC'
-      },
-
-    });*/
+  async findAll(req: Req) {
+    const currentUserId = await this.isAuth(req);
+    if (!currentUserId){
+      const qb = this.personRepository.createQueryBuilder('person');
+      const [persons, count] =await qb.innerJoinAndSelect("person.tags", "tag").take(3).orderBy("person.createdAt", "DESC").getManyAndCount();
+      return [persons, count];
+    }
     const qb = this.personRepository.createQueryBuilder('person');
-    const [persons, count] =await qb.take(3).orderBy("person.createdAt", "DESC").getManyAndCount();
-    return [persons, count];
+    const [persons, count] = await qb.innerJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect("person").addSelect("user.id").addSelect("user.name").orderBy("person.createdAt", "DESC").take(3).getManyAndCount();
+    return [this.setLikedforCurrentUser(currentUserId, persons), count];
   }
 
-  async findArtists() {
+  async getPopular(req: Req) {
+    const currentUserId = await this.isAuth(req);
+    if (!currentUserId){
+      const qb = this.personRepository.createQueryBuilder('person');
+      const [persons, count] = await qb.innerJoinAndSelect("person.tags", "tag").orderBy('person.views', 'ASC').take(3).getManyAndCount();
+      return [persons, count];
+    }
     const qb = this.personRepository.createQueryBuilder('person');
-    return qb.innerJoinAndSelect("person.personArt", "art").getMany()
+    const [persons, count] = await qb.innerJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect("person").addSelect("user.id").addSelect("user.name").take(3).orderBy('person.views', 'DESC').getManyAndCount();
+    return [this.setLikedforCurrentUser(currentUserId, persons), count];
   }
 
-  async findMusicians() {
+  async findByTag(req: Req, tagid: number) {
+    const currentUserId = await this.isAuth(req);
+    if (!currentUserId){
+      const qb = this.personRepository.createQueryBuilder('person');
+      const [persons, count] = await qb.innerJoinAndSelect("person.tags", "tag").where(`tag.id = :tag`, {tag: tagid}).getManyAndCount();
+      return [persons, count];
+    }
     const qb = this.personRepository.createQueryBuilder('person');
-    return qb.innerJoinAndSelect("person.personMusic", "music").getMany()
+    const [persons, count] = await qb.innerJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect("user.id").addSelect("user.name").where(`tag.id = :tag`, {tag: tagid}).take(3).orderBy('person.views', 'DESC').getManyAndCount();
+    return [this.setLikedforCurrentUser(currentUserId, persons), count];
   }
 
-  async findOne(id: number) {
-    //const qb = this.personRepository.createQueryBuilder('person');
-    //qb.innerJoinAndSelect("person.personPaintings", "painting").innerJoinAndSelect("person.personMusic", "music").where("person.id = :id", { id: id });
-    //let onePerson = await qb.getOne();
-    let onePerson = await this.personRepository.findOne(id, {relations: ["personArt", "personMusic", "tags"]});
-    if(onePerson)this.personRepository.update(id, {views: onePerson.views + 1});
-    return onePerson;
+  async findOne(req: Req, id: number) {
+    const currentUserId = await this.isAuth(req);
+    if (!currentUserId){
+      const qb = this.personRepository.createQueryBuilder('person');
+      const person = await qb.innerJoinAndSelect("person.tags", "tag").leftJoin("person.personArt", "art").leftJoin("person.personMusic", "music").where("person.id = :id", {id: id}).getOne();
+      return person;
+    }
+    const qb = this.personRepository.createQueryBuilder('person');
+    const person = await qb.innerJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").leftJoin("person.personArt", "art").leftJoin("person.personMusic", "music").addSelect("user.id").addSelect("user.name").where("person.id = :id", {id: id}).getOne();
+    this.personRepository.update(id, {views: person.views + 1});
+    const comments = await this.commentService.findAllforPerson(id);
+    return {person, comments};
   }
 
-
-
-  async getPopular() {
-    const qb = this.personRepository.createQueryBuilder('popularQueryBuilder');
-    qb.orderBy('views', 'DESC');
-    qb.limit(10);
-    let [persons, number] = await  qb.getManyAndCount();
-    return {persons, number};
+  async findOneSimple(id: number){
+    return this.personRepository.findOne(id);
   }
 
   async search(searchPersonDto: SearchPersonDto) {
@@ -105,5 +122,36 @@ export class PersonService {
   async setLike(id: number) {
     let onePerson = await this.personRepository.findOne(id);
     this.personRepository.update(id, {views: onePerson.likes + 1});
+  }
+
+
+  async findMusicians() {
+    const qb = this.personRepository.createQueryBuilder('person');
+    return qb.innerJoinAndSelect("person.personMusic", "music").getMany()
+  }
+
+  async findArtists() {
+    const qb = this.personRepository.createQueryBuilder('person');
+    return qb.innerJoinAndSelect("person.personArt", "art").getMany()
+  }
+
+  setLikedforCurrentUser(currentUserId, persons: Person[]){
+    persons.forEach(person => {
+      person.liked_by.forEach(like => {
+        if (like.id == currentUserId){
+          person.liked = true;
+          return;
+        }
+
+      })
+    })
+    return persons;
+  }
+
+  async isAuth(req: Req){
+    if (!req.cookies['access_token'])
+      return false;
+    const decodedJwt = await jwtDecode<JwtPayload>(req.cookies['access_token']);
+    return Number(decodedJwt['sub']);
   }
 }

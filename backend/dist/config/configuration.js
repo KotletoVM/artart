@@ -8,6 +8,7 @@ const music_entity_1 = require("../music/entities/music.entity");
 const tag_entity_1 = require("../tag/entities/tag.entity");
 const event_entity_1 = require("../event/entities/event.entity");
 const comment_entity_1 = require("../comment/entities/comment.entity");
+const hashed_refresh_token_entity_1 = require("../hashed-refresh-token/entities/hashed-refresh-token.entity");
 const config = () => ({
     database: {
         type: process.env.DATABASE_TYPE,
@@ -16,8 +17,12 @@ const config = () => ({
         username: process.env.DATABASE_USERNAME,
         password: process.env.DATABASE_PASSWORD,
         database: process.env.DATABASE_NAME,
-        entities: [user_entity_1.User, person_entity_1.Person, comment_entity_1.Comment, art_entity_1.Art, music_entity_1.Music, event_entity_1.Event, tag_entity_1.Tag],
+        entities: [user_entity_1.User, person_entity_1.Person, comment_entity_1.Comment, art_entity_1.Art, music_entity_1.Music, event_entity_1.Event, tag_entity_1.Tag, hashed_refresh_token_entity_1.HashedRefreshToken],
         synchronize: true
+    },
+    token: {
+        expiresIn: process.env.JWT_EXPIRES_IN,
+        secret: process.env.JWT_SECRET
     }
 });
 exports.config = config;

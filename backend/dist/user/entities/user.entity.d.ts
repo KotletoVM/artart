@@ -6,6 +6,6 @@ export declare class User {
     hash: string;
     createdAt: Date;
     updatedAt: Date;
-    role: UserRole[];
+    role: UserRole;
     userpic: string;
 }

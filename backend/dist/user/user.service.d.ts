@@ -13,6 +13,7 @@ export declare class UserService {
         name: string;
         email: string;
         hash: string;
+        userpic: string;
     } & User>;
     findAll(): Promise<User[]>;
     findById(id: number): Promise<User>;

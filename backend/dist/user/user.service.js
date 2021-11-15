@@ -26,7 +26,8 @@ let UserService = class UserService {
         return this.usersRepository.save({
             name: createUserDto.name,
             email: createUserDto.email,
-            hash: createUserDto.password
+            hash: createUserDto.password,
+            userpic: createUserDto.userpic
         });
     }
     findAll() {

@@ -12,7 +12,7 @@ export class UpdateUserDto /*extends PartialType(CreateUserDto)*/ {
     @IsString()
     name?: string;
     @IsOptional()
-    role: UserRole[];
+    role: UserRole;
     @IsOptional()
     @IsUrl()
     userpic: string;

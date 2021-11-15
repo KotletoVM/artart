@@ -23,7 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         const user = await this.userService.findByCond(data);
 
         if (!user){
-            throw new UnauthorizedException();
+            throw new UnauthorizedException('User not found');
         }
         return data;
     }

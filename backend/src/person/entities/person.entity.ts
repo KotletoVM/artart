@@ -3,6 +3,8 @@ import {Contains, IsInt, Length, IsEmail, IsFQDN, IsDate, Min, Max} from "class-
 import { Music } from 'src/music/entities/music.entity';
 import { Art } from 'src/art/entities/art.entity';
 import { Tag } from 'src/tag/entities/tag.entity';
+import { User } from 'src/user/entities/user.entity';
+import { Exclude, Expose } from 'class-transformer';
 
 @Entity()
 export class Person {
@@ -37,4 +39,11 @@ export class Person {
         name: "person_tags"
     })
     tags: Tag[];
+    @ManyToMany(() => User, {nullable: true, eager: true, cascade: true})
+    @JoinTable({
+        name: "person_likes"
+    })
+    liked_by: User[];
+
+    liked: boolean;
 }

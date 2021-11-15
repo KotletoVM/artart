@@ -33,6 +33,7 @@
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
     "cookie-parser": "^1.4.5",
+    "jwt-decode": "^3.1.2",
     "mssql": "^7.2.1",
     "openssl-nodejs": "^1.0.5",
     "passport": "^0.5.0",

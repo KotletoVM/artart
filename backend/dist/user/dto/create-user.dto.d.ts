@@ -5,5 +5,5 @@ export declare class CreateUserDto {
     email: string;
     userpic: string;
     password: string;
-    role: UserRole[];
+    role: UserRole;
 }

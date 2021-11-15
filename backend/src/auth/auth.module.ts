@@ -6,13 +6,17 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { HashedRefreshToken } from 'src/hashed-refresh-token/entities/hashed-refresh-token.entity';
+import { User } from 'src/user/entities/user.entity';
+import { JwtRefreshTokenStrategy } from './strategies/jwtRefreshToken.strategy';
 
 @Module({
   imports: [UserModule, PassportModule, JwtModule.register({
     secret: "test",
-    signOptions: { expiresIn: '30d' },
-  })],
+    signOptions: { expiresIn: '30m' },
+  }), TypeOrmModule.forFeature([HashedRefreshToken]), TypeOrmModule.forFeature([User])],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy]
+  providers: [AuthService, LocalStrategy, JwtStrategy, JwtRefreshTokenStrategy]
 })
 export class AuthModule {}

@@ -18,7 +18,8 @@ CommentModule = __decorate([
     (0, common_1.Module)({
         imports: [typeorm_1.TypeOrmModule.forFeature([comment_entity_1.Comment])],
         controllers: [comment_controller_1.CommentController],
-        providers: [comment_service_1.CommentService]
+        providers: [comment_service_1.CommentService],
+        exports: [comment_service_1.CommentService]
     })
 ], CommentModule);
 exports.CommentModule = CommentModule;

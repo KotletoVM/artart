@@ -20,6 +20,7 @@ import { Tag } from './tag/entities/tag.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { config } from './config/configuration';
 import { DatabaseConfig } from './config/database.config';
+import { HashedRefreshTokenModule } from './hashed-refresh-token/hashed-refresh-token.module';
 
 
 @Module({
@@ -46,7 +47,8 @@ import { DatabaseConfig } from './config/database.config';
   MusicModule,
   ArtModule,
   EventModule,
-  TagModule],
+  TagModule,
+  HashedRefreshTokenModule],
   controllers: [AppController],
   providers: [AppService],
 })

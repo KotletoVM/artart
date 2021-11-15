@@ -44,7 +44,7 @@ __decorate([
         enum: role_enum_1.UserRole,
         default: role_enum_1.UserRole.USER
     }),
-    __metadata("design:type", Array)
+    __metadata("design:type", String)
 ], User.prototype, "role", void 0);
 __decorate([
     (0, typeorm_1.Column)({ default: 'https://lowcars.net/wp-content/uploads/2017/02/userpic.png' }),

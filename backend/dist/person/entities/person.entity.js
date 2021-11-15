@@ -14,6 +14,7 @@ const typeorm_1 = require("typeorm");
 const music_entity_1 = require("../../music/entities/music.entity");
 const art_entity_1 = require("../../art/entities/art.entity");
 const tag_entity_1 = require("../../tag/entities/tag.entity");
+const user_entity_1 = require("../../user/entities/user.entity");
 let Person = class Person {
 };
 __decorate([
@@ -71,6 +72,13 @@ __decorate([
     }),
     __metadata("design:type", Array)
 ], Person.prototype, "tags", void 0);
+__decorate([
+    (0, typeorm_1.ManyToMany)(() => user_entity_1.User, { nullable: true, eager: true, cascade: true }),
+    (0, typeorm_1.JoinTable)({
+        name: "person_likes"
+    }),
+    __metadata("design:type", Array)
+], Person.prototype, "liked_by", void 0);
 Person = __decorate([
     (0, typeorm_1.Entity)()
 ], Person);

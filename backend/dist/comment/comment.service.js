@@ -21,10 +21,10 @@ let CommentService = class CommentService {
     constructor(commentRepository) {
         this.commentRepository = commentRepository;
     }
-    create(createCommentDto, userid) {
+    create(createCommentDto, userid, personid) {
         return this.commentRepository.save({
             text: createCommentDto.text,
-            person: { id: createCommentDto.personid },
+            person: { id: personid },
             user: { id: userid }
         });
     }

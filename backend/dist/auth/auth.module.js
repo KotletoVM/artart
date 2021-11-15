@@ -15,16 +15,20 @@ const local_strategy_1 = require("./strategies/local.strategy");
 const passport_1 = require("@nestjs/passport");
 const jwt_1 = require("@nestjs/jwt");
 const jwt_strategy_1 = require("./strategies/jwt.strategy");
+const typeorm_1 = require("@nestjs/typeorm");
+const hashed_refresh_token_entity_1 = require("../hashed-refresh-token/entities/hashed-refresh-token.entity");
+const user_entity_1 = require("../user/entities/user.entity");
+const jwtRefreshToken_strategy_1 = require("./strategies/jwtRefreshToken.strategy");
 let AuthModule = class AuthModule {
 };
 AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [user_module_1.UserModule, passport_1.PassportModule, jwt_1.JwtModule.register({
                 secret: "test",
-                signOptions: { expiresIn: '30d' },
-            })],
+                signOptions: { expiresIn: '30m' },
+            }), typeorm_1.TypeOrmModule.forFeature([hashed_refresh_token_entity_1.HashedRefreshToken]), typeorm_1.TypeOrmModule.forFeature([user_entity_1.User])],
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService, local_strategy_1.LocalStrategy, jwt_strategy_1.JwtStrategy]
+        providers: [auth_service_1.AuthService, local_strategy_1.LocalStrategy, jwt_strategy_1.JwtStrategy, jwtRefreshToken_strategy_1.JwtRefreshTokenStrategy]
     })
 ], AuthModule);
 exports.AuthModule = AuthModule;

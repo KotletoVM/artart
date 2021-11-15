@@ -32,7 +32,7 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
         const data = { id: payload.sub, email: payload.email };
         const user = await this.userService.findByCond(data);
         if (!user) {
-            throw new common_1.UnauthorizedException();
+            throw new common_1.UnauthorizedException('User not found');
         }
         return data;
     }

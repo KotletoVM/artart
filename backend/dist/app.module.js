@@ -25,6 +25,7 @@ const tag_module_1 = require("./tag/tag.module");
 const config_1 = require("@nestjs/config");
 const configuration_1 = require("./config/configuration");
 const database_config_1 = require("./config/database.config");
+const hashed_refresh_token_module_1 = require("./hashed-refresh-token/hashed-refresh-token.module");
 let AppModule = class AppModule {
     constructor(configService) {
         this.configService = configService;
@@ -44,7 +45,8 @@ AppModule = __decorate([
             music_module_1.MusicModule,
             art_module_1.ArtModule,
             event_module_1.EventModule,
-            tag_module_1.TagModule],
+            tag_module_1.TagModule,
+            hashed_refresh_token_module_1.HashedRefreshTokenModule],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     }),

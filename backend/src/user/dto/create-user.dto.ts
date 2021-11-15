@@ -20,6 +20,6 @@ export class CreateUserDto {
         { message: 'Weak password' },)
     password: string;
     @IsOptional()
-    role: UserRole[];
+    role: UserRole;
     //hash?: string;
 }

@@ -9,4 +9,5 @@ export declare class AuthController {
         sub: number;
     }>;
     register(createUserDto: CreateUserDto, response: Response): Promise<void>;
+    refresh(req: any, response: Response): void;
 }

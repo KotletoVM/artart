@@ -26,14 +26,17 @@ let PersonController = class PersonController {
     create(createPersonDto) {
         return this.personService.create(createPersonDto);
     }
-    findAll() {
-        return this.personService.findAll();
+    async findAll(req) {
+        return this.personService.findAll(req);
     }
-    getPopular() {
-        return this.personService.getPopular();
+    getPopular(req) {
+        return this.personService.getPopular(req);
     }
     search(searchPersonDto) {
         return this.personService.search(searchPersonDto);
+    }
+    async findByTag(tagid, req) {
+        return this.personService.findByTag(req, tagid);
     }
     findArtists() {
         return this.personService.findArtists();
@@ -41,22 +44,22 @@ let PersonController = class PersonController {
     findMusicians() {
         return this.personService.findMusicians();
     }
-    async findOne(id) {
-        const find = await this.personService.findOne(+id);
+    async findOne(id, req) {
+        const find = await this.personService.findOne(req, +id);
         if (!find) {
             throw new common_1.NotFoundException('Person not found.');
         }
         return find;
     }
     async update(id, updatePersonDto) {
-        const find = await this.personService.findOne(+id);
+        const find = await this.personService.findOneSimple(+id);
         if (!find) {
             throw new common_1.NotFoundException('Person not found.');
         }
         return this.personService.update(+id, updatePersonDto);
     }
     async remove(id) {
-        const find = await this.personService.findOne(+id);
+        const find = await this.personService.findOneSimple(+id);
         if (!find) {
             throw new common_1.NotFoundException('Person not found.');
         }
@@ -73,14 +76,16 @@ __decorate([
 ], PersonController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
+    __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
 ], PersonController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)('popular'),
+    __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], PersonController.prototype, "getPopular", null);
 __decorate([
@@ -90,6 +95,14 @@ __decorate([
     __metadata("design:paramtypes", [search_person_dto_1.SearchPersonDto]),
     __metadata("design:returntype", void 0)
 ], PersonController.prototype, "search", null);
+__decorate([
+    (0, common_1.Get)('tags'),
+    __param(0, (0, common_1.Query)('tag')),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], PersonController.prototype, "findByTag", null);
 __decorate([
     (0, common_1.Get)('artists'),
     __metadata("design:type", Function),
@@ -105,8 +118,9 @@ __decorate([
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], PersonController.prototype, "findOne", null);
 __decorate([

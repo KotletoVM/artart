@@ -22,8 +22,8 @@ let CommentController = class CommentController {
     constructor(commentService) {
         this.commentService = commentService;
     }
-    create(req, createCommentDto) {
-        return this.commentService.create(createCommentDto, req.user.id);
+    create(req, createCommentDto, personid) {
+        return this.commentService.create(createCommentDto, req.user.id, personid);
     }
     findAllforPerson(personid) {
         return this.commentService.findAllforPerson(personid);
@@ -38,17 +38,23 @@ let CommentController = class CommentController {
         }
         return this.commentService.findOne(+id);
     }
-    async update(id, updateCommentDto) {
+    async update(id, updateCommentDto, req) {
         const find = await this.commentService.findOne(+id);
         if (!find) {
             throw new common_1.NotFoundException('Comment not found.');
         }
+        else if (find.user.id != req.user.id) {
+            throw new common_1.ForbiddenException('Its not your comment');
+        }
         return this.commentService.update(+id, updateCommentDto);
     }
-    async remove(id) {
+    async remove(id, req) {
         const find = await this.commentService.findOne(+id);
         if (!find) {
             throw new common_1.NotFoundException('Comment not found.');
+        }
+        else if (find.user.id != req.user.id) {
+            throw new common_1.ForbiddenException('Its not your comment');
         }
         return this.commentService.remove(+id);
     }
@@ -58,8 +64,9 @@ __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Query)('personid')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, create_comment_dto_1.CreateCommentDto]),
+    __metadata("design:paramtypes", [Object, create_comment_dto_1.CreateCommentDto, Number]),
     __metadata("design:returntype", void 0)
 ], CommentController.prototype, "create", null);
 __decorate([
@@ -89,16 +96,18 @@ __decorate([
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, update_comment_dto_1.UpdateCommentDto]),
+    __metadata("design:paramtypes", [String, update_comment_dto_1.UpdateCommentDto, Object]),
     __metadata("design:returntype", Promise)
 ], CommentController.prototype, "update", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], CommentController.prototype, "remove", null);
 CommentController = __decorate([

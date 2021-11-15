@@ -22,7 +22,9 @@ export class UserService {
     return this.usersRepository.save({
       name: createUserDto.name,
       email: createUserDto.email,
-      hash: createUserDto.password
+      hash: createUserDto.password,
+      //role: createUserDto.role,
+      userpic: createUserDto.userpic
     });
   }
 
@@ -66,6 +68,8 @@ export class UserService {
   async updateEmail(id: number, updateUserEmailDto: UpdateUserEmailDto){
     return this.usersRepository.update(id, {email: updateUserEmailDto.email});
   }
+
+
   /*remove(id: number) {
     return this.usersRepository.delete(id);
   }*/

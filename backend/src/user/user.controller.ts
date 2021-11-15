@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, UseGuards, Request, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, UseGuards, Request, Query, Redirect } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -6,6 +6,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { SearchUserDto } from './dto/search-user.dto';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UserRole } from 'src/enums/role.enum';
+import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 
 @Controller('user')
 export class UserController {

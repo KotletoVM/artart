@@ -31,6 +31,7 @@ const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const search_user_dto_1 = require("./dto/search-user.dto");
 const update_user_password_dto_1 = require("./dto/update-user-password.dto");
 const role_enum_1 = require("../enums/role.enum");
+const local_auth_guard_1 = require("../auth/guards/local-auth.guard");
 let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
