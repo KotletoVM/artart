@@ -7,6 +7,9 @@ import { SearchUserDto } from './dto/search-user.dto';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UserRole } from 'src/enums/role.enum';
 import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
+import { UpdateUserEmailDto } from './dto/update-user-email.dto';
+import { UpdateUserRoleDto } from './dto/update-user-role.dto';
+import { EmailConfirmationGuard } from 'src/auth/guards/emailConfirmation.guard';
 
 @Controller('user')
 export class UserController {
@@ -18,20 +21,19 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
   @Get('me')
   getProfile(@Request() req) {
-    return req.user;
+    return this.userService.getProfile(req.user.id)
   }
 
-
-//ограничение на авторизованного пользователя
+  @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
   @Get('search')
   search(@Query() searchUserDto: SearchUserDto) {
     return this.userService.search(searchUserDto);
   }
 
-//ограничение на авторизованного пользователя
+  @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const {hash, role, updatedAt, email, ...find} = await this.userService.findById(+id);
@@ -40,7 +42,6 @@ export class UserController {
   }
 
 //выход из акка если сменяется почта
-  //ЮЗЕР НЕ МОЖЕТ МЕНЯТЬ СВОЮ РОЛЬ (создать отдельно замену роли)
   @UseGuards(JwtAuthGuard)
   @Patch('me')
   async update(@Request() req, @Body() updateUserDto: UpdateUserDto) {
@@ -56,11 +57,30 @@ export class UserController {
     if (!find){throw new NotFoundException('User not found.');}
     return this.userService.updatePassword(+req.user.id, updateUserPasswordDto);
   }
-  /*
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    const find = await this.userService.findById(+id);
+
+
+  @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
+  @Patch('me/updateEmail')
+  async updateEmail(@Request() req, @Body() updateUserEmailDto: UpdateUserEmailDto) {
+    const find = await this.userService.findById(+req.user.id);
     if (!find){throw new NotFoundException('User not found.');}
-    return this.userService.remove(+id);
-  }*/
+    return this.userService.updateEmail(+req.user.id, updateUserEmailDto);
+  }
+
+  //только админ
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  async updateRole(@Request() req, @Body() updateUserRoleDto: UpdateUserRoleDto) {
+    const find = await this.userService.findById(+req.user.id);
+    if (!find){throw new NotFoundException('User not found.');}
+    return this.userService.updateRole(+req.user.id, updateUserRoleDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('me')
+  async remove(@Request() req) {
+    const find = await this.userService.findById(+req.user.id);
+    if (!find){throw new NotFoundException('User not found.');}
+    return this.userService.remove(+req.user.id);
+  }
 }

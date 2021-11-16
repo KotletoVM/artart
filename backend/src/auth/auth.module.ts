@@ -10,13 +10,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { HashedRefreshToken } from 'src/hashed-refresh-token/entities/hashed-refresh-token.entity';
 import { User } from 'src/user/entities/user.entity';
 import { JwtRefreshTokenStrategy } from './strategies/jwtRefreshToken.strategy';
+import { EmailConfirmationModule } from 'src/email-confirmation/email-confirmation.module';
+import { EmailConfirmationStrategy } from './strategies/emailConfirmation.strategy';
 
 @Module({
   imports: [UserModule, PassportModule, JwtModule.register({
     secret: "test",
     signOptions: { expiresIn: '30m' },
-  }), TypeOrmModule.forFeature([HashedRefreshToken]), TypeOrmModule.forFeature([User])],
+  }), TypeOrmModule.forFeature([HashedRefreshToken]), TypeOrmModule.forFeature([User]), EmailConfirmationModule],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, JwtRefreshTokenStrategy]
+  providers: [AuthService, LocalStrategy, JwtStrategy, JwtRefreshTokenStrategy, EmailConfirmationStrategy]
 })
 export class AuthModule {}

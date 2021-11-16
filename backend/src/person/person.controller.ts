@@ -5,6 +5,7 @@ import { UpdatePersonDto } from './dto/update-person.dto';
 import { SearchPersonDto } from './dto/search-person.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Request as Req} from 'express';
+import { EmailConfirmationGuard } from 'src/auth/guards/emailConfirmation.guard';
 
 @Controller('person')
 export class PersonController {
@@ -17,6 +18,11 @@ export class PersonController {
     return this.personService.create(createPersonDto);
   }
 
+  @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
+  @Post('like')
+  async setLike(@Request() req, @Query('personid') personid: number){
+    return this.personService.setLike(req.user.id, personid);
+  }
 
   @Get()
   async findAll(@Request() req: Req) {
@@ -36,6 +42,12 @@ export class PersonController {
   @Get('tags')
   async findByTag(@Query('tag') tagid: number, @Request() req: Req){
     return this.personService.findByTag(req, tagid);
+  }
+
+  @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
+  @Get('favorite')
+  async findUsersFavorite(@Request() req){
+    return this.personService.findUsersFavorite(req.user.id);
   }
 
   @Get('artists')
@@ -72,4 +84,5 @@ export class PersonController {
     if (!find){throw new NotFoundException('Person not found.');}
     return this.personService.remove(+id);
   }
+
 }

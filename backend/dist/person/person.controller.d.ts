@@ -9,6 +9,7 @@ export declare class PersonController {
     create(createPersonDto: CreatePersonDto): Promise<{
         generatedMaps: import("typeorm").ObjectLiteral[];
     }>;
+    setLike(req: any, personid: number): Promise<import("typeorm").UpdateResult>;
     findAll(req: Req): Promise<(number | import("./entities/person.entity").Person[])[]>;
     getPopular(req: Req): Promise<(number | import("./entities/person.entity").Person[])[]>;
     search(searchPersonDto: SearchPersonDto): Promise<{
@@ -16,12 +17,10 @@ export declare class PersonController {
         number: number;
     }>;
     findByTag(tagid: number, req: Req): Promise<(number | import("./entities/person.entity").Person[])[]>;
+    findUsersFavorite(req: any): Promise<(number | import("./entities/person.entity").Person[])[]>;
     findArtists(): Promise<import("./entities/person.entity").Person[]>;
     findMusicians(): Promise<import("./entities/person.entity").Person[]>;
-    findOne(id: string, req: Req): Promise<import("./entities/person.entity").Person | {
-        person: import("./entities/person.entity").Person;
-        comments: (number | import("../comment/entities/comment.entity").Comment[])[];
-    }>;
+    findOne(id: string, req: Req): Promise<import("./entities/person.entity").Person>;
     update(id: string, updatePersonDto: UpdatePersonDto): Promise<import("typeorm").UpdateResult>;
     remove(id: string): Promise<import("typeorm").DeleteResult>;
 }

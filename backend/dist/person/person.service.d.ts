@@ -12,26 +12,25 @@ export declare class PersonService {
     private personRepository;
     private artRepository;
     private musicRepository;
+    private commentRepository;
     private readonly commentService;
-    constructor(personRepository: Repository<Person>, artRepository: Repository<Art>, musicRepository: Repository<Music>, commentService: CommentService);
+    constructor(personRepository: Repository<Person>, artRepository: Repository<Art>, musicRepository: Repository<Music>, commentRepository: Repository<Comment>, commentService: CommentService);
     create(createPersonDto: CreatePersonDto): Promise<{
         generatedMaps: import("typeorm").ObjectLiteral[];
     }>;
+    setLike(userid: number, personid: number): Promise<import("typeorm").UpdateResult>;
     findAll(req: Req): Promise<(number | Person[])[]>;
     getPopular(req: Req): Promise<(number | Person[])[]>;
     findByTag(req: Req, tagid: number): Promise<(number | Person[])[]>;
-    findOne(req: Req, id: number): Promise<Person | {
-        person: Person;
-        comments: (number | Comment[])[];
-    }>;
+    findOne(req: Req, id: number): Promise<Person>;
     findOneSimple(id: number): Promise<Person>;
+    findUsersFavorite(id: number): Promise<(number | Person[])[]>;
     search(searchPersonDto: SearchPersonDto): Promise<{
         persons: Person[];
         number: number;
     }>;
     update(id: number, updatePersonDto: UpdatePersonDto): Promise<import("typeorm").UpdateResult>;
     remove(id: number): Promise<import("typeorm").DeleteResult>;
-    setLike(id: number): Promise<void>;
     findMusicians(): Promise<Person[]>;
     findArtists(): Promise<Person[]>;
     setLikedforCurrentUser(currentUserId: any, persons: Person[]): Person[];

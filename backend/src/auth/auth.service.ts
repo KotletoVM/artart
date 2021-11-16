@@ -4,11 +4,12 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/user/entities/user.entity';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { HashedRefreshToken } from 'src/hashed-refresh-token/entities/hashed-refresh-token.entity';
 import { CreateHashedRefreshTokenDto } from 'src/hashed-refresh-token/dto/create-hashed-refresh-token.dto';
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class AuthService {
@@ -17,7 +18,9 @@ export class AuthService {
               @InjectRepository(HashedRefreshToken)
               private tokenRepository: Repository<HashedRefreshToken>,
               @InjectRepository(User)
-              private userRepository: Repository<User>) {}
+              private userRepository: Repository<User>,
+              private configService: ConfigService
+              ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
     const hash = await bcrypt.hash(password, 10);
@@ -40,14 +43,14 @@ export class AuthService {
     }
   }
 
-    generateJwtAccessToken(data: {id: number, email: string}){
+    generateJwtAccessToken(data: {id: number, email: string}, secret: string, expiresIn: string){
       const payload = { email: data.email, sub: data.id};
-        return this.jwtService.sign(payload);
+        return this.jwtService.sign(payload, {expiresIn: expiresIn, secret: secret});
     }
 
-    generateJwtRefreshToken(data: {id: number, email: string}, secret: string, expiresIn: number){
+    generateJwtRefreshToken(data: {id: number, email: string}, secret: string, expiresIn: string){
         const payload = { email: data.email, sub: data.id};
-        return this.jwtService.sign(payload, {expiresIn: expiresIn + 'd', secret: secret});
+        return this.jwtService.sign(payload, {expiresIn: expiresIn, secret: secret});
     }
 
     async generateHash(password: string){
@@ -57,8 +60,8 @@ export class AuthService {
 
     async login(user: User, response: Response) {
         const payload = { email: user.email, sub: user.id};
-        const accessToken = this.generateJwtAccessToken(user);
-        const refreshToken = this.generateJwtRefreshToken(user, 'qwerty', 30);
+        const accessToken = this.generateJwtAccessToken(user, this.configService.get('access_token.secret'), this.configService.get('access_token.expiresIn'));
+        const refreshToken = this.generateJwtRefreshToken(user, this.configService.get('refresh_token.secret'), this.configService.get('refresh_token.expiresIn'));
         const token = await bcrypt.hash(refreshToken, 10);
         this.saveRefreshToken({userid: user.id, token: token})
         response.cookie('access_token', accessToken, {
@@ -85,8 +88,8 @@ export class AuthService {
           createUserDto.password = await this.generateHash(createUserDto.password);
           const {hash, ...user} = await this.userService.create(createUserDto);
           //const user = await this.userService.create(createUserDto);
-          const accessToken = this.generateJwtAccessToken(user);
-          const refreshToken = this.generateJwtRefreshToken(user, 'qwerty', 30);
+          const accessToken = this.generateJwtAccessToken(user, this.configService.get('access_token.secret'), this.configService.get('access_token.expiresIn'));
+          const refreshToken = this.generateJwtRefreshToken(user, this.configService.get('refresh_token.secret'), this.configService.get('refresh_token.expiresIn'));
           const token = await bcrypt.hash(refreshToken, 10);
           this.saveRefreshToken({userid: user.id, token: token})
           //this.tokenRepository.save({userid: user.id, token: token});
@@ -107,7 +110,7 @@ export class AuthService {
     }
 
     public getCookieWithJwtAccessToken(user: User, response: Response) {
-        const accessToken = this.generateJwtAccessToken(user);
+        const accessToken = this.generateJwtAccessToken(user, this.configService.get('access_token.secret'), this.configService.get('access_token.expiresIn'));
         response.cookie('access_token', accessToken, {
             httpOnly: true,
             domain: 'localhost',
@@ -126,11 +129,20 @@ export class AuthService {
         });
 
         if (isRefreshTokenMatching) {
-            //доделать вывод юзера
-            //return user;
             const user = await this.userRepository.findOne({id: userid});
             return user;
         }
+    }
+
+    async logOut(user: User, req: Request, response: Response){
+        const cookie_token: string = await req.cookies['refresh_token'];
+        const tokens = await this.tokenRepository.find();
+        tokens.forEach(async token => {
+            if (await bcrypt.compare(cookie_token, token.token)){
+                this.tokenRepository.delete({userid: user.id, token: token.token});
+            }
+        })
+        response.clearCookie('access_token').clearCookie('refresh_token').send({ success: [user.name, user.email] })
     }
 
 }

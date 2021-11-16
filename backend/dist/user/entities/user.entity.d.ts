@@ -8,4 +8,5 @@ export declare class User {
     updatedAt: Date;
     role: UserRole;
     userpic: string;
+    isEmailConfirmed: boolean;
 }

@@ -9,17 +9,21 @@ import { SearchUserDto } from './dto/search-user.dto';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserEmailDto } from './dto/update-user-email.dto';
+import { UpdateUserRoleDto } from './dto/update-user-role.dto';
+import { HashedRefreshToken } from 'src/hashed-refresh-token/entities/hashed-refresh-token.entity';
 
 @Injectable()
 export class UserService {
 
   constructor(
       @InjectRepository(User)
-      private usersRepository: Repository<User>,
+      private userRepository: Repository<User>,
+      @InjectRepository(HashedRefreshToken)
+      private tokenRepository: Repository<HashedRefreshToken>
   ) {}
 
   create(createUserDto: CreateUserDto) {
-    return this.usersRepository.save({
+    return this.userRepository.save({
       name: createUserDto.name,
       email: createUserDto.email,
       hash: createUserDto.password,
@@ -29,15 +33,21 @@ export class UserService {
   }
 
   findAll() {
-    return this.usersRepository.find();
+    return this.userRepository.find();
   }
 
   findById(id: number) {
-    return this.usersRepository.findOne(id);
+    return this.userRepository.findOne(id);
   }
 
+  findByEmail(email: string) {
+    return this.userRepository.findOne({email: email});
+  }
+
+
+
   async search(searchUserDto: SearchUserDto) {
-    const qb = this.usersRepository.createQueryBuilder('searchQueryBuilder');
+    const qb = this.userRepository.createQueryBuilder('searchQueryBuilder');
 
     if (searchUserDto.name){qb.andWhere(`searchQueryBuilder.name ILIKE :name`);}
 
@@ -53,24 +63,43 @@ export class UserService {
   }
 
   findByCond(cond: LoginUserDto){
-    return this.usersRepository.findOne(cond);
+    return this.userRepository.findOne(cond);
+  }
+
+  async getProfile(id: number){
+    const qb = this.userRepository.createQueryBuilder('user');
+    const user = await qb.select(["user.id", "user.name", "user.userpic", "user.email", "user.createdAt", "user.updatedAt"]).where("user.id = :id", {id: id}).getOne();
+    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    return this.usersRepository.update(id, updateUserDto);
+    return this.userRepository.update(id, updateUserDto);
   }
 
   async updatePassword(id: number, updateUserPasswordDto: UpdateUserPasswordDto){
     const hash = await bcrypt.hash(updateUserPasswordDto.password, 10);
-    return this.usersRepository.update(id, {hash: hash});
+    return this.userRepository.update(id, {hash: hash});
+    //logout
   }
 
   async updateEmail(id: number, updateUserEmailDto: UpdateUserEmailDto){
-    return this.usersRepository.update(id, {email: updateUserEmailDto.email});
+    return this.userRepository.update(id, {email: updateUserEmailDto.email});
+    //logout
   }
 
+  //ограничение на админа
+  async updateRole(id: number, updateUserRoleDto: UpdateUserRoleDto){
+    return this.userRepository.update(id, {role: updateUserRoleDto.role})
+  }
 
-  /*remove(id: number) {
-    return this.usersRepository.delete(id);
-  }*/
+  async remove(id: number){
+    this.tokenRepository.delete({userid: id});
+    return this.userRepository.delete(id);
+  }
+
+  async markEmailAsConfirmed(email: string) {
+    return this.userRepository.update({ email: email }, {
+      isEmailConfirmed: true
+    });
+  }
 }

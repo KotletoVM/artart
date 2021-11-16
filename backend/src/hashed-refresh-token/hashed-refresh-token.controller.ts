@@ -6,7 +6,7 @@ import { UpdateHashedRefreshTokenDto } from './dto/update-hashed-refresh-token.d
 @Controller('hashed-refresh-token')
 export class HashedRefreshTokenController {
   constructor(private readonly hashedRefreshTokenService: HashedRefreshTokenService) {}
-
+/*
   @Post()
   create(@Body() createHashedRefreshTokenDto: CreateHashedRefreshTokenDto) {
     return this.hashedRefreshTokenService.create(createHashedRefreshTokenDto);
@@ -30,5 +30,5 @@ export class HashedRefreshTokenController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.hashedRefreshTokenService.remove(+id);
-  }
+  }*/
 }

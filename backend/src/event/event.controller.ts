@@ -8,6 +8,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
+  //ограничение на админа
   @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() createEventDto: CreateEventDto) {
@@ -24,11 +25,13 @@ export class EventController {
     return this.eventService.findOne(+id);
   }
 
+  //ограничение на админа
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
     return this.eventService.update(+id, updateEventDto);
   }
 
+  //ограничение на админа
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.eventService.remove(+id);

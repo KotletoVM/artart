@@ -1,8 +1,6 @@
 import { Length, IsString, IsEmail, IsOptional, Matches } from 'class-validator';
 
-export class UpdateUserEmailDto /*extends PartialType(CreateUserDto)*/ {
-    @IsOptional()
-    id: number;
+export class UpdateUserEmailDto {
     @IsOptional()
     @IsEmail()
     email?: string;

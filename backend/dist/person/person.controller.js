@@ -26,6 +26,9 @@ let PersonController = class PersonController {
     create(createPersonDto) {
         return this.personService.create(createPersonDto);
     }
+    async setLike(req, personid) {
+        return this.personService.setLike(req.user.id, personid);
+    }
     async findAll(req) {
         return this.personService.findAll(req);
     }
@@ -37,6 +40,9 @@ let PersonController = class PersonController {
     }
     async findByTag(tagid, req) {
         return this.personService.findByTag(req, tagid);
+    }
+    async findUsersFavorite(req) {
+        return this.personService.findUsersFavorite(req.user.id);
     }
     findArtists() {
         return this.personService.findArtists();
@@ -75,6 +81,15 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], PersonController.prototype, "create", null);
 __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('like'),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Query)('personid')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Number]),
+    __metadata("design:returntype", Promise)
+], PersonController.prototype, "setLike", null);
+__decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
@@ -103,6 +118,14 @@ __decorate([
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], PersonController.prototype, "findByTag", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Get)('favorite'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PersonController.prototype, "findUsersFavorite", null);
 __decorate([
     (0, common_1.Get)('artists'),
     __metadata("design:type", Function),

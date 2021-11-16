@@ -1,1 +1,1 @@
-{"version":3,"file":"update-user-email.dto.js","sourceRoot":"","sources":["../../../src/user/dto/update-user-email.dto.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,qDAAiF;AAEjF,MAAa,kBAAkB;CAM9B;AAJG;IADC,IAAA,4BAAU,GAAE;;8CACF;AAGX;IAFC,IAAA,4BAAU,GAAE;IACZ,IAAA,yBAAO,GAAE;;iDACK;AALnB,gDAMC"}
+{"version":3,"file":"update-user-email.dto.js","sourceRoot":"","sources":["../../../src/user/dto/update-user-email.dto.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,qDAAiF;AAEjF,MAAa,kBAAkB;CAI9B;AADG;IAFC,IAAA,4BAAU,GAAE;IACZ,IAAA,yBAAO,GAAE;;iDACK;AAHnB,gDAIC"}

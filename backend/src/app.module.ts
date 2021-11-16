@@ -21,6 +21,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { config } from './config/configuration';
 import { DatabaseConfig } from './config/database.config';
 import { HashedRefreshTokenModule } from './hashed-refresh-token/hashed-refresh-token.module';
+import { EmailConfirmationModule } from './email-confirmation/email-confirmation.module';
 
 
 @Module({
@@ -48,7 +49,8 @@ import { HashedRefreshTokenModule } from './hashed-refresh-token/hashed-refresh-
   ArtModule,
   EventModule,
   TagModule,
-  HashedRefreshTokenModule],
+  HashedRefreshTokenModule,
+  EmailConfirmationModule],
   controllers: [AppController],
   providers: [AppService],
 })

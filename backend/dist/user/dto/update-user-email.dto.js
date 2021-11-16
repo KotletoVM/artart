@@ -15,10 +15,6 @@ class UpdateUserEmailDto {
 }
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Number)
-], UpdateUserEmailDto.prototype, "id", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsEmail)(),
     __metadata("design:type", String)
 ], UpdateUserEmailDto.prototype, "email", void 0);

@@ -20,9 +20,23 @@ const config = () => ({
         entities: [user_entity_1.User, person_entity_1.Person, comment_entity_1.Comment, art_entity_1.Art, music_entity_1.Music, event_entity_1.Event, tag_entity_1.Tag, hashed_refresh_token_entity_1.HashedRefreshToken],
         synchronize: true
     },
-    token: {
-        expiresIn: process.env.JWT_EXPIRES_IN,
-        secret: process.env.JWT_SECRET
+    access_token: {
+        secret: process.env.ACCESS_JWT_SECRET,
+        expiresIn: process.env.ACCESS_JWT_EXPIRESIN
+    },
+    refresh_token: {
+        secret: process.env.REFRESH_JWT_SECRET,
+        expiresIn: process.env.REFRESH_JWT_EXPIRESIN
+    },
+    verification: {
+        secret: process.env.VERIFICATION_JWT_SECRET,
+        expiresIn: process.env.VERIFICATION_JWT_EXPIRESIN,
+        url: process.env.EMAIL_CONFIRMATION_URL
+    },
+    email: {
+        service: process.env.EMAIL_SERVICE,
+        user: process.env.EMAIL_USER,
+        password: process.env.EMAIL_PASSWORD
     }
 });
 exports.config = config;

@@ -18,12 +18,14 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const user_entity_1 = require("./entities/user.entity");
 const bcrypt = require("bcrypt");
+const hashed_refresh_token_entity_1 = require("../hashed-refresh-token/entities/hashed-refresh-token.entity");
 let UserService = class UserService {
-    constructor(usersRepository) {
-        this.usersRepository = usersRepository;
+    constructor(userRepository, tokenRepository) {
+        this.userRepository = userRepository;
+        this.tokenRepository = tokenRepository;
     }
     create(createUserDto) {
-        return this.usersRepository.save({
+        return this.userRepository.save({
             name: createUserDto.name,
             email: createUserDto.email,
             hash: createUserDto.password,
@@ -31,13 +33,16 @@ let UserService = class UserService {
         });
     }
     findAll() {
-        return this.usersRepository.find();
+        return this.userRepository.find();
     }
     findById(id) {
-        return this.usersRepository.findOne(id);
+        return this.userRepository.findOne(id);
+    }
+    findByEmail(email) {
+        return this.userRepository.findOne({ email: email });
     }
     async search(searchUserDto) {
-        const qb = this.usersRepository.createQueryBuilder('searchQueryBuilder');
+        const qb = this.userRepository.createQueryBuilder('searchQueryBuilder');
         if (searchUserDto.name) {
             qb.andWhere(`searchQueryBuilder.name ILIKE :name`);
         }
@@ -52,23 +57,42 @@ let UserService = class UserService {
         return { users, number };
     }
     findByCond(cond) {
-        return this.usersRepository.findOne(cond);
+        return this.userRepository.findOne(cond);
+    }
+    async getProfile(id) {
+        const qb = this.userRepository.createQueryBuilder('user');
+        const user = await qb.select(["user.id", "user.name", "user.userpic", "user.email", "user.createdAt", "user.updatedAt"]).where("user.id = :id", { id: id }).getOne();
+        return user;
     }
     update(id, updateUserDto) {
-        return this.usersRepository.update(id, updateUserDto);
+        return this.userRepository.update(id, updateUserDto);
     }
     async updatePassword(id, updateUserPasswordDto) {
         const hash = await bcrypt.hash(updateUserPasswordDto.password, 10);
-        return this.usersRepository.update(id, { hash: hash });
+        return this.userRepository.update(id, { hash: hash });
     }
     async updateEmail(id, updateUserEmailDto) {
-        return this.usersRepository.update(id, { email: updateUserEmailDto.email });
+        return this.userRepository.update(id, { email: updateUserEmailDto.email });
+    }
+    async updateRole(id, updateUserRoleDto) {
+        return this.userRepository.update(id, { role: updateUserRoleDto.role });
+    }
+    async remove(id) {
+        this.tokenRepository.delete({ userid: id });
+        return this.userRepository.delete(id);
+    }
+    async markEmailAsConfirmed(email) {
+        return this.userRepository.update({ email: email }, {
+            isEmailConfirmed: true
+        });
     }
 };
 UserService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __param(1, (0, typeorm_1.InjectRepository)(hashed_refresh_token_entity_1.HashedRefreshToken)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository])
 ], UserService);
 exports.UserService = UserService;
 //# sourceMappingURL=user.service.js.map

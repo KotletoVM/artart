@@ -16,21 +16,29 @@ exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const local_auth_guard_1 = require("./guards/local-auth.guard");
+const jwt_auth_guard_1 = require("./guards/jwt-auth.guard");
 const jwt_refresh_token_guard_1 = require("./guards/jwt-refresh-token.guard");
 const create_user_dto_1 = require("../user/dto/create-user.dto");
 const user_service_1 = require("../user/user.service");
+const email_confirmation_service_1 = require("../email-confirmation/email-confirmation.service");
 let AuthController = class AuthController {
-    constructor(authService) {
+    constructor(authService, emailConfirmationService) {
         this.authService = authService;
+        this.emailConfirmationService = emailConfirmationService;
     }
     async login(req, response) {
         return this.authService.login(req.user, response);
     }
-    register(createUserDto, response) {
-        return this.authService.register(createUserDto, response);
+    async register(createUserDto, response) {
+        const user = await this.authService.register(createUserDto, response);
+        await this.emailConfirmationService.sendVerificationLink(createUserDto.email);
+        return user;
     }
     refresh(req, response) {
         return this.authService.getCookieWithJwtAccessToken(req.user, response);
+    }
+    logOut(req, response) {
+        return this.authService.logOut(req.user, req, response);
     }
 };
 __decorate([
@@ -48,7 +56,7 @@ __decorate([
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto, Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], AuthController.prototype, "register", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_refresh_token_guard_1.default),
@@ -59,9 +67,19 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "refresh", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('logout'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "logOut", null);
 AuthController = __decorate([
     (0, common_1.Controller)('auth'),
-    __metadata("design:paramtypes", [auth_service_1.AuthService])
+    __metadata("design:paramtypes", [auth_service_1.AuthService,
+        email_confirmation_service_1.EmailConfirmationService])
 ], AuthController);
 exports.AuthController = AuthController;
 //# sourceMappingURL=auth.controller.js.map

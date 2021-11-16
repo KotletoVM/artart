@@ -11,11 +11,25 @@ export declare const config: () => {
         username: string;
         password: string;
         database: string;
-        entities: (typeof Person | typeof Tag | typeof User | typeof Comment | typeof HashedRefreshToken)[];
+        entities: (typeof User | typeof Person | typeof Comment | typeof Tag | typeof HashedRefreshToken)[];
         synchronize: boolean;
     };
-    token: {
-        expiresIn: string;
+    access_token: {
         secret: string;
+        expiresIn: string;
+    };
+    refresh_token: {
+        secret: string;
+        expiresIn: string;
+    };
+    verification: {
+        secret: string;
+        expiresIn: string;
+        url: string;
+    };
+    email: {
+        service: string;
+        user: string;
+        password: string;
     };
 };

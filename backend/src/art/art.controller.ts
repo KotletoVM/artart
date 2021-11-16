@@ -9,7 +9,6 @@ export class ArtController {
   constructor(private readonly artService: ArtService) {}
 
   //ограничение на админа
-  //возможность сделать/изменить/удалить арт со странички персоны
   @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() createArtDto: CreateArtDto) {

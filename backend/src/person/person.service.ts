@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -23,6 +23,8 @@ export class PersonService {
       private artRepository: Repository<Art>,
       @InjectRepository(Music)
       private musicRepository: Repository<Music>,
+      @InjectRepository(Comment)
+      private commentRepository: Repository<Comment>,
       private readonly commentService: CommentService
   ) {}
 
@@ -34,15 +36,30 @@ export class PersonService {
     return person;
   }
 
+  async setLike(userid: number, personid: number) {
+    const qb = this.personRepository.createQueryBuilder('person');
+    let person = await this.personRepository.findOne(personid);
+    if (!person){
+      throw new NotFoundException('person not found.');
+    }
+    try {
+      const liked = await qb.relation(Person, "liked_by").of(personid).add(userid);
+    }
+    catch (e) {
+      throw new ForbiddenException('user can set only one like per person.');
+    }
+    return this.personRepository.update(personid, {views: person.views + 1 ,likes: person.likes + 1});;
+  }
+
   async findAll(req: Req) {
     const currentUserId = await this.isAuth(req);
     if (!currentUserId){
       const qb = this.personRepository.createQueryBuilder('person');
-      const [persons, count] =await qb.innerJoinAndSelect("person.tags", "tag").take(3).orderBy("person.createdAt", "DESC").getManyAndCount();
+      const [persons, count] =await qb.leftJoinAndSelect("person.tags", "tag").take(3).orderBy("person.createdAt", "DESC").getManyAndCount();
       return [persons, count];
     }
     const qb = this.personRepository.createQueryBuilder('person');
-    const [persons, count] = await qb.innerJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect("person").addSelect("user.id").addSelect("user.name").orderBy("person.createdAt", "DESC").take(3).getManyAndCount();
+    const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["person","user.id","user.name"]).orderBy("person.createdAt", "DESC").take(3).getManyAndCount();
     return [this.setLikedforCurrentUser(currentUserId, persons), count];
   }
 
@@ -50,11 +67,11 @@ export class PersonService {
     const currentUserId = await this.isAuth(req);
     if (!currentUserId){
       const qb = this.personRepository.createQueryBuilder('person');
-      const [persons, count] = await qb.innerJoinAndSelect("person.tags", "tag").orderBy('person.views', 'ASC').take(3).getManyAndCount();
+      const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").orderBy('person.views', 'ASC').take(3).getManyAndCount();
       return [persons, count];
     }
     const qb = this.personRepository.createQueryBuilder('person');
-    const [persons, count] = await qb.innerJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect("person").addSelect("user.id").addSelect("user.name").take(3).orderBy('person.views', 'DESC').getManyAndCount();
+    const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["person","user.id","user.name"]).orderBy('person.views', 'DESC').take(3).getManyAndCount();
     return [this.setLikedforCurrentUser(currentUserId, persons), count];
   }
 
@@ -62,11 +79,11 @@ export class PersonService {
     const currentUserId = await this.isAuth(req);
     if (!currentUserId){
       const qb = this.personRepository.createQueryBuilder('person');
-      const [persons, count] = await qb.innerJoinAndSelect("person.tags", "tag").where(`tag.id = :tag`, {tag: tagid}).getManyAndCount();
+      const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").where(`tag.id = :tag`, {tag: tagid}).getManyAndCount();
       return [persons, count];
     }
     const qb = this.personRepository.createQueryBuilder('person');
-    const [persons, count] = await qb.innerJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect("user.id").addSelect("user.name").where(`tag.id = :tag`, {tag: tagid}).take(3).orderBy('person.views', 'DESC').getManyAndCount();
+    const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["user.id", "user.name"]).where(`tag.id = :tag`, {tag: tagid}).take(3).orderBy('person.views', 'DESC').getManyAndCount();
     return [this.setLikedforCurrentUser(currentUserId, persons), count];
   }
 
@@ -74,18 +91,23 @@ export class PersonService {
     const currentUserId = await this.isAuth(req);
     if (!currentUserId){
       const qb = this.personRepository.createQueryBuilder('person');
-      const person = await qb.innerJoinAndSelect("person.tags", "tag").leftJoin("person.personArt", "art").leftJoin("person.personMusic", "music").where("person.id = :id", {id: id}).getOne();
+      const person = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.personArt", "art").leftJoin("person.personMusic", "music").where("person.id = :id", {id: id}).getOne();
       return person;
     }
     const qb = this.personRepository.createQueryBuilder('person');
-    const person = await qb.innerJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").leftJoin("person.personArt", "art").leftJoin("person.personMusic", "music").addSelect("user.id").addSelect("user.name").where("person.id = :id", {id: id}).getOne();
+    const person = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").leftJoin("person.personArt", "art").leftJoin("person.personMusic", "music").addSelect(["user.id", "user.name"]).where("person.id = :id", {id: id}).getOne();
     this.personRepository.update(id, {views: person.views + 1});
-    const comments = await this.commentService.findAllforPerson(id);
-    return {person, comments};
+    return person;
   }
 
   async findOneSimple(id: number){
     return this.personRepository.findOne(id);
+  }
+
+  async findUsersFavorite(id: number){
+    const qb = this.personRepository.createQueryBuilder('person');
+    const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["user.id", "user.name"]).where(`user.id = :id`, {id: id}).take(3).orderBy('person.views', 'DESC').getManyAndCount();
+    return [this.setLikedforCurrentUser(id, persons), count];
   }
 
   async search(searchPersonDto: SearchPersonDto) {
@@ -113,17 +135,13 @@ export class PersonService {
     return this.personRepository.update(id, updatePersonDto);
   }
 
-  remove(id: number) {
+  async remove(id: number) {
+    const qb = this.personRepository.createQueryBuilder('person');
     this.artRepository.delete({personid: id});
     this.musicRepository.delete({personid: id});
+    this.commentRepository.delete({person: {id: id}});
     return this.personRepository.delete(id);
   }
-
-  async setLike(id: number) {
-    let onePerson = await this.personRepository.findOne(id);
-    this.personRepository.update(id, {views: onePerson.likes + 1});
-  }
-
 
   async findMusicians() {
     const qb = this.personRepository.createQueryBuilder('person');
@@ -136,16 +154,21 @@ export class PersonService {
   }
 
   setLikedforCurrentUser(currentUserId, persons: Person[]){
-    persons.forEach(person => {
-      person.liked_by.forEach(like => {
-        if (like.id == currentUserId){
-          person.liked = true;
-          return;
-        }
+    try {
+      persons.forEach(person => {
+        person.liked_by.forEach(like => {
+          if (like.id == currentUserId){
+            person.liked = true;
+            return;
+          }
 
+        })
       })
-    })
-    return persons;
+      return persons;
+    }
+    catch (e) {
+      throw new NotFoundException('persons not found.');
+    }
   }
 
   async isAuth(req: Req){

@@ -6,7 +6,7 @@ import { UpdateTagDto } from './dto/update-tag.dto';
 @Controller('tag')
 export class TagController {
   constructor(private readonly tagService: TagService) {}
-
+/*
   @Post()
   create(@Body() createTagDto: CreateTagDto) {
     return this.tagService.create(createTagDto);
@@ -30,5 +30,5 @@ export class TagController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.tagService.remove(+id);
-  }
+  }*/
 }

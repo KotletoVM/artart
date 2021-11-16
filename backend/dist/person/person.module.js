@@ -17,11 +17,12 @@ const art_entity_1 = require("../art/entities/art.entity");
 const music_service_1 = require("../music/music.service");
 const comment_service_1 = require("../comment/comment.service");
 const comment_module_1 = require("../comment/comment.module");
+const comment_entity_1 = require("../comment/entities/comment.entity");
 let PersonModule = class PersonModule {
 };
 PersonModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([art_entity_1.Art]), typeorm_1.TypeOrmModule.forFeature([music_entity_1.Music]), typeorm_1.TypeOrmModule.forFeature([person_entity_1.Person]), comment_module_1.CommentModule],
+        imports: [typeorm_1.TypeOrmModule.forFeature([art_entity_1.Art]), typeorm_1.TypeOrmModule.forFeature([music_entity_1.Music]), typeorm_1.TypeOrmModule.forFeature([person_entity_1.Person]), typeorm_1.TypeOrmModule.forFeature([comment_entity_1.Comment]), comment_module_1.CommentModule],
         controllers: [person_controller_1.PersonController],
         providers: [person_service_1.PersonService]
     })

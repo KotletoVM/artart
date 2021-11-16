@@ -29,4 +29,6 @@ export class User {
     role: UserRole
     @Column({default: 'https://lowcars.net/wp-content/uploads/2017/02/userpic.png'})
     userpic: string;
+    @Column({ default: false })
+    public isEmailConfirmed: boolean;
 }

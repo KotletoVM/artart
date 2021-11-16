@@ -34,12 +34,14 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const hashed_refresh_token_entity_1 = require("../hashed-refresh-token/entities/hashed-refresh-token.entity");
 const create_hashed_refresh_token_dto_1 = require("../hashed-refresh-token/dto/create-hashed-refresh-token.dto");
+const config_1 = require("@nestjs/config");
 let AuthService = class AuthService {
-    constructor(userService, jwtService, tokenRepository, userRepository) {
+    constructor(userService, jwtService, tokenRepository, userRepository, configService) {
         this.userService = userService;
         this.jwtService = jwtService;
         this.tokenRepository = tokenRepository;
         this.userRepository = userRepository;
+        this.configService = configService;
     }
     async validateUser(email, password) {
         const hash = await bcrypt.hash(password, 10);
@@ -57,13 +59,13 @@ let AuthService = class AuthService {
             throw new common_1.ForbiddenException("User was not found.");
         }
     }
-    generateJwtAccessToken(data) {
+    generateJwtAccessToken(data, secret, expiresIn) {
         const payload = { email: data.email, sub: data.id };
-        return this.jwtService.sign(payload);
+        return this.jwtService.sign(payload, { expiresIn: expiresIn, secret: secret });
     }
     generateJwtRefreshToken(data, secret, expiresIn) {
         const payload = { email: data.email, sub: data.id };
-        return this.jwtService.sign(payload, { expiresIn: expiresIn + 'd', secret: secret });
+        return this.jwtService.sign(payload, { expiresIn: expiresIn, secret: secret });
     }
     async generateHash(password) {
         const hash = await bcrypt.hash(password, 10);
@@ -71,8 +73,8 @@ let AuthService = class AuthService {
     }
     async login(user, response) {
         const payload = { email: user.email, sub: user.id };
-        const accessToken = this.generateJwtAccessToken(user);
-        const refreshToken = this.generateJwtRefreshToken(user, 'qwerty', 30);
+        const accessToken = this.generateJwtAccessToken(user, this.configService.get('access_token.secret'), this.configService.get('access_token.expiresIn'));
+        const refreshToken = this.generateJwtRefreshToken(user, this.configService.get('refresh_token.secret'), this.configService.get('refresh_token.expiresIn'));
         const token = await bcrypt.hash(refreshToken, 10);
         this.saveRefreshToken({ userid: user.id, token: token });
         response.cookie('access_token', accessToken, {
@@ -94,8 +96,8 @@ let AuthService = class AuthService {
         try {
             createUserDto.password = await this.generateHash(createUserDto.password);
             const _a = await this.userService.create(createUserDto), { hash } = _a, user = __rest(_a, ["hash"]);
-            const accessToken = this.generateJwtAccessToken(user);
-            const refreshToken = this.generateJwtRefreshToken(user, 'qwerty', 30);
+            const accessToken = this.generateJwtAccessToken(user, this.configService.get('access_token.secret'), this.configService.get('access_token.expiresIn'));
+            const refreshToken = this.generateJwtRefreshToken(user, this.configService.get('refresh_token.secret'), this.configService.get('refresh_token.expiresIn'));
             const token = await bcrypt.hash(refreshToken, 10);
             this.saveRefreshToken({ userid: user.id, token: token });
             response.cookie('access_token', accessToken, {
@@ -113,7 +115,7 @@ let AuthService = class AuthService {
         }
     }
     getCookieWithJwtAccessToken(user, response) {
-        const accessToken = this.generateJwtAccessToken(user);
+        const accessToken = this.generateJwtAccessToken(user, this.configService.get('access_token.secret'), this.configService.get('access_token.expiresIn'));
         response.cookie('access_token', accessToken, {
             httpOnly: true,
             domain: 'localhost',
@@ -134,6 +136,16 @@ let AuthService = class AuthService {
             return user;
         }
     }
+    async logOut(user, req, response) {
+        const cookie_token = await req.cookies['refresh_token'];
+        const tokens = await this.tokenRepository.find();
+        tokens.forEach(async (token) => {
+            if (await bcrypt.compare(cookie_token, token.token)) {
+                this.tokenRepository.delete({ userid: user.id, token: token.token });
+            }
+        });
+        response.clearCookie('access_token').clearCookie('refresh_token').send({ success: [user.name, user.email] });
+    }
 };
 AuthService = __decorate([
     (0, common_1.Injectable)(),
@@ -142,7 +154,8 @@ AuthService = __decorate([
     __metadata("design:paramtypes", [user_service_1.UserService,
         jwt_1.JwtService,
         typeorm_2.Repository,
-        typeorm_2.Repository])
+        typeorm_2.Repository,
+        config_1.ConfigService])
 ], AuthService);
 exports.AuthService = AuthService;
 //# sourceMappingURL=auth.service.js.map

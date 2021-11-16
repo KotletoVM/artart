@@ -3,16 +3,15 @@ import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { EmailConfirmationGuard } from 'src/auth/guards/emailConfirmation.guard';
 
 @Controller('comment')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
-  //создание и просмотр комментов только на странице конкретной персоны
   //инструмент для админа - все комменты одного пользователя
 
-  //✔ - доделать отправку комментария от лица только текущего юзера
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
   @Post()
   create(@Request() req, @Body() createCommentDto: CreateCommentDto, @Query('personid') personid: number) {
     return this.commentService.create(createCommentDto, req.user.id, personid);
@@ -27,6 +26,7 @@ export class CommentController {
     return this.commentService.findAllforPerson(personid);
   }
 
+  //ограничение на админа
   @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
@@ -42,7 +42,8 @@ export class CommentController {
     return this.commentService.findOne(+id);
   }
 
-  @UseGuards(JwtAuthGuard)
+
+  @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto, @Request() req) {
     const find = await this.commentService.findOne(+id);
@@ -52,7 +53,7 @@ export class CommentController {
   }
 
   //СДЕЛАТЬ ВОЗМОЖНОСТЬ ДЛЯ АДМИНОВ УДАЛЯТЬ КОММЕНТЫ
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
   @Delete(':id')
   async remove(@Param('id') id: string, @Request() req) {
     const find = await this.commentService.findOne(+id);

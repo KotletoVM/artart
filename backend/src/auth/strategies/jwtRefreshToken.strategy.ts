@@ -18,7 +18,7 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-ref
             }/*ExtractJwt.fromExtractors([(request: Request) => {
                 return request?.cookies?.refresh_token;
             }])*//*ExtractJwt.fromAuthHeaderAsBearerToken()*/,
-            secretOrKey: 'qwerty',
+            secretOrKey: configService.get('refresh_token.secret'),
             passReqToCallback: true
         });
     }

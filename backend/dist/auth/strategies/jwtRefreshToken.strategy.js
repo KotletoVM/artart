@@ -23,7 +23,7 @@ let JwtRefreshTokenStrategy = class JwtRefreshTokenStrategy extends (0, passport
                     return null;
                 return req.cookies['refresh_token'];
             },
-            secretOrKey: 'qwerty',
+            secretOrKey: configService.get('refresh_token.secret'),
             passReqToCallback: true
         });
         this.authService = authService;

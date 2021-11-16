@@ -15,10 +15,6 @@ class UpdateUserPasswordDto {
 }
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Number)
-], UpdateUserPasswordDto.prototype, "id", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.Length)(6),
     (0, class_validator_1.Matches)(/^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})/, { message: 'Weak password' }),
     __metadata("design:type", String)
