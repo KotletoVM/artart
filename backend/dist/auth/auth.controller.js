@@ -21,6 +21,7 @@ const jwt_refresh_token_guard_1 = require("./guards/jwt-refresh-token.guard");
 const create_user_dto_1 = require("../user/dto/create-user.dto");
 const user_service_1 = require("../user/user.service");
 const email_confirmation_service_1 = require("../email-confirmation/email-confirmation.service");
+const emailConfirmation_guard_1 = require("./guards/emailConfirmation.guard");
 let AuthController = class AuthController {
     constructor(authService, emailConfirmationService) {
         this.authService = authService;
@@ -59,7 +60,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "register", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_refresh_token_guard_1.default),
+    (0, common_1.UseGuards)(jwt_refresh_token_guard_1.default, emailConfirmation_guard_1.EmailConfirmationGuard),
     (0, common_1.Post)('refresh'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Res)()),

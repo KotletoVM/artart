@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmailConfirmationController = void 0;
 const common_1 = require("@nestjs/common");
 const email_confirmation_service_1 = require("./email-confirmation.service");
+const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 let EmailConfirmationController = class EmailConfirmationController {
     constructor(emailConfirmationService) {
         this.emailConfirmationService = emailConfirmationService;
@@ -22,6 +23,9 @@ let EmailConfirmationController = class EmailConfirmationController {
     async confirm(confirmEmailDto) {
         const email = await this.emailConfirmationService.decodeConfirmationToken(confirmEmailDto);
         await this.emailConfirmationService.confirmEmail(email);
+    }
+    async resendConfirmationLink(req) {
+        await this.emailConfirmationService.resendConfirmationLink(req.user.id);
     }
 };
 __decorate([
@@ -31,6 +35,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], EmailConfirmationController.prototype, "confirm", null);
+__decorate([
+    (0, common_1.Post)('resend-confirmation-link'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], EmailConfirmationController.prototype, "resendConfirmationLink", null);
 EmailConfirmationController = __decorate([
     (0, common_1.Controller)('email'),
     __metadata("design:paramtypes", [email_confirmation_service_1.EmailConfirmationService])

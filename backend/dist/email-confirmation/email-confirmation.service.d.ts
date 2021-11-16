@@ -12,4 +12,5 @@ export declare class EmailConfirmationService {
     decodeConfirmationToken(token: string): Promise<any>;
     sendMail(options: Mail.Options): Promise<any>;
     sendVerificationLink(email: string): Promise<any>;
+    resendConfirmationLink(userId: number): Promise<void>;
 }

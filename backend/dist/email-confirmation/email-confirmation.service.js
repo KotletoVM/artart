@@ -69,6 +69,13 @@ let EmailConfirmationService = class EmailConfirmationService {
             text,
         });
     }
+    async resendConfirmationLink(userId) {
+        const user = await this.userService.findById(userId);
+        if (user.isEmailConfirmed) {
+            throw new common_1.BadRequestException('Email already confirmed');
+        }
+        await this.sendVerificationLink(user.email);
+    }
 };
 EmailConfirmationService = __decorate([
     (0, common_1.Injectable)(),

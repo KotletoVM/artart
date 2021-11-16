@@ -4,6 +4,9 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { EmailConfirmationGuard } from 'src/auth/guards/emailConfirmation.guard';
+import { UserRole } from 'src/enums/role.enum';
+import { Roles } from 'src/decorators/roles.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @Controller('comment')
 export class CommentController {
@@ -27,14 +30,16 @@ export class CommentController {
   }
 
   //ограничение на админа
-  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
   findAll() {
     return this.commentService.findAll();
   }
 
   //ограничение на админа
-  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const find = await this.commentService.findOne(+id);

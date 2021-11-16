@@ -18,6 +18,7 @@ const comment_service_1 = require("./comment.service");
 const create_comment_dto_1 = require("./dto/create-comment.dto");
 const update_comment_dto_1 = require("./dto/update-comment.dto");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
+const emailConfirmation_guard_1 = require("../auth/guards/emailConfirmation.guard");
 let CommentController = class CommentController {
     constructor(commentService) {
         this.commentService = commentService;
@@ -60,7 +61,7 @@ let CommentController = class CommentController {
     }
 };
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, emailConfirmation_guard_1.EmailConfirmationGuard),
     (0, common_1.Post)(),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Body)()),
@@ -92,7 +93,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], CommentController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, emailConfirmation_guard_1.EmailConfirmationGuard),
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
@@ -102,7 +103,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], CommentController.prototype, "update", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, emailConfirmation_guard_1.EmailConfirmationGuard),
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Request)()),

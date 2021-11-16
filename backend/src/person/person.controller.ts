@@ -6,13 +6,17 @@ import { SearchPersonDto } from './dto/search-person.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Request as Req} from 'express';
 import { EmailConfirmationGuard } from 'src/auth/guards/emailConfirmation.guard';
+import { Roles } from 'src/decorators/roles.decorator';
+import { UserRole } from 'src/enums/role.enum';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @Controller('person')
 export class PersonController {
   constructor(private readonly personService: PersonService) {}
 
   //ограничение на админа
-  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post()
   create(@Body() createPersonDto: CreatePersonDto) {
     return this.personService.create(createPersonDto);
@@ -68,7 +72,8 @@ export class PersonController {
   }
 
   //ограничение на админа
-  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updatePersonDto: UpdatePersonDto) {
     const find = await this.personService.findOneSimple(+id);
@@ -77,7 +82,8 @@ export class PersonController {
   }
 
   //ограничение на админа
-  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const find = await this.personService.findOneSimple(+id);

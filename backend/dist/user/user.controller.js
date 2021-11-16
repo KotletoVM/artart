@@ -106,6 +106,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "getProfile", null);
 __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, emailConfirmation_guard_1.EmailConfirmationGuard),
     (0, common_1.Get)('search'),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
@@ -113,6 +114,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "search", null);
 __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, emailConfirmation_guard_1.EmailConfirmationGuard),
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
@@ -138,7 +140,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "updatePassword", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, emailConfirmation_guard_1.EmailConfirmationGuard),
     (0, common_1.Patch)('me/updateEmail'),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Body)()),
