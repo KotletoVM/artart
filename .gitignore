@@ -1,7 +1,6 @@
-jwt-secret.constant.ts
 .env
-/node_modules
-/dist
-npm-debug.log
-.DS_Store
-/*.env
+backend/node_modules
+backend/dist
+backend/npm-debug.log
+backend/.DS_Store
+backend/*.env
