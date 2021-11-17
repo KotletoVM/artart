@@ -2,3 +2,5 @@
 backend/npm-debug.log
 backend/.DS_Store
 backend/*.env
+npm-debug.log
+.DS_Store
