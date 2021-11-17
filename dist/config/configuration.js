@@ -18,7 +18,7 @@ const config = () => ({
         password: process.env.DATABASE_PASSWORD,
         database: process.env.DATABASE_NAME,
         entities: [user_entity_1.User, person_entity_1.Person, comment_entity_1.Comment, art_entity_1.Art, music_entity_1.Music, event_entity_1.Event, tag_entity_1.Tag, hashed_refresh_token_entity_1.HashedRefreshToken],
-        synchronize: true
+        synchronize: false
     },
     access_token: {
         secret: process.env.ACCESS_JWT_SECRET,

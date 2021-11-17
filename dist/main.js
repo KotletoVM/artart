@@ -10,7 +10,7 @@ async function bootstrap() {
     app.useGlobalPipes(new common_1.ValidationPipe());
     app.use(cookieParser());
     const configService = app.get(config_1.ConfigService);
-    await app.listen(configService.get('PORT'));
+    await app.listen(configService.get('PORT') || 8080);
 }
 bootstrap();
 //# sourceMappingURL=main.js.map
