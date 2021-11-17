@@ -16,7 +16,8 @@ export const config = () => ({
         password: process.env.DATABASE_PASSWORD,
         database: process.env.DATABASE_NAME,
         entities: [User, Person, Comment, Art,Music, Event, Tag, HashedRefreshToken],
-        synchronize: false //true
+        synchronize: true, //true,
+        ssl: { rejectUnauthorized: false }
     },
     access_token: {
         secret: process.env.ACCESS_JWT_SECRET,
