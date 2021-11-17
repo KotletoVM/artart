@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Inject, forwardRef } from '@nestjs/common';
 import { CreateEmailConfirmationDto } from './dto/create-email-confirmation.dto';
 import { UpdateEmailConfirmationDto } from './dto/update-email-confirmation.dto';
 import { createTransport } from 'nodemailer';
@@ -12,9 +12,9 @@ export class EmailConfirmationService {
   private nodemailerTransport: Mail;
 
   constructor(
+      private readonly userService: UserService,
       private readonly configService: ConfigService,
       private readonly jwtService: JwtService,
-      private readonly userService: UserService
   ) {
     this.nodemailerTransport = createTransport({
       service: configService.get('email.service'),
@@ -31,6 +31,7 @@ export class EmailConfirmationService {
       throw new BadRequestException('Email already confirmed');
     }
     await this.userService.markEmailAsConfirmed(email);
+    return email;
   }
 
   public async decodeConfirmationToken(token: string) {
@@ -64,12 +65,25 @@ export class EmailConfirmationService {
 
     const url = `${this.configService.get('verification.url')}?token=${token}`;
 
-    const text = `Welcome to the ARTART web-application. To confirm the email address, click here: ${url}`;
+    const text = `Welcome to the ARTART web-application. To confirm your email address, click here: ${url}`;
+    const html = "<h3>Welcome to the ARTART web-application.</h3><h4></h4>" +
+        "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color: #00AAFF;  width: 220px; border-collapse: collapse;\">\n" +
+        "<tbody>\n" +
+        "<tr>\n" +
+        "<td style=\"border-collapse: collapse; border-spacing: 0; font-family: ‘Trebuchet MS’, sans-serif; " +
+        "font-size: 18px; text-align: center; color: #FFFFFF;  text-shadow: 1px 1px 0 #ff9444; border: 1px solid #00AAFF; padding: 13px;\">\n" +
+        `<a href=\"${url}\" style=\"text-decoration: none; color: #FFFFFF;\" ` +
+        "target=\"_self\">CONFIRM EMAIL</a></td>\n" +
+        "</tbody>\n" +
+        "</table>" +
+        "<p style='font-size: 15px'>or click on this link:</p>" +
+        `<a href=\"${url}\" >Confirm email</a>`
 
     return this.sendMail({
       to: email,
       subject: 'ARTART. Email confirmation | ARTART. Подтверждение Email ',
       text,
+      html
     })
   }
 

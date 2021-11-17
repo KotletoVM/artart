@@ -139,7 +139,8 @@ export class AuthService {
         const tokens = await this.tokenRepository.find();
         tokens.forEach(async token => {
             if (await bcrypt.compare(cookie_token, token.token)){
-                this.tokenRepository.delete({userid: user.id, token: token.token});
+                console.log(cookie_token, token.token);
+                this.tokenRepository.delete({token: token.token});
             }
         })
         response.clearCookie('access_token').clearCookie('refresh_token').send({ success: [user.name, user.email] })

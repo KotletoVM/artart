@@ -11,8 +11,6 @@ import { Roles } from 'src/decorators/roles.decorator';
 export class MusicController {
   constructor(private readonly musicService: MusicService) {}
 
-  //ограничение на админа
-  //возможность сделать/изменить/удалить музыку со странички персоны
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Post()
@@ -30,15 +28,15 @@ export class MusicController {
     return this.musicService.findOne(+id);
   }
 
-  //ограничение на админа
-  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateMusicDto: UpdateMusicDto) {
     return this.musicService.update(+id, updateMusicDto);
   }
 
-  //ограничение на админа
-  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.musicService.remove(+id);

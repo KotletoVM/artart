@@ -16,10 +16,10 @@ const config_1 = require("@nestjs/config");
 const jwt_1 = require("@nestjs/jwt");
 const user_service_1 = require("../user/user.service");
 let EmailConfirmationService = class EmailConfirmationService {
-    constructor(configService, jwtService, userService) {
+    constructor(userService, configService, jwtService) {
+        this.userService = userService;
         this.configService = configService;
         this.jwtService = jwtService;
-        this.userService = userService;
         this.nodemailerTransport = (0, nodemailer_1.createTransport)({
             service: configService.get('email.service'),
             auth: {
@@ -34,6 +34,7 @@ let EmailConfirmationService = class EmailConfirmationService {
             throw new common_1.BadRequestException('Email already confirmed');
         }
         await this.userService.markEmailAsConfirmed(email);
+        return email;
     }
     async decodeConfirmationToken(token) {
         try {
@@ -62,11 +63,24 @@ let EmailConfirmationService = class EmailConfirmationService {
             expiresIn: this.configService.get('verification.expiresIn')
         });
         const url = `${this.configService.get('verification.url')}?token=${token}`;
-        const text = `Welcome to the ARTART web-application. To confirm the email address, click here: ${url}`;
+        const text = `Welcome to the ARTART web-application. To confirm your email address, click here: ${url}`;
+        const html = "<h3>Welcome to the ARTART web-application.</h3><h4></h4>" +
+            "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color: #00AAFF;  width: 220px; border-collapse: collapse;\">\n" +
+            "<tbody>\n" +
+            "<tr>\n" +
+            "<td style=\"border-collapse: collapse; border-spacing: 0; font-family: ‘Trebuchet MS’, sans-serif; " +
+            "font-size: 18px; text-align: center; color: #FFFFFF;  text-shadow: 1px 1px 0 #ff9444; border: 1px solid #00AAFF; padding: 13px;\">\n" +
+            `<a href=\"${url}\" style=\"text-decoration: none; color: #FFFFFF;\" ` +
+            "target=\"_self\">CONFIRM EMAIL</a></td>\n" +
+            "</tbody>\n" +
+            "</table>" +
+            "<p style='font-size: 15px'>or click on this link:</p>" +
+            `<a href=\"${url}\" >Confirm email</a>`;
         return this.sendMail({
             to: email,
             subject: 'ARTART. Email confirmation | ARTART. Подтверждение Email ',
             text,
+            html
         });
     }
     async resendConfirmationLink(userId) {
@@ -79,9 +93,9 @@ let EmailConfirmationService = class EmailConfirmationService {
 };
 EmailConfirmationService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [config_1.ConfigService,
-        jwt_1.JwtService,
-        user_service_1.UserService])
+    __metadata("design:paramtypes", [user_service_1.UserService,
+        config_1.ConfigService,
+        jwt_1.JwtService])
 ], EmailConfirmationService);
 exports.EmailConfirmationService = EmailConfirmationService;
 //# sourceMappingURL=email-confirmation.service.js.map

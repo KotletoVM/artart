@@ -27,6 +27,6 @@ export class EmailConfirmationStrategy extends PassportStrategy(Strategy, 'email
         if (user.isEmailConfirmed == false){
             throw new UnauthorizedException('Confirm your email first');
         }
-        return data;
+        return user;
     }
 }

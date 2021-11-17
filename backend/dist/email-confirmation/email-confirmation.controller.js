@@ -22,7 +22,7 @@ let EmailConfirmationController = class EmailConfirmationController {
     }
     async confirm(confirmEmailDto) {
         const email = await this.emailConfirmationService.decodeConfirmationToken(confirmEmailDto);
-        await this.emailConfirmationService.confirmEmail(email);
+        return await this.emailConfirmationService.confirmEmail(email);
     }
     async resendConfirmationLink(req) {
         await this.emailConfirmationService.resendConfirmationLink(req.user.id);

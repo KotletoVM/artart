@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, UseGuards, Request, Query, Redirect } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, UseGuards, Request, Query, Redirect, HttpCode, Res, Inject, forwardRef } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -10,10 +10,16 @@ import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 import { UpdateUserEmailDto } from './dto/update-user-email.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { EmailConfirmationGuard } from 'src/auth/guards/emailConfirmation.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/decorators/roles.decorator';
+import { Response } from 'express';
+import { EmailConfirmationService } from 'src/email-confirmation/email-confirmation.service';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+      private readonly emailConfirmationService: EmailConfirmationService,
+      private readonly userService: UserService, ) {}
 
 //ограничение на авторизованного пользователя
   @Get()
@@ -36,12 +42,11 @@ export class UserController {
   @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    const {hash, role, updatedAt, email, ...find} = await this.userService.findById(+id);
+    const {hash, role, updatedAt, email, isEmailConfirmed, ...find} = await this.userService.findById(+id);
     if (!find){throw new NotFoundException('User not found.');}
     return find;
   }
 
-//выход из акка если сменяется почта
   @UseGuards(JwtAuthGuard)
   @Patch('me')
   async update(@Request() req, @Body() updateUserDto: UpdateUserDto) {
@@ -49,26 +54,27 @@ export class UserController {
     if (!find){throw new NotFoundException('User not found.');}
     return this.userService.update(+req.user.id, updateUserDto);
   }
-//выход из акка если сменяется пароль
+
   @UseGuards(JwtAuthGuard)
   @Patch('me/updatePass')
-  async updatePassword(@Request() req, @Body() updateUserPasswordDto: UpdateUserPasswordDto) {
+  async updatePassword(@Request() req, @Body() updateUserPasswordDto: UpdateUserPasswordDto, @Res() responce: Response) {
     const find = await this.userService.findById(+req.user.id);
     if (!find){throw new NotFoundException('User not found.');}
-    return this.userService.updatePassword(+req.user.id, updateUserPasswordDto);
+    return this.userService.updatePassword(+req.user.id, updateUserPasswordDto, responce);
   }
 
 
-  @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
-  @Patch('me/updateEmail')
-  async updateEmail(@Request() req, @Body() updateUserEmailDto: UpdateUserEmailDto) {
-    const find = await this.userService.findById(+req.user.id);
-    if (!find){throw new NotFoundException('User not found.');}
-    return this.userService.updateEmail(+req.user.id, updateUserEmailDto);
-  }
-
-  //только админ
   @UseGuards(JwtAuthGuard)
+  @Patch('me/updateEmail')
+  async updateEmail(@Request() req, @Body() updateUserEmailDto: UpdateUserEmailDto, @Res() responce: Response) {
+    const find = await this.userService.findById(+req.user.id);
+    if (!find){throw new NotFoundException('User not found.');}
+    const user = await this.userService.updateEmail(+req.user.id, updateUserEmailDto, responce);
+    await this.emailConfirmationService.sendVerificationLink(updateUserEmailDto.email);
+  }
+
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Patch(':id')
   async updateRole(@Request() req, @Body() updateUserRoleDto: UpdateUserRoleDto) {
     const find = await this.userService.findById(+req.user.id);

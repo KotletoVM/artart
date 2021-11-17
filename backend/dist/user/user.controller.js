@@ -35,8 +35,12 @@ const local_auth_guard_1 = require("../auth/guards/local-auth.guard");
 const update_user_email_dto_1 = require("./dto/update-user-email.dto");
 const update_user_role_dto_1 = require("./dto/update-user-role.dto");
 const emailConfirmation_guard_1 = require("../auth/guards/emailConfirmation.guard");
+const roles_guard_1 = require("../auth/guards/roles.guard");
+const roles_decorator_1 = require("../decorators/roles.decorator");
+const email_confirmation_service_1 = require("../email-confirmation/email-confirmation.service");
 let UserController = class UserController {
-    constructor(userService) {
+    constructor(emailConfirmationService, userService) {
+        this.emailConfirmationService = emailConfirmationService;
         this.userService = userService;
     }
     findAll() {
@@ -49,7 +53,7 @@ let UserController = class UserController {
         return this.userService.search(searchUserDto);
     }
     async findOne(id) {
-        const _a = await this.userService.findById(+id), { hash, role, updatedAt, email } = _a, find = __rest(_a, ["hash", "role", "updatedAt", "email"]);
+        const _a = await this.userService.findById(+id), { hash, role, updatedAt, email, isEmailConfirmed } = _a, find = __rest(_a, ["hash", "role", "updatedAt", "email", "isEmailConfirmed"]);
         if (!find) {
             throw new common_1.NotFoundException('User not found.');
         }
@@ -62,19 +66,20 @@ let UserController = class UserController {
         }
         return this.userService.update(+req.user.id, updateUserDto);
     }
-    async updatePassword(req, updateUserPasswordDto) {
+    async updatePassword(req, updateUserPasswordDto, responce) {
         const find = await this.userService.findById(+req.user.id);
         if (!find) {
             throw new common_1.NotFoundException('User not found.');
         }
-        return this.userService.updatePassword(+req.user.id, updateUserPasswordDto);
+        return this.userService.updatePassword(+req.user.id, updateUserPasswordDto, responce);
     }
-    async updateEmail(req, updateUserEmailDto) {
+    async updateEmail(req, updateUserEmailDto, responce) {
         const find = await this.userService.findById(+req.user.id);
         if (!find) {
             throw new common_1.NotFoundException('User not found.');
         }
-        return this.userService.updateEmail(+req.user.id, updateUserEmailDto);
+        const user = await this.userService.updateEmail(+req.user.id, updateUserEmailDto, responce);
+        await this.emailConfirmationService.sendVerificationLink(updateUserEmailDto.email);
     }
     async updateRole(req, updateUserRoleDto) {
         const find = await this.userService.findById(+req.user.id);
@@ -135,21 +140,24 @@ __decorate([
     (0, common_1.Patch)('me/updatePass'),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, update_user_password_dto_1.UpdateUserPasswordDto]),
+    __metadata("design:paramtypes", [Object, update_user_password_dto_1.UpdateUserPasswordDto, Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "updatePassword", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, emailConfirmation_guard_1.EmailConfirmationGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Patch)('me/updateEmail'),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, update_user_email_dto_1.UpdateUserEmailDto]),
+    __metadata("design:paramtypes", [Object, update_user_email_dto_1.UpdateUserEmailDto, Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "updateEmail", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, roles_decorator_1.Roles)(role_enum_1.UserRole.ADMIN),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Body)()),
@@ -167,7 +175,8 @@ __decorate([
 ], UserController.prototype, "remove", null);
 UserController = __decorate([
     (0, common_1.Controller)('user'),
-    __metadata("design:paramtypes", [user_service_1.UserService])
+    __metadata("design:paramtypes", [email_confirmation_service_1.EmailConfirmationService,
+        user_service_1.UserService])
 ], UserController);
 exports.UserController = UserController;
 //# sourceMappingURL=user.controller.js.map

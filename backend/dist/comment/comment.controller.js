@@ -19,6 +19,9 @@ const create_comment_dto_1 = require("./dto/create-comment.dto");
 const update_comment_dto_1 = require("./dto/update-comment.dto");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const emailConfirmation_guard_1 = require("../auth/guards/emailConfirmation.guard");
+const role_enum_1 = require("../enums/role.enum");
+const roles_decorator_1 = require("../decorators/roles.decorator");
+const roles_guard_1 = require("../auth/guards/roles.guard");
 let CommentController = class CommentController {
     constructor(commentService) {
         this.commentService = commentService;
@@ -78,14 +81,16 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], CommentController.prototype, "findAllforPerson", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, roles_decorator_1.Roles)(role_enum_1.UserRole.ADMIN),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], CommentController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, roles_decorator_1.Roles)(role_enum_1.UserRole.ADMIN),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),

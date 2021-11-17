@@ -33,20 +33,20 @@ let PersonController = class PersonController {
     async setLike(req, personid) {
         return this.personService.setLike(req.user.id, personid);
     }
-    async findAll(req) {
-        return this.personService.findAll(req);
+    async findAll(req, take, skip) {
+        return this.personService.findAll(req, take, skip);
     }
-    getPopular(req) {
-        return this.personService.getPopular(req);
+    getPopular(req, take, skip) {
+        return this.personService.getPopular(req, take, skip);
     }
-    search(searchPersonDto) {
-        return this.personService.search(searchPersonDto);
+    search(searchPersonDto, take, skip) {
+        return this.personService.search(searchPersonDto, take, skip);
     }
-    async findByTag(tagid, req) {
-        return this.personService.findByTag(req, tagid);
+    async findByTag(tagid, take, skip, req) {
+        return this.personService.findByTag(req, tagid, take, skip);
     }
-    async findUsersFavorite(req) {
-        return this.personService.findUsersFavorite(req.user.id);
+    async findUsersFavorite(req, take, skip) {
+        return this.personService.findUsersFavorite(req.user.id, take, skip);
     }
     findArtists() {
         return this.personService.findArtists();
@@ -97,38 +97,48 @@ __decorate([
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Query)('take')),
+    __param(2, (0, common_1.Query)('skip')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Number, Number]),
     __metadata("design:returntype", Promise)
 ], PersonController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)('popular'),
     __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Query)('take')),
+    __param(2, (0, common_1.Query)('skip')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Number, Number]),
     __metadata("design:returntype", void 0)
 ], PersonController.prototype, "getPopular", null);
 __decorate([
     (0, common_1.Get)('search'),
     __param(0, (0, common_1.Query)()),
+    __param(1, (0, common_1.Query)('take')),
+    __param(2, (0, common_1.Query)('skip')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [search_person_dto_1.SearchPersonDto]),
+    __metadata("design:paramtypes", [search_person_dto_1.SearchPersonDto, Number, Number]),
     __metadata("design:returntype", void 0)
 ], PersonController.prototype, "search", null);
 __decorate([
     (0, common_1.Get)('tags'),
     __param(0, (0, common_1.Query)('tag')),
-    __param(1, (0, common_1.Request)()),
+    __param(1, (0, common_1.Query)('take')),
+    __param(2, (0, common_1.Query)('skip')),
+    __param(3, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:paramtypes", [Number, Number, Number, Object]),
     __metadata("design:returntype", Promise)
 ], PersonController.prototype, "findByTag", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, emailConfirmation_guard_1.EmailConfirmationGuard),
     (0, common_1.Get)('favorite'),
     __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Query)('take')),
+    __param(2, (0, common_1.Query)('skip')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Number, Number]),
     __metadata("design:returntype", Promise)
 ], PersonController.prototype, "findUsersFavorite", null);
 __decorate([

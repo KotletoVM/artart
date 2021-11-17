@@ -14,7 +14,6 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 export class PersonController {
   constructor(private readonly personService: PersonService) {}
 
-  //ограничение на админа
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Post()
@@ -29,29 +28,29 @@ export class PersonController {
   }
 
   @Get()
-  async findAll(@Request() req: Req) {
-    return this.personService.findAll(req);
+  async findAll(@Request() req: Req, @Query('take') take: number, @Query('skip') skip: number) {
+    return this.personService.findAll(req, take, skip);
   }
 
   @Get('popular')
-  getPopular(@Request() req: Req) {
-    return this.personService.getPopular(req);
+  getPopular(@Request() req: Req, @Query('take') take: number, @Query('skip') skip: number) {
+    return this.personService.getPopular(req, take, skip);
   }
 
   @Get('search')
-  search(@Query() searchPersonDto : SearchPersonDto){
-    return this.personService.search(searchPersonDto);
+  search(@Query() searchPersonDto : SearchPersonDto, @Query('take') take: number, @Query('skip') skip: number){
+    return this.personService.search(searchPersonDto, take, skip);
   }
 
   @Get('tags')
-  async findByTag(@Query('tag') tagid: number, @Request() req: Req){
-    return this.personService.findByTag(req, tagid);
+  async findByTag(@Query('tag') tagid: number, @Query('take') take: number, @Query('skip') skip: number, @Request() req: Req){
+    return this.personService.findByTag(req, tagid, take, skip);
   }
 
   @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
   @Get('favorite')
-  async findUsersFavorite(@Request() req){
-    return this.personService.findUsersFavorite(req.user.id);
+  async findUsersFavorite(@Request() req, @Query('take') take: number, @Query('skip') skip: number){
+    return this.personService.findUsersFavorite(req.user.id, take, skip);
   }
 
   @Get('artists')

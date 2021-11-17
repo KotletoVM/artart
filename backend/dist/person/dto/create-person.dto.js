@@ -40,5 +40,13 @@ __decorate([
     (0, class_validator_1.ArrayNotEmpty)(),
     __metadata("design:type", Array)
 ], CreatePersonDto.prototype, "tags", void 0);
+__decorate([
+    (0, class_validator_1.IsEmpty)(),
+    __metadata("design:type", Number)
+], CreatePersonDto.prototype, "likes", void 0);
+__decorate([
+    (0, class_validator_1.IsEmpty)(),
+    __metadata("design:type", Number)
+], CreatePersonDto.prototype, "views", void 0);
 exports.CreatePersonDto = CreatePersonDto;
 //# sourceMappingURL=create-person.dto.js.map

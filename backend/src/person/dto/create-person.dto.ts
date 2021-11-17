@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsUrl, IsNotEmpty, IsArray, Min, ArrayNotEmpty } from "class-validator";
+import { IsOptional, IsString, IsUrl, IsNotEmpty, IsArray, Min, ArrayNotEmpty, IsEmpty } from "class-validator";
 import { Tag } from "src/tag/entities/tag.entity";
 
 export class CreatePersonDto {
@@ -19,4 +19,8 @@ export class CreatePersonDto {
      @IsArray()
      @ArrayNotEmpty()
      tags: Tag[]
+     @IsEmpty()
+     likes: number
+     @IsEmpty()
+     views: number
 }

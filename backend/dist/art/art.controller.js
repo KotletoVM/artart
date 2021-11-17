@@ -18,6 +18,9 @@ const art_service_1 = require("./art.service");
 const create_art_dto_1 = require("./dto/create-art.dto");
 const update_art_dto_1 = require("./dto/update-art.dto");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
+const role_enum_1 = require("../enums/role.enum");
+const roles_guard_1 = require("../auth/guards/roles.guard");
+const roles_decorator_1 = require("../decorators/roles.decorator");
 let ArtController = class ArtController {
     constructor(artService) {
         this.artService = artService;
@@ -39,7 +42,8 @@ let ArtController = class ArtController {
     }
 };
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, roles_decorator_1.Roles)(role_enum_1.UserRole.ADMIN),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -61,7 +65,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ArtController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, roles_decorator_1.Roles)(role_enum_1.UserRole.ADMIN),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
@@ -70,7 +75,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ArtController.prototype, "update", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, roles_decorator_1.Roles)(role_enum_1.UserRole.ADMIN),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),

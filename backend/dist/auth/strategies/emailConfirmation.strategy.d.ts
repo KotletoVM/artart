@@ -9,9 +9,6 @@ export declare class EmailConfirmationStrategy extends EmailConfirmationStrategy
     validate(payload: {
         sub: number;
         email: string;
-    }): Promise<{
-        id: number;
-        email: string;
-    }>;
+    }): Promise<import("../../user/entities/user.entity").User>;
 }
 export {};

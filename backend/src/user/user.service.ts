@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject, forwardRef } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,6 +11,7 @@ import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserEmailDto } from './dto/update-user-email.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { HashedRefreshToken } from 'src/hashed-refresh-token/entities/hashed-refresh-token.entity';
+import { Response } from 'express';
 
 @Injectable()
 export class UserService {
@@ -19,7 +20,7 @@ export class UserService {
       @InjectRepository(User)
       private userRepository: Repository<User>,
       @InjectRepository(HashedRefreshToken)
-      private tokenRepository: Repository<HashedRefreshToken>
+      private tokenRepository: Repository<HashedRefreshToken>,
   ) {}
 
   create(createUserDto: CreateUserDto) {
@@ -47,17 +48,14 @@ export class UserService {
 
 
   async search(searchUserDto: SearchUserDto) {
-    const qb = this.userRepository.createQueryBuilder('searchQueryBuilder');
+    const qb = this.userRepository.createQueryBuilder('user');
 
-    if (searchUserDto.name){qb.andWhere(`searchQueryBuilder.name ILIKE :name`);}
-
-    if (searchUserDto.email){qb.andWhere(`searchQueryBuilder.email ILIKE :email`);}
+    if (searchUserDto.name){qb.andWhere(`user.name ILIKE :name`);}
 
     qb.setParameters({
-      name: `%${searchUserDto.name}%`,
-      email:`%${searchUserDto.email}%`
+      name: `%${searchUserDto.name}%`
     })
-    let [users, number] = await  qb.getManyAndCount();
+    let [users, number] = await  qb.select(["user.id", "user.name", "user.userpic", "user.createdAt"]).getManyAndCount();
     return {users, number};
 
   }
@@ -72,18 +70,33 @@ export class UserService {
     return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return this.userRepository.update(id, updateUserDto);
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    let name,userpic;
+    if (updateUserDto.name){name = await this.userRepository.update(id, {name: updateUserDto.name})};
+    if (updateUserDto.userpic){userpic = await this.userRepository.update(id, {userpic: updateUserDto.userpic})};
+    return {name, userpic};
   }
 
-  async updatePassword(id: number, updateUserPasswordDto: UpdateUserPasswordDto){
-    const hash = await bcrypt.hash(updateUserPasswordDto.password, 10);
-    return this.userRepository.update(id, {hash: hash});
-    //logout
+  async updatePassword(id: number, updateUserPasswordDto: UpdateUserPasswordDto, response: Response){
+    if (updateUserPasswordDto.password){
+      const hash = await bcrypt.hash(updateUserPasswordDto.password, 10);
+      const hashUpdate = await this.userRepository.update(id, {hash: hash});
+      if (hashUpdate){response.clearCookie('access_token').clearCookie('refresh_token').send({hashUpdate});
+      }
+      else throw new NotFoundException('something wrong');
+    }
+    else throw new NotFoundException('to update password enter new password');
   }
 
-  async updateEmail(id: number, updateUserEmailDto: UpdateUserEmailDto){
-    return this.userRepository.update(id, {email: updateUserEmailDto.email});
+  async updateEmail(id: number, updateUserEmailDto: UpdateUserEmailDto, response: Response){
+    if (updateUserEmailDto.email){
+      const emailUpdate = await this.userRepository.update(id, {email: updateUserEmailDto.email, isEmailConfirmed: false});
+      if (emailUpdate){response.clearCookie('access_token').clearCookie('refresh_token').send({emailUpdate});
+    }
+      else throw new NotFoundException('something wrong');
+    }
+    else throw new NotFoundException('to update email enter new email');
+
     //logout
   }
 

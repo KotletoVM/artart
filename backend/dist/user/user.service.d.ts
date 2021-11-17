@@ -8,6 +8,7 @@ import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserEmailDto } from './dto/update-user-email.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { HashedRefreshToken } from 'src/hashed-refresh-token/entities/hashed-refresh-token.entity';
+import { Response } from 'express';
 export declare class UserService {
     private userRepository;
     private tokenRepository;
@@ -27,9 +28,12 @@ export declare class UserService {
     }>;
     findByCond(cond: LoginUserDto): Promise<User>;
     getProfile(id: number): Promise<User>;
-    update(id: number, updateUserDto: UpdateUserDto): Promise<import("typeorm").UpdateResult>;
-    updatePassword(id: number, updateUserPasswordDto: UpdateUserPasswordDto): Promise<import("typeorm").UpdateResult>;
-    updateEmail(id: number, updateUserEmailDto: UpdateUserEmailDto): Promise<import("typeorm").UpdateResult>;
+    update(id: number, updateUserDto: UpdateUserDto): Promise<{
+        name: any;
+        userpic: any;
+    }>;
+    updatePassword(id: number, updateUserPasswordDto: UpdateUserPasswordDto, response: Response): Promise<void>;
+    updateEmail(id: number, updateUserEmailDto: UpdateUserEmailDto, response: Response): Promise<void>;
     updateRole(id: number, updateUserRoleDto: UpdateUserRoleDto): Promise<import("typeorm").UpdateResult>;
     remove(id: number): Promise<import("typeorm").DeleteResult>;
     markEmailAsConfirmed(email: string): Promise<import("typeorm").UpdateResult>;

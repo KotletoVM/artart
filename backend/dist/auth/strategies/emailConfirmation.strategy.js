@@ -38,7 +38,7 @@ let EmailConfirmationStrategy = class EmailConfirmationStrategy extends (0, pass
         if (user.isEmailConfirmed == false) {
             throw new common_1.UnauthorizedException('Confirm your email first');
         }
-        return data;
+        return user;
     }
 };
 EmailConfirmationStrategy = __decorate([

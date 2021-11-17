@@ -6,4 +6,6 @@ export declare class CreatePersonDto {
     description: string;
     personpic: string;
     tags: Tag[];
+    likes: number;
+    views: number;
 }

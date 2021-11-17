@@ -19,13 +19,13 @@ export declare class PersonService {
         generatedMaps: import("typeorm").ObjectLiteral[];
     }>;
     setLike(userid: number, personid: number): Promise<import("typeorm").UpdateResult>;
-    findAll(req: Req): Promise<(number | Person[])[]>;
-    getPopular(req: Req): Promise<(number | Person[])[]>;
-    findByTag(req: Req, tagid: number): Promise<(number | Person[])[]>;
-    findOne(req: Req, id: number): Promise<Person>;
+    findAll(req: Req, take?: number, skip?: number): Promise<(number | Person[])[]>;
+    getPopular(req: Req, take?: number, skip?: number): Promise<(number | Person[])[]>;
+    findByTag(req: Req, tagid: number, take?: number, skip?: number): Promise<(number | Person[])[]>;
+    findOne(req: Req, id: number): Promise<Person | Person[]>;
     findOneSimple(id: number): Promise<Person>;
-    findUsersFavorite(id: number): Promise<(number | Person[])[]>;
-    search(searchPersonDto: SearchPersonDto): Promise<{
+    findUsersFavorite(id: number, take?: number, skip?: number): Promise<(number | Person[])[]>;
+    search(searchPersonDto: SearchPersonDto, take?: number, skip?: number): Promise<{
         persons: Person[];
         number: number;
     }>;

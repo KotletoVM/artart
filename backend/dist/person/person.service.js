@@ -63,37 +63,49 @@ let PersonService = class PersonService {
         return this.personRepository.update(personid, { views: person.views + 1, likes: person.likes + 1 });
         ;
     }
-    async findAll(req) {
+    async findAll(req, take = 10, skip = 0) {
         const currentUserId = await this.isAuth(req);
         if (!currentUserId) {
             const qb = this.personRepository.createQueryBuilder('person');
-            const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").take(3).orderBy("person.createdAt", "DESC").getManyAndCount();
+            const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").take(take).skip(skip).orderBy("person.createdAt", "DESC").getManyAndCount();
             return [persons, count];
         }
         const qb = this.personRepository.createQueryBuilder('person');
-        const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["person", "user.id", "user.name"]).orderBy("person.createdAt", "DESC").take(3).getManyAndCount();
+        const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["person", "user.id", "user.name"]).orderBy("person.createdAt", "DESC").take(take).skip(skip).getManyAndCount();
         return [this.setLikedforCurrentUser(currentUserId, persons), count];
     }
-    async getPopular(req) {
+    async getPopular(req, take = 10, skip = 0) {
         const currentUserId = await this.isAuth(req);
         if (!currentUserId) {
             const qb = this.personRepository.createQueryBuilder('person');
-            const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").orderBy('person.views', 'ASC').take(3).getManyAndCount();
+            const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").orderBy('person.views', 'ASC').take(take).skip(skip).getManyAndCount();
             return [persons, count];
         }
         const qb = this.personRepository.createQueryBuilder('person');
-        const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["person", "user.id", "user.name"]).orderBy('person.views', 'DESC').take(3).getManyAndCount();
+        const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["person", "user.id", "user.name"]).orderBy('person.views', 'DESC').take(take).skip(skip).getManyAndCount();
         return [this.setLikedforCurrentUser(currentUserId, persons), count];
     }
-    async findByTag(req, tagid) {
+    async findByTag(req, tagid, take = 10, skip = 0) {
         const currentUserId = await this.isAuth(req);
         if (!currentUserId) {
             const qb = this.personRepository.createQueryBuilder('person');
-            const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").where(`tag.id = :tag`, { tag: tagid }).getManyAndCount();
+            const qb1 = this.personRepository.createQueryBuilder('person');
+            const personsWTagsId = await qb.leftJoinAndSelect("person.tags", "tag").select(["person.id", "person.views"]).where(`tag.id = :tag`, { tag: tagid }).take(take).skip(skip).orderBy('person.views', 'DESC').getMany();
+            const personids = [];
+            personsWTagsId.forEach(function (pers) {
+                personids.push(pers.id);
+            });
+            const [persons, count] = await qb1.leftJoinAndSelect("person.tags", "tag").where(`person.id IN (:...personid)`, { personid: personids }).orderBy('person.views', 'DESC').take(take).skip(skip).getManyAndCount();
             return [persons, count];
         }
         const qb = this.personRepository.createQueryBuilder('person');
-        const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["user.id", "user.name"]).where(`tag.id = :tag`, { tag: tagid }).take(3).orderBy('person.views', 'DESC').getManyAndCount();
+        const qb1 = this.personRepository.createQueryBuilder('person');
+        const personsWTagsId = await qb.leftJoinAndSelect("person.tags", "tag").select(["person.id", "person.views"]).where(`tag.id = :tag`, { tag: tagid }).take(take).skip(skip).orderBy('person.views', 'DESC').getMany();
+        const personids = [];
+        personsWTagsId.forEach(function (pers) {
+            personids.push(pers.id);
+        });
+        const [persons, count] = await qb1.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["user.id", "user.name"]).where(`person.id IN (:...personid)`, { personid: personids }).orderBy('person.views', 'DESC').take(take).skip(skip).getManyAndCount();
         return [this.setLikedforCurrentUser(currentUserId, persons), count];
     }
     async findOne(req, id) {
@@ -106,17 +118,17 @@ let PersonService = class PersonService {
         const qb = this.personRepository.createQueryBuilder('person');
         const person = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").leftJoin("person.personArt", "art").leftJoin("person.personMusic", "music").addSelect(["user.id", "user.name"]).where("person.id = :id", { id: id }).getOne();
         this.personRepository.update(id, { views: person.views + 1 });
-        return person;
+        return this.setLikedforCurrentUser(currentUserId, [person]);
     }
     async findOneSimple(id) {
         return this.personRepository.findOne(id);
     }
-    async findUsersFavorite(id) {
+    async findUsersFavorite(id, take = 10, skip = 0) {
         const qb = this.personRepository.createQueryBuilder('person');
-        const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["user.id", "user.name"]).where(`user.id = :id`, { id: id }).take(3).orderBy('person.views', 'DESC').getManyAndCount();
+        const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["user.id", "user.name"]).where(`user.id = :id`, { id: id }).take(take).skip(skip).orderBy('person.views', 'DESC').getManyAndCount();
         return [this.setLikedforCurrentUser(id, persons), count];
     }
-    async search(searchPersonDto) {
+    async search(searchPersonDto, take = 10, skip = 0) {
         const qb = this.personRepository.createQueryBuilder('searchQueryBuilder');
         if (searchPersonDto.views) {
             qb.orderBy('views', searchPersonDto.views);
@@ -135,10 +147,11 @@ let PersonService = class PersonService {
             fullname: `%${searchPersonDto.fullname}%`,
             pseudonym: `%${searchPersonDto.pseudonym}%`
         });
-        let [persons, number] = await qb.getManyAndCount();
+        let [persons, number] = await qb.take(take).skip(skip).getManyAndCount();
         return { persons, number };
     }
     update(id, updatePersonDto) {
+        console.log(updatePersonDto);
         return this.personRepository.update(id, updatePersonDto);
     }
     async remove(id) {

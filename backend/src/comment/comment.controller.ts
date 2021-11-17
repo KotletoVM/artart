@@ -29,7 +29,6 @@ export class CommentController {
     return this.commentService.findAllforPerson(personid);
   }
 
-  //ограничение на админа
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
@@ -37,7 +36,6 @@ export class CommentController {
     return this.commentService.findAll();
   }
 
-  //ограничение на админа
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get(':id')

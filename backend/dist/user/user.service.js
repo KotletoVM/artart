@@ -42,18 +42,14 @@ let UserService = class UserService {
         return this.userRepository.findOne({ email: email });
     }
     async search(searchUserDto) {
-        const qb = this.userRepository.createQueryBuilder('searchQueryBuilder');
+        const qb = this.userRepository.createQueryBuilder('user');
         if (searchUserDto.name) {
-            qb.andWhere(`searchQueryBuilder.name ILIKE :name`);
-        }
-        if (searchUserDto.email) {
-            qb.andWhere(`searchQueryBuilder.email ILIKE :email`);
+            qb.andWhere(`user.name ILIKE :name`);
         }
         qb.setParameters({
-            name: `%${searchUserDto.name}%`,
-            email: `%${searchUserDto.email}%`
+            name: `%${searchUserDto.name}%`
         });
-        let [users, number] = await qb.getManyAndCount();
+        let [users, number] = await qb.select(["user.id", "user.name", "user.userpic", "user.createdAt"]).getManyAndCount();
         return { users, number };
     }
     findByCond(cond) {
@@ -64,15 +60,42 @@ let UserService = class UserService {
         const user = await qb.select(["user.id", "user.name", "user.userpic", "user.email", "user.createdAt", "user.updatedAt"]).where("user.id = :id", { id: id }).getOne();
         return user;
     }
-    update(id, updateUserDto) {
-        return this.userRepository.update(id, updateUserDto);
+    async update(id, updateUserDto) {
+        let name, userpic;
+        if (updateUserDto.name) {
+            name = await this.userRepository.update(id, { name: updateUserDto.name });
+        }
+        ;
+        if (updateUserDto.userpic) {
+            userpic = await this.userRepository.update(id, { userpic: updateUserDto.userpic });
+        }
+        ;
+        return { name, userpic };
     }
-    async updatePassword(id, updateUserPasswordDto) {
-        const hash = await bcrypt.hash(updateUserPasswordDto.password, 10);
-        return this.userRepository.update(id, { hash: hash });
+    async updatePassword(id, updateUserPasswordDto, response) {
+        if (updateUserPasswordDto.password) {
+            const hash = await bcrypt.hash(updateUserPasswordDto.password, 10);
+            const hashUpdate = await this.userRepository.update(id, { hash: hash });
+            if (hashUpdate) {
+                response.clearCookie('access_token').clearCookie('refresh_token').send({ hashUpdate });
+            }
+            else
+                throw new common_1.NotFoundException('something wrong');
+        }
+        else
+            throw new common_1.NotFoundException('to update password enter new password');
     }
-    async updateEmail(id, updateUserEmailDto) {
-        return this.userRepository.update(id, { email: updateUserEmailDto.email });
+    async updateEmail(id, updateUserEmailDto, response) {
+        if (updateUserEmailDto.email) {
+            const emailUpdate = await this.userRepository.update(id, { email: updateUserEmailDto.email, isEmailConfirmed: false });
+            if (emailUpdate) {
+                response.clearCookie('access_token').clearCookie('refresh_token').send({ emailUpdate });
+            }
+            else
+                throw new common_1.NotFoundException('something wrong');
+        }
+        else
+            throw new common_1.NotFoundException('to update email enter new email');
     }
     async updateRole(id, updateUserRoleDto) {
         return this.userRepository.update(id, { role: updateUserRoleDto.role });

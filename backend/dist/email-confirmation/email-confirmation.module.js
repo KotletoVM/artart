@@ -20,7 +20,7 @@ EmailConfirmationModule = __decorate([
         imports: [config_1.ConfigModule, jwt_1.JwtModule.register({
                 secret: "test",
                 signOptions: { expiresIn: '30m' },
-            }), user_module_1.UserModule],
+            }), (0, common_1.forwardRef)(() => user_module_1.UserModule)],
         controllers: [email_confirmation_controller_1.EmailConfirmationController],
         providers: [email_confirmation_service_1.EmailConfirmationService],
         exports: [email_confirmation_service_1.EmailConfirmationService]

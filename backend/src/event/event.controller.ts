@@ -11,7 +11,6 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
-  //ограничение на админа
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Post()
@@ -29,7 +28,6 @@ export class EventController {
     return this.eventService.findOne(+id);
   }
 
-  //ограничение на админа
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Patch(':id')
@@ -37,7 +35,6 @@ export class EventController {
     return this.eventService.update(+id, updateEventDto);
   }
 
-  //ограничение на админа
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete(':id')

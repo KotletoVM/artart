@@ -10,17 +10,17 @@ export declare class PersonController {
         generatedMaps: import("typeorm").ObjectLiteral[];
     }>;
     setLike(req: any, personid: number): Promise<import("typeorm").UpdateResult>;
-    findAll(req: Req): Promise<(number | import("./entities/person.entity").Person[])[]>;
-    getPopular(req: Req): Promise<(number | import("./entities/person.entity").Person[])[]>;
-    search(searchPersonDto: SearchPersonDto): Promise<{
+    findAll(req: Req, take: number, skip: number): Promise<(number | import("./entities/person.entity").Person[])[]>;
+    getPopular(req: Req, take: number, skip: number): Promise<(number | import("./entities/person.entity").Person[])[]>;
+    search(searchPersonDto: SearchPersonDto, take: number, skip: number): Promise<{
         persons: import("./entities/person.entity").Person[];
         number: number;
     }>;
-    findByTag(tagid: number, req: Req): Promise<(number | import("./entities/person.entity").Person[])[]>;
-    findUsersFavorite(req: any): Promise<(number | import("./entities/person.entity").Person[])[]>;
+    findByTag(tagid: number, take: number, skip: number, req: Req): Promise<(number | import("./entities/person.entity").Person[])[]>;
+    findUsersFavorite(req: any, take: number, skip: number): Promise<(number | import("./entities/person.entity").Person[])[]>;
     findArtists(): Promise<import("./entities/person.entity").Person[]>;
     findMusicians(): Promise<import("./entities/person.entity").Person[]>;
-    findOne(id: string, req: Req): Promise<import("./entities/person.entity").Person>;
+    findOne(id: string, req: Req): Promise<import("./entities/person.entity").Person | import("./entities/person.entity").Person[]>;
     update(id: string, updatePersonDto: UpdatePersonDto): Promise<import("typeorm").UpdateResult>;
     remove(id: string): Promise<import("typeorm").DeleteResult>;
 }
