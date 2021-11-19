@@ -5,7 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Person } from './entities/person.entity';
 import { Repository, Not  } from 'typeorm';
 import { SearchPersonDto } from './dto/search-person.dto';
-import { Music } from 'src/music/entities/music.entity';
 import { Art } from 'src/art/entities/art.entity';
 import { Tag } from 'src/tag/entities/tag.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
@@ -21,8 +20,6 @@ export class PersonService {
       private personRepository: Repository<Person>,
       @InjectRepository(Art)
       private artRepository: Repository<Art>,
-      @InjectRepository(Music)
-      private musicRepository: Repository<Music>,
       @InjectRepository(Comment)
       private commentRepository: Repository<Comment>,
       private readonly commentService: CommentService
@@ -104,11 +101,11 @@ export class PersonService {
     const currentUserId = await this.isAuth(req);
     if (!currentUserId){
       const qb = this.personRepository.createQueryBuilder('person');
-      const person = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.personArt", "art").leftJoin("person.personMusic", "music").where("person.id = :id", {id: id}).getOne();
+      const person = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.personArt", "art").where("person.id = :id", {id: id}).getOne();
       return person;
     }
     const qb = this.personRepository.createQueryBuilder('person');
-    const person = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").leftJoin("person.personArt", "art").leftJoin("person.personMusic", "music").addSelect(["user.id", "user.name"]).where("person.id = :id", {id: id}).getOne();
+    const person = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").leftJoin("person.personArt", "art").addSelect(["user.id", "user.name"]).where("person.id = :id", {id: id}).getOne();
     this.personRepository.update(id, {views: person.views + 1});
     return this.setLikedforCurrentUser(currentUserId, [person]);
   }
@@ -152,19 +149,8 @@ export class PersonService {
   async remove(id: number) {
     const qb = this.personRepository.createQueryBuilder('person');
     this.artRepository.delete({personid: id});
-    this.musicRepository.delete({personid: id});
     this.commentRepository.delete({person: {id: id}});
     return this.personRepository.delete(id);
-  }
-
-  async findMusicians() {
-    const qb = this.personRepository.createQueryBuilder('person');
-    return qb.innerJoinAndSelect("person.personMusic", "music").getMany()
-  }
-
-  async findArtists() {
-    const qb = this.personRepository.createQueryBuilder('person');
-    return qb.innerJoinAndSelect("person.personArt", "art").getMany()
   }
 
   setLikedforCurrentUser(currentUserId, persons: Person[] ){

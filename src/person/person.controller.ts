@@ -53,16 +53,6 @@ export class PersonController {
     return this.personService.findUsersFavorite(req.user.id, take, skip);
   }
 
-  @Get('artists')
-  findArtists(){
-    return this.personService.findArtists();
-  }
-
-  @Get('musicians')
-  findMusicians(){
-    return this.personService.findMusicians();
-  }
-
   @Get(':id')
   async findOne(@Param('id') id: string, @Request() req: Req) {
     const find = await this.personService.findOne(req, +id);

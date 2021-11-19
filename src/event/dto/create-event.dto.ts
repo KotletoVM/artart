@@ -1,4 +1,4 @@
-import { IsString, IsDate, IsOptional, IsArray, IsNotEmpty } from "class-validator";
+import { IsString, IsDate, IsOptional, IsArray, IsNotEmpty, IsUrl, ArrayUnique, ArrayNotEmpty } from "class-validator";
 import { Type } from 'class-transformer';
 
 export class CreateEventDto {
@@ -19,5 +19,7 @@ export class CreateEventDto {
     endDate?: Date;
     @IsNotEmpty()
     @IsArray()
+    @ArrayNotEmpty()
+    @ArrayUnique()
     pics: string[];
 }

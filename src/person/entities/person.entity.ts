@@ -1,6 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne, ManyToMany, JoinColumn, JoinTable} from 'typeorm'
 import {Contains, IsInt, Length, IsEmail, IsFQDN, IsDate, Min, Max} from "class-validator";
-import { Music } from 'src/music/entities/music.entity';
 import { Art } from 'src/art/entities/art.entity';
 import { Tag } from 'src/tag/entities/tag.entity';
 import { User } from 'src/user/entities/user.entity';
@@ -31,9 +30,6 @@ export class Person {
     @OneToMany(type => Art, art => art.personid,
         /*{ eager: true, cascade: true}*/)
     personArt?: Art[];
-    @OneToMany(type => Music, music => music.personid,
-        /*{ eager: true, cascade: true}*/)
-    personMusic?: Music[];
     @ManyToMany(() => Tag, {nullable: true, eager: true, cascade: true})
     @JoinTable({
         name: "person_tags"
