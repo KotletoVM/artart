@@ -23,16 +23,12 @@ export class ArtController {
 
   @Get()
   findAllforPerson(@Query('personid') personid: string) {
-    if (!personid)
     return this.artService.findAllforPerson(+personid);
-    throw new ForbiddenException('you should enter person id.');
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    if (!id)
     return this.artService.findOne(+id);
-    throw new ForbiddenException('you should enter id of art.');
   }
 
   //ограничение на админа

@@ -1,10 +1,12 @@
-import { IsNotEmpty, IsString, IsOptional, IsUrl } from "class-validator";
+import { IsNotEmpty, IsString, IsOptional, IsUrl, ArrayNotEmpty, ArrayUnique, IsArray } from "class-validator";
 
 export class CreateArtDto {
     id: number;
     @IsNotEmpty()
-    @IsUrl()
-    url: string;
+    @IsArray()
+    @ArrayNotEmpty()
+    @ArrayUnique()
+    url: string[];
     @IsOptional()
     @IsString()
     description?: string;

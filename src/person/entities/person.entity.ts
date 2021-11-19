@@ -26,7 +26,7 @@ export class Person {
     @Column({default: 0})
     likes: number;
     @Column("simple-json", {nullable: true})
-    socNetworks: {instagram: string, vk: string, site: string};
+    socNetworks: {instagram: string, vk: string, tg: string, spotify: string, site: string};
     @OneToMany(type => Art, art => art.personid,
         /*{ eager: true, cascade: true}*/)
     personArt?: Art[];
