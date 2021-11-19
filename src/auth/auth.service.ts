@@ -1,5 +1,6 @@
-import { Injectable, ForbiddenException, HttpService } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
+import {HttpService} from "@nestjs/axios"
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/user/entities/user.entity';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
@@ -68,11 +69,11 @@ export class AuthService {
         this.saveRefreshToken({userid: user.id, token: token})
         response.cookie('access_token', accessToken, {
                 httpOnly: true,
-                domain: 'localhost',
+                domain: this.configService.get('cookie.cookieDomain'),
                 expires: new Date(Date.now() + 20000 * 60 * 60 * 24),
             }).cookie('refresh_token', refreshToken, {
             httpOnly: true,
-            domain: 'localhost',
+            domain: this.configService.get('cookie.cookieDomain'),
             expires: new Date(Date.now() + 20000 * 60 * 60 * 24),
         }).send({ success: payload });
         return payload;/* {
@@ -90,8 +91,8 @@ export class AuthService {
           createUserDto.password = await this.generateHash(createUserDto.password);
           const {hash, ...user} = await this.userService.create(createUserDto);
           //const user = await this.userService.create(createUserDto);
-          console.log(file);
-          this.httpService.post('https://storage.yandexcloud.net/artart/userpic/');
+          //console.log(file);
+          //this.httpService.post('https://storage.yandexcloud.net/artart/userpic/');
           const accessToken = this.generateJwtAccessToken(user, this.configService.get('access_token.secret'), this.configService.get('access_token.expiresIn'));
           const refreshToken = this.generateJwtRefreshToken(user, this.configService.get('refresh_token.secret'), this.configService.get('refresh_token.expiresIn'));
           const token = await bcrypt.hash(refreshToken, 10);
@@ -99,11 +100,11 @@ export class AuthService {
           //this.tokenRepository.save({userid: user.id, token: token});
           response.cookie('access_token', accessToken, {
               httpOnly: true,
-              domain: 'localhost',
+              domain: this.configService.get('cookie.cookieDomain'),
               expires: new Date(Date.now() + 20000 * 60 * 60 * 24),
           }).cookie('refresh_token', refreshToken, {
               httpOnly: true,
-              domain: 'localhost',
+              domain: this.configService.get('cookie.cookieDomain'),
               expires: new Date(Date.now() + 20000 * 60 * 60 * 24),
           }).send({ success: user });
       }
@@ -117,7 +118,7 @@ export class AuthService {
         const accessToken = this.generateJwtAccessToken(user, this.configService.get('access_token.secret'), this.configService.get('access_token.expiresIn'));
         response.cookie('access_token', accessToken, {
             httpOnly: true,
-            domain: 'localhost',
+            domain: this.configService.get('cookie.cookieDomain'),
             expires: new Date(Date.now() + 20000 * 60 * 60 * 24)}).send({ success: [user.name, user.email] });
     }
 

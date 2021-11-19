@@ -35,5 +35,8 @@ export const config = () => ({
         service: process.env.EMAIL_SERVICE,
         user: process.env.EMAIL_USER,
         password: process.env.EMAIL_PASSWORD
+    },
+    cookie:{
+        cookieDomain: process.env.COOKIE_DOMAIN
     }
 });

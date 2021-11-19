@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, ForbiddenException } from '@nestjs/common';
 import { ArtService } from './art.service';
 import { CreateArtDto } from './dto/create-art.dto';
 import { UpdateArtDto } from './dto/update-art.dto';
@@ -22,13 +22,17 @@ export class ArtController {
   //добавить @Get() с выводом запрета при попытке получить все арты
 
   @Get()
-  findAllforPerson(@Query('personid') personid: number) {
+  findAllforPerson(@Query('personid') personid: string) {
+    if (!personid)
     return this.artService.findAllforPerson(+personid);
+    throw new ForbiddenException('you should enter person id.');
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
+    if (!id)
     return this.artService.findOne(+id);
+    throw new ForbiddenException('you should enter id of art.');
   }
 
   //ограничение на админа

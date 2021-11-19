@@ -1,4 +1,4 @@
-import { Module, HttpModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UserModule } from 'src/user/user.module';
@@ -12,6 +12,7 @@ import { User } from 'src/user/entities/user.entity';
 import { JwtRefreshTokenStrategy } from './strategies/jwtRefreshToken.strategy';
 import { EmailConfirmationModule } from 'src/email-confirmation/email-confirmation.module';
 import { EmailConfirmationStrategy } from './strategies/emailConfirmation.strategy';
+import {HttpModule} from "@nestjs/axios"
 
 @Module({
   imports: [UserModule, PassportModule, JwtModule.register({
