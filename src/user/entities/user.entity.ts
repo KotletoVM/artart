@@ -9,7 +9,7 @@ import { Exclude } from 'class-transformer';
 export class User {
     @PrimaryGeneratedColumn()
     id: number;
-    @Column()
+    @Column({unique: true})
     name: string;
     @Column({unique: true})
     email: string;
@@ -27,7 +27,7 @@ export class User {
         default: UserRole.USER
     })
     role: UserRole
-    @Column({default: 'https://lowcars.net/wp-content/uploads/2017/02/userpic.png'})
+    @Column({default: 'https://storage.yandexcloud.net/artart/userpic/userpic.png'})
     userpic: string;
     @Column({ default: false })
     public isEmailConfirmed: boolean;

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, HttpModule } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UserModule } from 'src/user/user.module';
@@ -17,7 +17,14 @@ import { EmailConfirmationStrategy } from './strategies/emailConfirmation.strate
   imports: [UserModule, PassportModule, JwtModule.register({
     secret: "test",
     signOptions: { expiresIn: '30m' },
-  }), TypeOrmModule.forFeature([HashedRefreshToken]), TypeOrmModule.forFeature([User]), EmailConfirmationModule],
+  }),
+    TypeOrmModule.forFeature([HashedRefreshToken]),
+    TypeOrmModule.forFeature([User]),
+    EmailConfirmationModule,
+    HttpModule.register({
+      timeout: 5000,
+      maxRedirects: 5,
+    })],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy, JwtRefreshTokenStrategy, EmailConfirmationStrategy]
 })

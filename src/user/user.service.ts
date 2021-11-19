@@ -24,6 +24,8 @@ export class UserService {
   ) {}
 
   create(createUserDto: CreateUserDto) {
+
+
     return this.userRepository.save({
       name: createUserDto.name,
       email: createUserDto.email,
@@ -33,8 +35,9 @@ export class UserService {
     });
   }
 
-  findAll() {
-    return this.userRepository.find();
+  async findAll(take: number = 10, skip: number = 0) {
+    const qb = this.userRepository.createQueryBuilder('user');
+    qb.select(["user.id", "user.name", "user.userpic"]).take(take).skip(skip).getManyAndCount();
   }
 
   findById(id: number) {

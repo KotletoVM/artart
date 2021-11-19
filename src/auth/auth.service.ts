@@ -1,4 +1,4 @@
-import { Injectable, ForbiddenException } from '@nestjs/common';
+import { Injectable, ForbiddenException, HttpService } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/user/entities/user.entity';
@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { HashedRefreshToken } from 'src/hashed-refresh-token/entities/hashed-refresh-token.entity';
 import { CreateHashedRefreshTokenDto } from 'src/hashed-refresh-token/dto/create-hashed-refresh-token.dto';
 import { ConfigService } from "@nestjs/config";
+import { createHmac } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +20,8 @@ export class AuthService {
               private tokenRepository: Repository<HashedRefreshToken>,
               @InjectRepository(User)
               private userRepository: Repository<User>,
-              private configService: ConfigService
+              private configService: ConfigService,
+              private httpService: HttpService
               ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
@@ -83,11 +85,13 @@ export class AuthService {
         this.tokenRepository.save({userid: createHashedRefreshTokenDto.userid, token: createHashedRefreshTokenDto.token});
     }
 
-    async register(createUserDto: CreateUserDto, response: Response){
+    async register(createUserDto: CreateUserDto, response: Response, file?: Express.Multer.File){
       try {
           createUserDto.password = await this.generateHash(createUserDto.password);
           const {hash, ...user} = await this.userService.create(createUserDto);
           //const user = await this.userService.create(createUserDto);
+          console.log(file);
+          this.httpService.post('https://storage.yandexcloud.net/artart/userpic/');
           const accessToken = this.generateJwtAccessToken(user, this.configService.get('access_token.secret'), this.configService.get('access_token.expiresIn'));
           const refreshToken = this.generateJwtRefreshToken(user, this.configService.get('refresh_token.secret'), this.configService.get('refresh_token.expiresIn'));
           const token = await bcrypt.hash(refreshToken, 10);
@@ -145,5 +149,16 @@ export class AuthService {
         })
         response.clearCookie('access_token').clearCookie('refresh_token').send({ success: [user.name, user.email] })
     }
+/*
+    sign(key: string, string: string){
+      return createHmac('sha-256', key).update(string);
+    }
 
+    createSignKey(date: Date, region: string, service: string, sign: string){
+        const DateKey = this.sign("AWS4" + "SecretKey", date.toDateString()).digest('hex');
+        const RegionKey = this.sign(DateKey, "ru-central1").digest('hex');
+        const ServiceKey = this.sign(RegionKey, "s3").digest('hex');
+        const SigningKey = this.sign(ServiceKey, "aws4_request").digest('hex')
+        return SigningKey;
+    }*/
 }

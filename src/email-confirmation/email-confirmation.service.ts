@@ -77,7 +77,7 @@ export class EmailConfirmationService {
         "</tbody>\n" +
         "</table>" +
         "<p style='font-size: 15px'>or click on this link:</p>" +
-        `<a href=\"${url}\" >Confirm email</a>`
+        `<a href=\"${url}\" >${url}</a>`
 
     return this.sendMail({
       to: email,

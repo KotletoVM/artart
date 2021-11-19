@@ -21,10 +21,10 @@ export class UserController {
       private readonly emailConfirmationService: EmailConfirmationService,
       private readonly userService: UserService, ) {}
 
-//ограничение на авторизованного пользователя
+  @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  findAll(@Query('take') take: number, @Query('skip') skip: number) {
+    return this.userService.findAll(take, skip);
   }
 
   @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
