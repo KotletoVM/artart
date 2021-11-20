@@ -10,7 +10,6 @@ import { Tag } from 'src/tag/entities/tag.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { Request as Req} from 'express';
 import jwtDecode, { JwtPayload } from 'jwt-decode';
-import {CommentService} from  '../comment/comment.service';
 
 @Injectable()
 export class PersonService {
@@ -21,8 +20,7 @@ export class PersonService {
       @InjectRepository(Art)
       private artRepository: Repository<Art>,
       @InjectRepository(Comment)
-      private commentRepository: Repository<Comment>,
-      private readonly commentService: CommentService
+      private commentRepository: Repository<Comment>
   ) {}
 
   async create(createPersonDto: CreatePersonDto) {

@@ -13,6 +13,7 @@ import { JwtRefreshTokenStrategy } from './strategies/jwtRefreshToken.strategy';
 import { EmailConfirmationModule } from 'src/email-confirmation/email-confirmation.module';
 import { EmailConfirmationStrategy } from './strategies/emailConfirmation.strategy';
 import {HttpModule} from "@nestjs/axios"
+import { FileModule } from 'src/file/file.module';
 
 @Module({
   imports: [UserModule, PassportModule, JwtModule.register({
@@ -25,7 +26,7 @@ import {HttpModule} from "@nestjs/axios"
     HttpModule.register({
       timeout: 5000,
       maxRedirects: 5,
-    })],
+    }), FileModule],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy, JwtRefreshTokenStrategy, EmailConfirmationStrategy]
 })

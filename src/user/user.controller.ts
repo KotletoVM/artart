@@ -14,7 +14,9 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Response } from 'express';
 import { EmailConfirmationService } from 'src/email-confirmation/email-confirmation.service';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('user')
 @Controller('user')
 export class UserController {
   constructor(

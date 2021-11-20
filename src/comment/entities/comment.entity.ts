@@ -16,7 +16,7 @@ export class Comment {
     @ManyToOne(type => User , user => user.id, { eager: true, cascade: true, nullable: false})
     @JoinColumn({name: 'userid'})
     user: User;
-    @ManyToOne(type => Person, {nullable: false})
+    @ManyToOne(type => Person, person => person.id, {nullable: false})
     @JoinColumn({name: 'personid'})
     person: Person;
 

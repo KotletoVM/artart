@@ -25,6 +25,8 @@ export class Person {
     views: number;
     @Column({default: 0})
     likes: number;
+    @Column({default: 0})
+    comments: number;
     @Column("simple-json", {nullable: true})
     socNetworks: {instagram: string, vk: string, tg: string, spotify: string, site: string};
     @OneToMany(type => Art, art => art.personid,

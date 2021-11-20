@@ -12,6 +12,10 @@ import { HashedRefreshToken } from 'src/hashed-refresh-token/entities/hashed-ref
 import { CreateHashedRefreshTokenDto } from 'src/hashed-refresh-token/dto/create-hashed-refresh-token.dto';
 import { ConfigService } from "@nestjs/config";
 import { createHmac } from 'crypto';
+import {S3, Endpoint} from 'aws-sdk';
+import { UpdateUserDto } from '../user/dto/update-user.dto';
+import { FileService } from 'src/file/file.service';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +26,8 @@ export class AuthService {
               @InjectRepository(User)
               private userRepository: Repository<User>,
               private configService: ConfigService,
-              private httpService: HttpService
+              private httpService: HttpService,
+              private fileService: FileService
               ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
@@ -90,9 +95,9 @@ export class AuthService {
       try {
           createUserDto.password = await this.generateHash(createUserDto.password);
           const {hash, ...user} = await this.userService.create(createUserDto);
-          //const user = await this.userService.create(createUserDto);
-          //console.log(file);
-          //this.httpService.post('https://storage.yandexcloud.net/artart/userpic/');
+          if(file){
+              const userpicUpload = this.saveUserpic(`userpic/${uuid()}-${user.id}.png`, user.id, file).catch();
+          }
           const accessToken = this.generateJwtAccessToken(user, this.configService.get('access_token.secret'), this.configService.get('access_token.expiresIn'));
           const refreshToken = this.generateJwtRefreshToken(user, this.configService.get('refresh_token.secret'), this.configService.get('refresh_token.expiresIn'));
           const token = await bcrypt.hash(refreshToken, 10);
@@ -112,6 +117,12 @@ export class AuthService {
           /*УМЕНЬШИТЬ КОЛИЧЕСТВО ВЫВОДИМЫХ ДАННЫХ*/
           throw new ForbiddenException(e);
       }
+    }
+
+    async saveUserpic(filename: string, userid: number, file:  Express.Multer.File){
+        const newUserpic = await this.fileService.saveFile(filename, file);
+        const user: UpdateUserDto = {id: undefined, password: undefined, name: undefined, role: undefined, email: undefined, userpic: newUserpic.Location};
+        return this.userService.update(userid, user);
     }
 
     public getCookieWithJwtAccessToken(user: User, response: Response) {

@@ -1,26 +1,34 @@
 import { IsOptional, IsString, IsUrl, IsNotEmpty, IsArray, Min, ArrayNotEmpty, IsEmpty } from "class-validator";
 import { Tag } from "src/tag/entities/tag.entity";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
 export class CreatePersonDto {
      id: number;
+     @ApiPropertyOptional()
      @IsOptional()
      @IsString()
-     fullname: string;
+     fullname?: string;
+     @ApiPropertyOptional()
      @IsOptional()
      @IsString()
-     pseudonym: string;
+     pseudonym?: string;
+     @ApiPropertyOptional()
      @IsOptional()
      @IsString()
-     description: string;
+     description?: string;
+     @ApiPropertyOptional()
      @IsOptional()
      @IsUrl()
-     personpic: string;
+     personpic?: string;
+     @ApiProperty()
      @IsNotEmpty()
      @IsArray()
      @ArrayNotEmpty()
-     tags: Tag[]
+     tags: Tag[];
      @IsEmpty()
-     likes: number
+     likes: number;
      @IsEmpty()
-     views: number
+     views: number;
+     @IsEmpty()
+     comments: number;
 }

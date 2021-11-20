@@ -35,6 +35,10 @@ export class UserService {
     });
   }
 
+  async changeUserpic(userid: number, file: Express.Multer.File){
+
+  }
+
   async findAll(take: number = 10, skip: number = 0) {
     const qb = this.userRepository.createQueryBuilder('user');
     qb.select(["user.id", "user.name", "user.userpic"]).take(take).skip(skip).getManyAndCount();

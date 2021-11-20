@@ -38,5 +38,12 @@ export const config = () => ({
     },
     cookie:{
         cookieDomain: process.env.COOKIE_DOMAIN
+    },
+    awsConfig:{
+        accessKey: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        region: process.env.AWS_REGION,
+        bucket: process.env.AWS_PUBLIC_BUCKET_NAME,
+        endpoint: process.env.AWS_ENDPOINT
     }
 });

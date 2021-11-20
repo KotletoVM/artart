@@ -9,7 +9,9 @@ import { EmailConfirmationGuard } from 'src/auth/guards/emailConfirmation.guard'
 import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/enums/role.enum';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('person')
 @Controller('person')
 export class PersonController {
   constructor(private readonly personService: PersonService) {}

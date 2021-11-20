@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Res, Req, Redirect, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Res, Req, Redirect, UseInterceptors, UploadedFile, ForbiddenException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -10,7 +10,9 @@ import { UserService } from 'src/user/user.service';
 import { Response } from 'express';
 import { EmailConfirmationService } from 'src/email-confirmation/email-confirmation.service';
 import { EmailConfirmationGuard } from './guards/emailConfirmation.guard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService,
@@ -23,8 +25,17 @@ export class AuthController {
   }
 
   @Post('register')
-  async register(@Body() createUserDto: CreateUserDto, @Res() response: Response){
-    const user = await this.authService.register(createUserDto, response);
+  @UseInterceptors(FileInterceptor('file'))
+  async register(@Body() createUserDto: CreateUserDto, @Res() response: Response, @UploadedFile() userpic?: Express.Multer.File){
+    if (userpic){
+      if (userpic.mimetype != 'image/jpeg' && userpic.mimetype != 'image/png'){
+        throw new ForbiddenException('userpic must be image (jpg, jpeg or png)')
+      }
+      if (userpic.size >= 5000000){
+        throw new ForbiddenException('userpic size must be less then 5 Mb');
+      }
+    }
+    const user = await this.authService.register(createUserDto, response, userpic);
     await this.emailConfirmationService.sendVerificationLink(createUserDto.email);
     return user;
   }

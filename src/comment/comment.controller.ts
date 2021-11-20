@@ -7,12 +7,12 @@ import { EmailConfirmationGuard } from 'src/auth/guards/emailConfirmation.guard'
 import { UserRole } from 'src/enums/role.enum';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('comment')
 @Controller('comment')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
-
-  //инструмент для админа - все комменты одного пользователя
 
   @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
   @Post()
@@ -20,20 +20,16 @@ export class CommentController {
     return this.commentService.create(createCommentDto, req.user.id, personid);
   }
 
-  //ограничение на админа (интерфейс для подчистки гадких комментов,
-  // поэтому выводятся сразу все из всех персон)
-
-
   @Get()
-  findAllforPerson(@Query('personid') personid: number) {
-    return this.commentService.findAllforPerson(personid);
+  findAllforPerson(@Query('personid') personid: number, @Query('take') take: number, @Query('skip') skip: number) {
+    return this.commentService.findAllforPerson(personid, take, skip);
   }
 
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
-  findAll() {
-    return this.commentService.findAll();
+  findAll(@Query('take') take: number, @Query('skip') skip: number) {
+    return this.commentService.findAll(take, skip);
   }
 
   @Roles(UserRole.ADMIN)

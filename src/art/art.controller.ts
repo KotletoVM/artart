@@ -6,7 +6,9 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UserRole } from 'src/enums/role.enum';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/decorators/roles.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('art')
 @Controller('art')
 export class ArtController {
   constructor(private readonly artService: ArtService) {}

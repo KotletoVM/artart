@@ -20,6 +20,7 @@ import { config } from './config/configuration';
 import { DatabaseConfig } from './config/database.config';
 import { HashedRefreshTokenModule } from './hashed-refresh-token/hashed-refresh-token.module';
 import { EmailConfirmationModule } from './email-confirmation/email-confirmation.module';
+import { FileModule } from './file/file.module';
 
 
 @Module({
@@ -47,7 +48,8 @@ import { EmailConfirmationModule } from './email-confirmation/email-confirmation
   EventModule,
   TagModule,
   HashedRefreshTokenModule,
-  EmailConfirmationModule],
+  EmailConfirmationModule,
+  FileModule],
   controllers: [AppController],
   providers: [AppService],
 })
