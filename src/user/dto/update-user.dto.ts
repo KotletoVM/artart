@@ -13,9 +13,7 @@ export class UpdateUserDto /*extends PartialType(CreateUserDto)*/ {
     @Length(2)
     @IsString()
     name?: string;
-    @ApiPropertyOptional()
-    @IsOptional()
-    @IsUrl()
+    @IsEmpty()
     userpic: string;
     @IsEmpty()
     password: string;

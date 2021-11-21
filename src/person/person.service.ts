@@ -10,6 +10,8 @@ import { Tag } from 'src/tag/entities/tag.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { Request as Req} from 'express';
 import jwtDecode, { JwtPayload } from 'jwt-decode';
+import { v4 as uuid } from 'uuid';
+import { FileService } from 'src/file/file.service';
 
 @Injectable()
 export class PersonService {
@@ -20,15 +22,29 @@ export class PersonService {
       @InjectRepository(Art)
       private artRepository: Repository<Art>,
       @InjectRepository(Comment)
-      private commentRepository: Repository<Comment>
+      private commentRepository: Repository<Comment>,
+      private fileService: FileService
   ) {}
 
   async create(createPersonDto: CreatePersonDto) {
-    /*return this.personRepository.save(createPersonDto);*/
     const qb = this.personRepository.createQueryBuilder('person');
-    const {identifiers, raw, ...person} = await qb.insert().values(createPersonDto).execute();
-    const tags = await qb.relation(Person, "tags").of(identifiers).add(createPersonDto.tags);
-    return person;
+    const person = await this.personRepository.save(createPersonDto);
+    const tags = await qb.relation(Person, "tags").of(person.id).add(createPersonDto.tags);
+    /*if(personpic){
+      const filename = `personpic/${uuid()}-${person.id}.png`;
+      const personpicUpload = await this.savePersonpic(filename, person.id, personpic);
+    }*/
+    return {person, tags};
+  }
+
+  async updatePersonpic(personid: number, file:  Express.Multer.File){
+    const person = await this.personRepository.findOne({id: personid});
+    const filename = `personpic/${uuid()}-${person.id}.png`;
+    const newPersonpic = await this.fileService.saveFile(filename, file);
+    if (!person.personpic.includes('personpic.png')){
+      this.fileService.deleteFile(person.personpic);
+    }
+    return this.update(personid, {personpic: newPersonpic.Location});
   }
 
   async setLike(userid: number, personid: number) {
@@ -140,7 +156,6 @@ export class PersonService {
   }
 
   update(id: number, updatePersonDto: UpdatePersonDto) {
-    console.log(updatePersonDto);
     return this.personRepository.update(id, updatePersonDto);
   }
 

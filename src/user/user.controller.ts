@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, UseGuards, Request, Query, Redirect, HttpCode, Res, Inject, forwardRef } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, UseGuards, Request, Query, Redirect, HttpCode, Res, Inject, forwardRef, UseInterceptors, UploadedFile, ForbiddenException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -15,6 +15,7 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { Response } from 'express';
 import { EmailConfirmationService } from 'src/email-confirmation/email-confirmation.service';
 import { ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('user')
 @Controller('user')
@@ -55,6 +56,24 @@ export class UserController {
     const find = await this.userService.findById(+req.user.id);
     if (!find){throw new NotFoundException('User not found.');}
     return this.userService.update(+req.user.id, updateUserDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  @Patch('me/updateUserpic')
+  async updateUserpic(@Request() req, @UploadedFile() userpic?: Express.Multer.File) {
+    if (userpic){
+      if (userpic.mimetype != 'image/jpeg' && userpic.mimetype != 'image/png'){
+        throw new ForbiddenException('userpic must be image (jpg, jpeg or png)')
+      }
+      if (userpic.size >= 5000000){
+        throw new ForbiddenException('userpic size must be less then 5 Mb');
+      }
+      const find = await this.userService.findById(+req.user.id);
+      if (!find){throw new NotFoundException('User not found.');}
+      return this.userService.updateUserpic(req.user, userpic);
+    }
+    throw new ForbiddenException('to update userpic upload new userpic first.');
   }
 
   @UseGuards(JwtAuthGuard)

@@ -96,7 +96,8 @@ export class AuthService {
           createUserDto.password = await this.generateHash(createUserDto.password);
           const {hash, ...user} = await this.userService.create(createUserDto);
           if(file){
-              const userpicUpload = this.saveUserpic(`userpic/${uuid()}-${user.id}.png`, user.id, file).catch();
+              const filename = `userpic/${uuid()}-${user.id}.png`;
+              const userpicUpload = this.saveUserpic(filename, user.id, file);
           }
           const accessToken = this.generateJwtAccessToken(user, this.configService.get('access_token.secret'), this.configService.get('access_token.expiresIn'));
           const refreshToken = this.generateJwtRefreshToken(user, this.configService.get('refresh_token.secret'), this.configService.get('refresh_token.expiresIn'));

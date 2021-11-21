@@ -12,6 +12,8 @@ import { UpdateUserEmailDto } from './dto/update-user-email.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { HashedRefreshToken } from 'src/hashed-refresh-token/entities/hashed-refresh-token.entity';
 import { Response } from 'express';
+import { FileService } from 'src/file/file.service';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class UserService {
@@ -21,22 +23,25 @@ export class UserService {
       private userRepository: Repository<User>,
       @InjectRepository(HashedRefreshToken)
       private tokenRepository: Repository<HashedRefreshToken>,
+      private fileService: FileService
   ) {}
 
   create(createUserDto: CreateUserDto) {
-
-
     return this.userRepository.save({
       name: createUserDto.name,
       email: createUserDto.email,
       hash: createUserDto.password,
       //role: createUserDto.role,
-      userpic: createUserDto.userpic
     });
   }
 
-  async changeUserpic(userid: number, file: Express.Multer.File){
-
+  async updateUserpic(user: User, userpic: Express.Multer.File){
+    const filename = `userpic/${uuid()}-${user.id}.png`;
+    const newUserpic = await this.fileService.saveFile(filename, userpic);
+    if (!user.userpic.includes('userpic.png')){
+      this.fileService.deleteFile(user.userpic);
+    }
+    return this.userRepository.update(user.id, {userpic: newUserpic.Location});
   }
 
   async findAll(take: number = 10, skip: number = 0) {

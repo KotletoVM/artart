@@ -6,9 +6,10 @@ import {User} from  './entities/user.entity';
 import { AuthModule } from '../auth/auth.module';
 import { HashedRefreshToken } from 'src/hashed-refresh-token/entities/hashed-refresh-token.entity';
 import { EmailConfirmationModule } from 'src/email-confirmation/email-confirmation.module';
+import { FileModule } from 'src/file/file.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), TypeOrmModule.forFeature([HashedRefreshToken]), forwardRef(() => EmailConfirmationModule)],
+  imports: [TypeOrmModule.forFeature([User]), TypeOrmModule.forFeature([HashedRefreshToken]), forwardRef(() => EmailConfirmationModule), FileModule],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService]

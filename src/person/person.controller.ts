@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, Query, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, Query, UseGuards, Request, UseInterceptors, UploadedFile, ForbiddenException } from '@nestjs/common';
 import { PersonService } from './person.service';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
@@ -10,6 +10,7 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/enums/role.enum';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('person')
 @Controller('person')
@@ -21,6 +22,23 @@ export class PersonController {
   @Post()
   create(@Body() createPersonDto: CreatePersonDto) {
     return this.personService.create(createPersonDto);
+  }
+
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  @Patch('updatePersonpic')
+  async updatePersonpic(@Query('personid') personid: number, @UploadedFile() personpic?: Express.Multer.File) {
+    if (personpic){
+      if (personpic.mimetype != 'image/jpeg' && personpic.mimetype != 'image/png'){
+        throw new ForbiddenException('userpic must be image (jpg, jpeg or png)')
+      }
+      if (personpic.size >= 5000000){
+        throw new ForbiddenException('userpic size must be less then 5 Mb');
+      }
+      return this.personService.updatePersonpic(personid, personpic);
+    }
+    throw new ForbiddenException('to update personpic upload new personpic first.');
   }
 
   @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
