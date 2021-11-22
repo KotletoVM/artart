@@ -17,6 +17,8 @@ export class Person {
     description?: string;
     @Column({default: 'https://storage.yandexcloud.net/artart/personpic/personpic.png'})
     personpic: string;
+    @Column({default: 'https://storage.yandexcloud.net/artart/personpic/personpic.png'})
+    previewWork: string;
     @CreateDateColumn({type: 'timestamp'})
     createdAt: Date;
     @UpdateDateColumn({type: 'timestamp'})

@@ -24,22 +24,6 @@ export class PersonController {
     return this.personService.create(createPersonDto);
   }
 
-  @Roles(UserRole.ADMIN)
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @UseInterceptors(FileInterceptor('file'))
-  @Patch('updatePersonpic')
-  async updatePersonpic(@Query('personid') personid: number, @UploadedFile() personpic?: Express.Multer.File) {
-    if (personpic){
-      if (personpic.mimetype != 'image/jpeg' && personpic.mimetype != 'image/png'){
-        throw new ForbiddenException('userpic must be image (jpg, jpeg or png)')
-      }
-      if (personpic.size >= 5000000){
-        throw new ForbiddenException('userpic size must be less then 5 Mb');
-      }
-      return this.personService.updatePersonpic(personid, personpic);
-    }
-    throw new ForbiddenException('to update personpic upload new personpic first.');
-  }
 
   @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
   @Post('like')
@@ -80,7 +64,23 @@ export class PersonController {
     return find;
   }
 
-  //ограничение на админа
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  @Patch('updatePersonpic')
+  async updatePersonpic(@Query('personid') personid: number, @UploadedFile() personpic?: Express.Multer.File) {
+    if (personpic){
+      if (personpic.mimetype != 'image/jpeg' && personpic.mimetype != 'image/png'){
+        throw new ForbiddenException('userpic must be image (jpg, jpeg or png)')
+      }
+      if (personpic.size >= 5000000){
+        throw new ForbiddenException('userpic size must be less then 5 Mb');
+      }
+      return this.personService.updatePersonpic(personid, personpic);
+    }
+    throw new ForbiddenException('to update personpic upload new personpic first.');
+  }
+
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Patch(':id')

@@ -20,6 +20,10 @@ export class CreatePersonDto {
      @IsOptional()
      @IsUrl()
      personpic?: string;
+     @ApiPropertyOptional()
+     @IsOptional()
+     @IsUrl()
+     previewWork?: string;
      @ApiProperty()
      @IsNotEmpty()
      @IsArray()
