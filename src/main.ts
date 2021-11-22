@@ -11,10 +11,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser(/*secret дописать*/));
-  app.use(cors({
-    origin: `http://localhost:3000`,  //react's address
-    credentials: true
-  }));
+  app.enableCors();
   const configService: ConfigService = app.get(ConfigService);
   const config = new DocumentBuilder()
       .setTitle('ARTART')
