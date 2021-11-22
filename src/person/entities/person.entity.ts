@@ -15,7 +15,7 @@ export class Person {
     pseudonym?: string;
     @Column({nullable: true})
     description?: string;
-    @Column({default: 'https://cdn4.vectorstock.com/i/1000x1000/84/68/hipster-man-in-glasses-avatar-profile-userpic-vector-8988468.jpg'})
+    @Column({default: 'https://storage.yandexcloud.net/artart/personpic/personpic.png'})
     personpic: string;
     @CreateDateColumn({type: 'timestamp'})
     createdAt: Date;

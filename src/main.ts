@@ -5,10 +5,16 @@ import * as cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { config as awsConfig } from 'aws-sdk';
+import {cors} from 'cors'
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser(/*secret дописать*/));
+  app.use(cors({
+    origin: `http://localhost:3000`,  //react's address
+    credentials: true
+  }));
   const configService: ConfigService = app.get(ConfigService);
   const config = new DocumentBuilder()
       .setTitle('ARTART')
