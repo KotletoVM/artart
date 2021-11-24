@@ -21,6 +21,7 @@ import { DatabaseConfig } from './config/database.config';
 import { HashedRefreshTokenModule } from './hashed-refresh-token/hashed-refresh-token.module';
 import { EmailConfirmationModule } from './email-confirmation/email-confirmation.module';
 import { FileModule } from './file/file.module';
+import { ResetPasswordModule } from './reset-password/reset-password.module';
 
 
 @Module({
@@ -49,7 +50,8 @@ import { FileModule } from './file/file.module';
   TagModule,
   HashedRefreshTokenModule,
   EmailConfirmationModule,
-  FileModule],
+  FileModule,
+  ResetPasswordModule],
   controllers: [AppController],
   providers: [AppService],
 })

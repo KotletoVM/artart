@@ -16,13 +16,15 @@ import { Response } from 'express';
 import { EmailConfirmationService } from 'src/email-confirmation/email-confirmation.service';
 import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ResetPasswordService } from 'src/reset-password/reset-password.service';
 
 @ApiTags('user')
 @Controller('user')
 export class UserController {
   constructor(
       private readonly emailConfirmationService: EmailConfirmationService,
-      private readonly userService: UserService, ) {}
+      private readonly userService: UserService,
+      private readonly resetPasswordService: ResetPasswordService) {}
 
   @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
   @Get()
@@ -92,6 +94,19 @@ export class UserController {
     if (!find){throw new NotFoundException('User not found.');}
     const user = await this.userService.updateEmail(+req.user.id, updateUserEmailDto, responce);
     await this.emailConfirmationService.sendVerificationLink(updateUserEmailDto.email);
+  }
+
+  @Patch('password/reset')
+  async sendResetLink(@Body() updateUserEmailDto: UpdateUserEmailDto) {
+    const find = await this.userService.findByEmail(updateUserEmailDto.email);
+    if (!find){throw new NotFoundException('User not found.');}
+    return this.resetPasswordService.sendResetLink(updateUserEmailDto.email);
+  }
+
+  @Patch('password/reset/:token')
+  async resetPassword(@Param('token') token: string, @Body() updateUserPasswordDto: UpdateUserPasswordDto) {
+    const email = await this.resetPasswordService.decodeConfirmationToken(token);
+    return this.userService.resetPassword(email, updateUserPasswordDto);
   }
 
   @Roles(UserRole.ADMIN)

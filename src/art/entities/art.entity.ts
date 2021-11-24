@@ -8,7 +8,7 @@ export class Art {
     id: number;
     @Column("simple-array")
     url: string[];
-    @Column({nullable:true})
+    @Column({default: 'без названия'})
     title: string;
     @Column({nullable:true})
     description: string;

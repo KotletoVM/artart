@@ -117,6 +117,16 @@ export class UserService {
     return this.userRepository.update(id, {role: updateUserRoleDto.role})
   }
 
+  async resetPassword(email: string, updateUserPasswordDto: UpdateUserPasswordDto){
+    const user = await this.findByEmail(email);
+    if (!user){throw new NotFoundException('user not found');}
+    if (updateUserPasswordDto){
+      const hash = await bcrypt.hash(updateUserPasswordDto.password, 10);
+      return this.userRepository.update(user.id, {hash: hash});
+    }
+    else throw new NotFoundException('to reset password enter new password');
+  }
+
   async remove(id: number){
     this.tokenRepository.delete({userid: id});
     return this.userRepository.delete(id);
