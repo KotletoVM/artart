@@ -14,14 +14,7 @@ export class CreateEventDto {
     description: string;
     @ApiProperty()
     @IsNotEmpty()
-    @IsDate()
-    @Type(() => Date)
-    startDate?: Date;
-    @ApiPropertyOptional()
-    @IsOptional()
-    @IsDate()
-    @Type(() => Date)
-    endDate?: Date;
+    date: string;
     @ApiProperty()
     @IsNotEmpty()
     @IsArray()

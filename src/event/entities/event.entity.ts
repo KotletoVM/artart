@@ -9,9 +9,7 @@ export class Event {
     @Column()
     description: string;
     @Column()
-    startDate: Date;
-    @Column({nullable: true})
-    endDate?: Date;
+    date: string;
     @CreateDateColumn({type: 'timestamp'})
     createdAt: Date;
     @UpdateDateColumn({type: 'timestamp'})
