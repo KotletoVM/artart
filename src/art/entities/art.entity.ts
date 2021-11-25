@@ -10,7 +10,7 @@ export class Art {
     pic: string[];
     @Column("simple-array", {nullable:true})
     video: string[];
-    @Column({default: 'без названия'})
+    @Column({default: 'Без названия'})
     title: string;
     @Column({nullable:true})
     description: string;
