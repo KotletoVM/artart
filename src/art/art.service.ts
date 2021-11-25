@@ -24,7 +24,7 @@ export class ArtService {
   findOne(id: number) {
     //return this.artRepository.findOne(id, {relations: ["personid"]});
     const qb = this.artRepository.createQueryBuilder('art');
-    const art = qb.innerJoinAndSelect('art.personid', 'person').select('art').addSelect('person.id').addSelect('person.pseudonym').where('art.id = :id', {id: id}).getOne();
+    const art = qb.innerJoinAndSelect('art.personid', 'person').select('art').addSelect('person.id').addSelect('person.fullname').where('art.id = :id', {id: id}).getOne();
     return art;
   }
 

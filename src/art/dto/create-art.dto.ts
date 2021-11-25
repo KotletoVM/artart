@@ -9,6 +9,16 @@ export class CreateArtDto {
     @ArrayNotEmpty()
     @ArrayUnique()
     url: string[];
+    @ApiProperty()
+    @IsOptional()
+    @IsArray()
+    @ArrayUnique()
+    pic?: string[];
+    @ApiProperty()
+    @IsOptional()
+    @IsArray()
+    @ArrayUnique()
+    video?: string[];
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()

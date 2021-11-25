@@ -8,6 +8,10 @@ export class Art {
     id: number;
     @Column("simple-array")
     url: string[];
+    @Column("simple-array", {nullable:true})
+    pic: string[];
+    @Column("simple-array", {nullable:true})
+    video: string[];
     @Column({default: 'без названия'})
     title: string;
     @Column({nullable:true})
