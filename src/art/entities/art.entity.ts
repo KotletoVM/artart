@@ -6,8 +6,6 @@ import { Person } from 'src/person/entities/person.entity';
 export class Art {
     @PrimaryGeneratedColumn()
     id: number;
-    @Column("simple-array")
-    url: string[];
     @Column("simple-array", {nullable:true})
     pic: string[];
     @Column("simple-array", {nullable:true})

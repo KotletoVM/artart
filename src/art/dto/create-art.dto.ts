@@ -4,12 +4,6 @@ import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 export class CreateArtDto {
     id: number;
     @ApiProperty()
-    @IsNotEmpty()
-    @IsArray()
-    @ArrayNotEmpty()
-    @ArrayUnique()
-    url: string[];
-    @ApiProperty()
     @IsOptional()
     @IsArray()
     @ArrayUnique()
