@@ -16,9 +16,9 @@ export class EventService {
     return this.eventRepository.save(createEventDto);
   }
 
-  async findAll() {
+  async findAll(take: number = 10, skip: number = 0) {
     const qb = this.eventRepository.createQueryBuilder('event');
-    const [events, count] =await qb.take(3).orderBy("event.startDate", "ASC").getManyAndCount();
+    const [events, count] =await qb.take(take).skip(skip).getManyAndCount();
     return [events, count];
   }
 
