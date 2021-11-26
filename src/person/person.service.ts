@@ -129,8 +129,16 @@ export class PersonService {
     return this.setLikedforCurrentUser(currentUserId, [person]);
   }
 
+  async getSoc(personid: number){
+    const qb = this.personRepository.createQueryBuilder('person');
+    const person = await qb.where("person.id = :id", {id: personid}).getOne();
+    return person.socNetworks;
+  }
+
   async findOneSimple(id: number){
-    return this.personRepository.findOne(id);
+    const qb = this.personRepository.createQueryBuilder('person');
+    const person = await qb.where("person.id = :id", {id: id}).getOne();
+    return person;
   }
 
   async findUsersFavorite(id: number, take: number = 10, skip: number = 0){
@@ -195,4 +203,5 @@ export class PersonService {
     const decodedJwt = await jwtDecode<JwtPayload>(req.cookies['access_token']);
     return Number(decodedJwt['sub']);
   }
+
 }

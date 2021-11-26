@@ -57,12 +57,21 @@ export class PersonController {
     return this.personService.findUsersFavorite(req.user.id, take, skip);
   }
 
+  @Get('soc')
+  async getSoc(@Query('personid') personid: number, @Request() req: Req) {
+    const find = await this.personService.findOneSimple(personid);
+    if (!find){throw new NotFoundException('Person not found.');}
+    return await this.personService.getSoc(personid);
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string, @Request() req: Req) {
     const find = await this.personService.findOne(req, +id);
     if (!find){throw new NotFoundException('Person not found.');}
     return find;
   }
+
+
 
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
