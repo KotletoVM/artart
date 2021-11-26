@@ -35,4 +35,11 @@ export class CreatePersonDto {
      views: number;
      @IsEmpty()
      comments: number;
+     socNetworks: {
+          instagram: string;
+          vk: string;
+          tg: string;
+          spotify: string;
+          site: string;
+     };
 }
