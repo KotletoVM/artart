@@ -52,10 +52,6 @@ export class ResetPasswordService {
     })
   }
 
-  resetPassword(token: string){
-
-  }
-
   sendMail(options: Mail.Options) {
     return this.nodemailerTransport.sendMail(options);
   }

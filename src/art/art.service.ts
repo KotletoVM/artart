@@ -14,6 +14,9 @@ export class ArtService {
 
 
   create(createArtDto: CreateArtDto) {
+    if (createArtDto.pic != null && createArtDto.previewChange && createArtDto.pic.length != 0){
+      //this.personService.updatePreview(createArtDto.pic[0]);
+    }
     return this.artRepository.save(createArtDto);
   }
 
@@ -28,12 +31,10 @@ export class ArtService {
     return art;
   }
 
-  //ограничение на админа
   update(id: number, updateArtDto: UpdateArtDto) {
     return this.artRepository.update(id, updateArtDto);
   }
 
-  //ограничение на админа
   remove(id: number) {
     return this.artRepository.delete(id);
   }

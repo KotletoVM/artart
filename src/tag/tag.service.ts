@@ -12,23 +12,8 @@ export class TagService {
       private tagRepository: Repository<Tag>,
   ) {}
 
-  create(createTagDto: CreateTagDto) {
-    return this.tagRepository.create(createTagDto);
-  }
-
-  findAll() {
-    return this.tagRepository.find();
-  }
-
-  findOne(id: number) {
-    return this.tagRepository.findOne(id);
-  }
-
-  update(id: number, updateTagDto: UpdateTagDto) {
-    return this.tagRepository.update(id, updateTagDto);
-  }
-
-  remove(id: number) {
-    return this.tagRepository.delete(id);
+  async findPersonTags(personid: number){
+    const qb = await this.tagRepository.createQueryBuilder('tag');
+    return qb.select('tag').leftJoin("tag.persons", "person").where("person.id = :personid", {personid: personid}).getMany();
   }
 }

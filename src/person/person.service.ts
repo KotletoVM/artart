@@ -57,9 +57,14 @@ export class PersonService {
       const liked = await qb.relation(Person, "liked_by").of(personid).add(userid);
     }
     catch (e) {
-      throw new ForbiddenException('user can set only one like per person.');
+      if (e.code === '23505'){
+        const qb1 = this.personRepository.createQueryBuilder('person');
+        qb.relation(Person, "liked_by").of(personid).remove(userid);
+        return this.personRepository.update(personid, {likes: person.likes - 1});
+      }
+      else {return new Error()}
     }
-    return this.personRepository.update(personid, {views: person.views + 1 ,likes: person.likes + 1});;
+    return this.personRepository.update(personid, {likes: person.likes + 1});
   }
 
   async findAll(req: Req, take: number = 10, skip: number = 0) {

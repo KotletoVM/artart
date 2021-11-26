@@ -6,11 +6,13 @@ export class CreateArtDto {
     @ApiProperty()
     @IsOptional()
     @IsArray()
+    @ArrayNotEmpty()
     @ArrayUnique()
     pic?: string[];
     @ApiProperty()
     @IsOptional()
     @IsArray()
+    @ArrayNotEmpty()
     @ArrayUnique()
     video?: string[];
     @ApiPropertyOptional()
@@ -24,4 +26,5 @@ export class CreateArtDto {
     @ApiProperty()
     @IsNotEmpty()
     personid: number;
+    previewChange: boolean;
 }
