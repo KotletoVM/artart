@@ -49,7 +49,7 @@ export class PersonService {
 
   async setLike(userid: number, personid: number) {
     const qb = this.personRepository.createQueryBuilder('person');
-    let person = await this.personRepository.findOne(personid);
+    let person = await this.findOneSimple(personid);
     if (!person){
       throw new NotFoundException('person not found.');
     }
