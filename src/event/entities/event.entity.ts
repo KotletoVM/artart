@@ -10,7 +10,7 @@ export class Event {
     description: string;
     @Column()
     date: string;
-    @Column()
+    @Column({nullable: true})
     place: string;
     @CreateDateColumn({type: 'timestamp'})
     createdAt: Date;
