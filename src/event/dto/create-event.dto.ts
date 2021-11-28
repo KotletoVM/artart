@@ -16,6 +16,8 @@ export class CreateEventDto {
     @IsNotEmpty()
     date: string;
     @ApiProperty()
+    place: string;
+    @ApiProperty()
     @IsNotEmpty()
     @IsArray()
     @ArrayNotEmpty()
