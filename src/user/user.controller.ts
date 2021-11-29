@@ -32,7 +32,7 @@ export class UserController {
     return this.userService.findAll(take, skip);
   }
 
-  @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
+  @UseGuards(JwtAuthGuard, /*EmailConfirmationGuard*/)
   @Get('me')
   getProfile(@Request() req) {
     return this.userService.getProfile(req.user.id)

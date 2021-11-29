@@ -4,10 +4,10 @@ import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
 export class CreatePersonDto {
      id: number;
-     @ApiPropertyOptional()
-     @IsOptional()
+     @ApiProperty()
+     @IsNotEmpty()
      @IsString()
-     fullname?: string;
+     fullname: string;
      @ApiPropertyOptional()
      @IsOptional()
      @IsString()

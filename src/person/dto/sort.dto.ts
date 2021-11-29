@@ -13,7 +13,7 @@ export class SortDto {
      @ApiPropertyOptional()
      @IsOptional()
      @Matches(/ASC|DESC/, {message: "Order must be ASC or DESC"})
-     order: 'DESC'|'ASC' = 'DESC'
+     order: 'DESC'|'ASC' = 'ASC'
      @ApiPropertyOptional()
      @IsOptional()
      @Matches(/alphabet|popular|createDate/, {message: "Order must be ASC or DESC"})

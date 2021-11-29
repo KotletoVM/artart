@@ -9,7 +9,7 @@ import { Exclude, Expose } from 'class-transformer';
 export class Person {
     @PrimaryGeneratedColumn()
     id: number;
-    @Column({nullable: true})
+    @Column()
     fullname?: string;
     @Column({nullable: true})
     pseudonym?: string;
