@@ -12,6 +12,7 @@ import { Request as Req} from 'express';
 import jwtDecode, { JwtPayload } from 'jwt-decode';
 import { v4 as uuid } from 'uuid';
 import { FileService } from 'src/file/file.service';
+import { SortDto } from './dto/sort.dto';
 
 @Injectable()
 export class PersonService {
@@ -67,30 +68,55 @@ export class PersonService {
     return this.personRepository.update(personid, {likes: person.likes + 1});
   }
 
-  async findAll(req: Req, take: number = 10, skip: number = 0) {
+  async findAll(req: Req, sortDto: SortDto) {
+    const take = Number(sortDto.take)
+    const skip = Number(sortDto.skip)
+    let orderBy: string;
+    switch (sortDto.orderBy) {
+      case 'createDate':
+        orderBy = "person.createdAt"
+            break
+      case 'alphabet':
+        orderBy = "person.fullname"
+            break
+      case 'popular':
+        orderBy = "person.likes"
+    }
     const currentUserId = await this.isAuth(req);
     if (!currentUserId){
       const qb = this.personRepository.createQueryBuilder('person');
-      const [persons, count] =await qb.leftJoinAndSelect("person.tags", "tag").take(take).skip(skip).orderBy("person.createdAt", "DESC").getManyAndCount();
+      const [persons, count] =await qb.leftJoinAndSelect("person.tags", "tag").take(take).skip(skip).orderBy(orderBy, sortDto.order).getManyAndCount();
       return [persons, count];
     }
     const qb = this.personRepository.createQueryBuilder('person');
-    const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["person","user.id","user.name"]).orderBy("person.createdAt", "DESC").take(take).skip(skip).getManyAndCount();
+    const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["person","user.id","user.name"]).orderBy(orderBy, sortDto.order).take(take).skip(skip).getManyAndCount();
     return [this.setLikedforCurrentUser(currentUserId, persons), count];
   }
-
-  async getPopular(req: Req, take: number = 10, skip: number = 0) {
+/*
+  async getPopular(req: Req, sortDto: SortDto) {
     const currentUserId = await this.isAuth(req);
     if (!currentUserId){
       const qb = this.personRepository.createQueryBuilder('person');
-      const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").orderBy('person.views', 'ASC').take(take).skip(skip).getManyAndCount();
+      const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").orderBy('person.likes', sortDto.order).take(sortDto.take).skip(sortDto.skip).getManyAndCount();
       return [persons, count];
     }
     const qb = this.personRepository.createQueryBuilder('person');
-    const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["person","user.id","user.name"]).orderBy('person.views', 'DESC').take(take).skip(skip).getManyAndCount();
+    const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["person","user.id","user.name"]).orderBy('person.likes', sortDto.order).take(sortDto.take).skip(sortDto.skip).getManyAndCount();
     return [this.setLikedforCurrentUser(currentUserId, persons), count];
   }
 
+  async getByAlphabet(req: Req, sortDto: SortDto) {
+    const currentUserId = await this.isAuth(req);
+    if (!currentUserId){
+      const qb = this.personRepository.createQueryBuilder('person');
+      const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").orderBy('person.fullname', sortDto.order).take(sortDto.take).skip(sortDto.skip).getManyAndCount();
+      return [persons, count];
+    }
+    const qb = this.personRepository.createQueryBuilder('person');
+    const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["person","user.id","user.name"]).orderBy('person.fullname', sortDto.order).take(sortDto.take).skip(sortDto.skip).getManyAndCount();
+    return [this.setLikedforCurrentUser(currentUserId, persons), count];
+  }
+*/
   async findByTag(req: Req, tagid: number, take: number = 10, skip: number = 0) {
     const currentUserId = await this.isAuth(req);
     if (!currentUserId){
@@ -125,7 +151,7 @@ export class PersonService {
     }
     const qb = this.personRepository.createQueryBuilder('person');
     const person = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").leftJoin("person.personArt", "art").addSelect(["user.id", "user.name"]).where("person.id = :id", {id: id}).getOne();
-    this.personRepository.update(id, {views: person.views + 1});
+    if (person) this.personRepository.update(id, {views: person.views + 1});
     return this.setLikedforCurrentUser(currentUserId, [person]);
   }
 
@@ -193,7 +219,7 @@ export class PersonService {
       return persons;
     }
     catch (e) {
-      throw new NotFoundException('persons not found.');
+      return null;
     }
   }
 
@@ -203,5 +229,4 @@ export class PersonService {
     const decodedJwt = await jwtDecode<JwtPayload>(req.cookies['access_token']);
     return Number(decodedJwt['sub']);
   }
-
 }

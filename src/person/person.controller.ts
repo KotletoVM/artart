@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, Query, UseGuards, Request, UseInterceptors, UploadedFile, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, Query, UseGuards, Request, UseInterceptors, UploadedFile, ForbiddenException, BadRequestException, UsePipes, ValidationPipe } from '@nestjs/common';
 import { PersonService } from './person.service';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
@@ -11,6 +11,7 @@ import { UserRole } from 'src/enums/role.enum';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { SortDto } from './dto/sort.dto';
 
 @ApiTags('person')
 @Controller('person')
@@ -32,15 +33,21 @@ export class PersonController {
   }
 
   @Get()
-  async findAll(@Request() req: Req, @Query('take') take: number, @Query('skip') skip: number) {
-    return this.personService.findAll(req, take, skip);
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async findAll(@Request() req: Req, @Query() sortDto: SortDto) {
+    return this.personService.findAll(req, sortDto);
   }
-
+/*
   @Get('popular')
-  getPopular(@Request() req: Req, @Query('take') take: number, @Query('skip') skip: number) {
-    return this.personService.getPopular(req, take, skip);
+  getPopular(@Request() req: Req, @Body() sortDto: SortDto) {
+    return this.personService.getPopular(req, sortDto);
   }
 
+  @Get('alphabet')
+  getByAlphabet(@Request() req: Req, @Body() sortDto: SortDto) {
+    return this.personService.getByAlphabet(req, sortDto);
+  }
+*/
   @Get('search')
   search(@Query() searchPersonDto : SearchPersonDto, @Query('take') take: number, @Query('skip') skip: number){
     return this.personService.search(searchPersonDto, take, skip);
@@ -66,6 +73,7 @@ export class PersonController {
 
   @Get(':id')
   async findOne(@Param('id') id: string, @Request() req: Req) {
+    if (!+id){throw new BadRequestException('Id must be a number.')}
     const find = await this.personService.findOne(req, +id);
     if (!find){throw new NotFoundException('Person not found.');}
     return find;
@@ -80,14 +88,14 @@ export class PersonController {
   async updatePersonpic(@Query('personid') personid: number, @UploadedFile() personpic?: Express.Multer.File) {
     if (personpic){
       if (personpic.mimetype != 'image/jpeg' && personpic.mimetype != 'image/png'){
-        throw new ForbiddenException('userpic must be image (jpg, jpeg or png)')
+        throw new ForbiddenException('Userpic must be image (jpg, jpeg or png).')
       }
       if (personpic.size >= 5000000){
-        throw new ForbiddenException('userpic size must be less then 5 Mb');
+        throw new ForbiddenException('Userpic size must be less then 5 Mb.');
       }
       return this.personService.updatePersonpic(personid, personpic);
     }
-    throw new ForbiddenException('to update personpic upload new personpic first.');
+    throw new ForbiddenException('To update personpic upload new personpic first.');
   }
 
   @Roles(UserRole.ADMIN)
