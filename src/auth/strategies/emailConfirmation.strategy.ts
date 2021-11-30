@@ -8,10 +8,10 @@ import { ConfigService } from '@nestjs/config';
 export class EmailConfirmationStrategy extends PassportStrategy(Strategy, 'email-confirm') {
     constructor(private readonly  userService: UserService, private configService: ConfigService) {
         super({
-            jwtFromRequest: (req) => {
+            jwtFromRequest: /*(req) => {
                 if (!req || !req.cookies) return null;
-                return req.cookies['refresh_token'];
-            }/*ExtractJwt.fromAuthHeaderAsBearerToken()*/,
+                return req.cookies['refresh_token'];}*/
+            ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: true,
             secretOrKey: configService.get('refresh_token.secret'),
         });
