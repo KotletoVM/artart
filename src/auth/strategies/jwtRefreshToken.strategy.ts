@@ -12,19 +12,19 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-ref
     constructor(private readonly  authService: AuthService,
                 private readonly  configService: ConfigService) {
         super({
-            jwtFromRequest: (req) => {
+            jwtFromRequest: /*(req) => {
                 if (!req || !req.cookies) return null;
                 return req.cookies['refresh_token'];
-            }/*ExtractJwt.fromExtractors([(request: Request) => {
-                return request?.cookies?.refresh_token;
-            }])*//*ExtractJwt.fromAuthHeaderAsBearerToken()*/,
+            }*/
+            ExtractJwt.fromAuthHeaderAsBearerToken(),
             secretOrKey: configService.get('refresh_token.secret'),
             passReqToCallback: true
         });
     }
 
     async validate(req: Request, payload: {sub: number, email: string }) {
-        const refreshToken = req.cookies['refresh_token'];
+        const refreshToken = req.headers.authorization;
+        console.log(refreshToken);
         return this.authService.getUserIfRefreshTokenMatches(refreshToken, payload.sub);
     }
 }

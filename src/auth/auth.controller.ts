@@ -40,10 +40,10 @@ export class AuthController {
     return user;
   }
 
-  @UseGuards(JwtRefreshGuard, EmailConfirmationGuard)
+  @UseGuards(JwtRefreshGuard, /*EmailConfirmationGuard*/)
   @Post('refresh')
-  refresh(@Req() req, @Res() response: Response) {
-    return  this.authService.getCookieWithJwtAccessToken(req.user, response);
+  refresh(@Req() req) {
+    return  this.authService.getJwtAccessToken(req.user);
   }
 
   @UseGuards(JwtAuthGuard)

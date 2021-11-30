@@ -127,12 +127,13 @@ export class AuthService {
         return this.userService.update(userid, user);
     }
 
-    public getCookieWithJwtAccessToken(user: User, response: Response) {
+    public getJwtAccessToken(user: User) {
         const accessToken = this.generateJwtAccessToken(user, this.configService.get('access_token.secret'), this.configService.get('access_token.expiresIn'));
-        response.cookie('access_token', accessToken, {
+        /*response.cookie('access_token', accessToken, {
             httpOnly: true,
             domain: this.configService.get('cookie.cookieDomain'),
-            expires: new Date(Date.now() + 20000 * 60 * 60 * 24)}).send({ success: [user.name, user.email] });
+            expires: new Date(Date.now() + 20000 * 60 * 60 * 24)}).send({ success: [user.name, user.email] });*/
+        return accessToken;
     }
 
     async getUserIfRefreshTokenMatches(refreshToken: string, userid: number) {
