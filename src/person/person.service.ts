@@ -61,11 +61,15 @@ export class PersonService {
       if (e.code === '23505'){
         const qb1 = this.personRepository.createQueryBuilder('person');
         qb.relation(Person, "liked_by").of(personid).remove(userid);
-        return this.personRepository.update(personid, {likes: person.likes - 1});
+        this.personRepository.update(personid, {likes: person.likes - 1});
+        const pers = await this.findOneSimple(personid);
+        return pers.likes;
       }
       else {return new Error()}
     }
-    return this.personRepository.update(personid, {likes: person.likes + 1});
+    this.personRepository.update(personid, {likes: person.likes + 1});
+    const pers = await this.findOneSimple(personid);
+    return pers.likes;
   }
 
   async findAll(req: Req, sortDto: SortDto) {
