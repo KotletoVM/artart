@@ -72,7 +72,7 @@ export class AuthService {
         const refreshToken = this.generateJwtRefreshToken(user, this.configService.get('refresh_token.secret'), this.configService.get('refresh_token.expiresIn'));
         const token = await bcrypt.hash(refreshToken, 10);
         this.saveRefreshToken({userid: user.id, token: token})
-        response.cookie('access_token', accessToken, {
+        /*response.cookie('access_token', accessToken, {
                 httpOnly: true,
                 domain: this.configService.get('cookie.cookieDomain'),
                 expires: new Date(Date.now() + 20000 * 60 * 60 * 24),
@@ -80,8 +80,9 @@ export class AuthService {
             httpOnly: true,
             domain: this.configService.get('cookie.cookieDomain'),
             expires: new Date(Date.now() + 20000 * 60 * 60 * 24),
-        }).send({ success: payload });
-        return payload;/* {
+        }).send({ success: payload });*/
+        return [payload, accessToken, refreshToken]
+        /* {
             ...payload,
             token: this.generateJwtToken(user),
         }*/;
@@ -103,8 +104,7 @@ export class AuthService {
           const refreshToken = this.generateJwtRefreshToken(user, this.configService.get('refresh_token.secret'), this.configService.get('refresh_token.expiresIn'));
           const token = await bcrypt.hash(refreshToken, 10);
           this.saveRefreshToken({userid: user.id, token: token})
-          //this.tokenRepository.save({userid: user.id, token: token});
-          response.cookie('access_token', accessToken, {
+          /*response.cookie('access_token', accessToken, {
               httpOnly: true,
               domain: this.configService.get('cookie.cookieDomain'),
               expires: new Date(Date.now() + 20000 * 60 * 60 * 24),
@@ -112,7 +112,8 @@ export class AuthService {
               httpOnly: true,
               domain: this.configService.get('cookie.cookieDomain'),
               expires: new Date(Date.now() + 20000 * 60 * 60 * 24),
-          }).send({ success: user });
+          }).send({ success: user });*/
+          return [user, accessToken, refreshToken];
       }
       catch (e) {
           /*УМЕНЬШИТЬ КОЛИЧЕСТВО ВЫВОДИМЫХ ДАННЫХ*/
