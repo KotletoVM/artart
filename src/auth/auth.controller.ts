@@ -43,7 +43,7 @@ export class AuthController {
   @UseGuards(JwtRefreshGuard, /*EmailConfirmationGuard*/)
   @Post('refresh')
   refresh(@Req() req) {
-    console.log(req)
+    console.log(req.user)
     return  this.authService.getJwtAccessToken(req.user);
   }
 
