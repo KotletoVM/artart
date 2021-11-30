@@ -20,13 +20,13 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req, @Res() response: Response) {
-    return this.authService.login(req.user, response);
+  async login(@Request() req) {
+    return this.authService.login(req.user);
   }
 
   @Post('register')
   @UseInterceptors(FileInterceptor('file'))
-  async register(@Body() createUserDto: CreateUserDto, @Res() response: Response, @UploadedFile() userpic?: Express.Multer.File){
+  async register(@Body() createUserDto: CreateUserDto, @UploadedFile() userpic?: Express.Multer.File){
     if (userpic){
       if (userpic.mimetype != 'image/jpeg' && userpic.mimetype != 'image/png'){
         throw new ForbiddenException('userpic must be image (jpg, jpeg or png)')
@@ -35,7 +35,7 @@ export class AuthController {
         throw new ForbiddenException('userpic size must be less then 5 Mb');
       }
     }
-    const user = await this.authService.register(createUserDto, response, userpic);
+    const user = await this.authService.register(createUserDto, userpic);
     await this.emailConfirmationService.sendVerificationLink(createUserDto.email);
     return user;
   }

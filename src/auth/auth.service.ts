@@ -66,7 +66,7 @@ export class AuthService {
         return hash;
     }
 
-    async login(user: User, response: Response) {
+    async login(user: User,/* response: Response*/) {
         const payload = { email: user.email, sub: user.id};
         const accessToken = this.generateJwtAccessToken(user, this.configService.get('access_token.secret'), this.configService.get('access_token.expiresIn'));
         const refreshToken = this.generateJwtRefreshToken(user, this.configService.get('refresh_token.secret'), this.configService.get('refresh_token.expiresIn'));
@@ -81,7 +81,7 @@ export class AuthService {
             domain: this.configService.get('cookie.cookieDomain'),
             expires: new Date(Date.now() + 20000 * 60 * 60 * 24),
         }).send({ success: payload });*/
-        return [payload, accessToken, refreshToken]
+        return {payload, accessToken, refreshToken}
         /* {
             ...payload,
             token: this.generateJwtToken(user),
@@ -92,7 +92,7 @@ export class AuthService {
         this.tokenRepository.save({userid: createHashedRefreshTokenDto.userid, token: createHashedRefreshTokenDto.token});
     }
 
-    async register(createUserDto: CreateUserDto, response: Response, file?: Express.Multer.File){
+    async register(createUserDto: CreateUserDto, file?: Express.Multer.File){
       try {
           createUserDto.password = await this.generateHash(createUserDto.password);
           const {hash, ...user} = await this.userService.create(createUserDto);
@@ -113,7 +113,7 @@ export class AuthService {
               domain: this.configService.get('cookie.cookieDomain'),
               expires: new Date(Date.now() + 20000 * 60 * 60 * 24),
           }).send({ success: user });*/
-          return [user, accessToken, refreshToken];
+          return {user, accessToken, refreshToken};
       }
       catch (e) {
           /*УМЕНЬШИТЬ КОЛИЧЕСТВО ВЫВОДИМЫХ ДАННЫХ*/
