@@ -26,7 +26,7 @@ export class PersonController {
   }
 
 
-  @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
+  @UseGuards(JwtAuthGuard, /*EmailConfirmationGuard*/)
   @Post('like')
   async setLike(@Request() req, @Query('personid') personid: number){
     return this.personService.setLike(req.user.id, personid);
@@ -58,7 +58,7 @@ export class PersonController {
     return this.personService.findByTag(req, tagid, take, skip);
   }
 
-  @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
+  @UseGuards(JwtAuthGuard,/* EmailConfirmationGuard*/)
   @Get('favorite')
   async findUsersFavorite(@Request() req, @Query('take') take: number, @Query('skip') skip: number){
     return this.personService.findUsersFavorite(req.user.id, take, skip);
