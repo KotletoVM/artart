@@ -55,7 +55,7 @@ export class PersonService {
       throw new NotFoundException('person not found.');
     }
     try {
-      qb.relation(Person, "liked_by").of(personid).add(userid)
+      await qb.relation(Person, "liked_by").of(personid).add(userid);
     }
     catch (e) {
       if (e.code === '23505'){
@@ -67,6 +67,7 @@ export class PersonService {
       }
       else return new Error('Error: ' + e.code)
     }
+
     const upd = await this.personRepository.update(personid, {likes: person.likes + 1});
     const pers = await this.findOneSimple(personid);
     return pers.likes;
