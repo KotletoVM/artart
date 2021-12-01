@@ -63,7 +63,7 @@ export class EmailConfirmationService {
       expiresIn: this.configService.get('verification.expiresIn')
     });
 
-    const url = `${this.configService.get('verification.url')}?token=${token}`;
+    const url = `${this.configService.get('verification.url')}/${token}`;
 
     const text = `Welcome to the ARTART web-application. To confirm your email address, click here: ${url}`;
     const html = "<h3>Welcome to the ARTART web-application.</h3><h4></h4>" +
