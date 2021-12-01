@@ -55,19 +55,19 @@ export class PersonService {
       throw new NotFoundException('person not found.');
     }
     try {
-      const liked = await qb.relation(Person, "liked_by").of(personid).add(userid);
+      qb.relation(Person, "liked_by").of(personid).add(userid)
     }
     catch (e) {
       if (e.code === '23505'){
         const qb1 = this.personRepository.createQueryBuilder('person');
         qb.relation(Person, "liked_by").of(personid).remove(userid);
-        this.personRepository.update(personid, {likes: person.likes - 1});
+        const upd = await this.personRepository.update(personid, {likes: person.likes - 1});
         const pers = await this.findOneSimple(personid);
         return pers.likes;
       }
-      else {return new Error()}
+      else return new Error('Error: ' + e.code)
     }
-    this.personRepository.update(personid, {likes: person.likes + 1});
+    const upd = await this.personRepository.update(personid, {likes: person.likes + 1});
     const pers = await this.findOneSimple(personid);
     return pers.likes;
   }
