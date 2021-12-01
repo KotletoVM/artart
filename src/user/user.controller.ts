@@ -32,19 +32,19 @@ export class UserController {
     return this.userService.findAll(take, skip);
   }
 
-  @UseGuards(JwtAuthGuard, /*EmailConfirmationGuard*/)
+  @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
   @Get('me')
   getProfile(@Request() req) {
     return this.userService.getProfile(req.user.id)
   }
 
-  @UseGuards(JwtAuthGuard, /*EmailConfirmationGuard*/)
+  @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
   @Get('search')
   search(@Query() searchUserDto: SearchUserDto) {
     return this.userService.search(searchUserDto);
   }
 
-  @UseGuards(JwtAuthGuard, /*EmailConfirmationGuard*/)
+  @UseGuards(JwtAuthGuard, EmailConfirmationGuard)
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const {hash, role, updatedAt, email, isEmailConfirmed, ...find} = await this.userService.findById(+id);
