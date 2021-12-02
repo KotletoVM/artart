@@ -34,7 +34,7 @@ export class PersonController {
 
   @Get()
   @UsePipes(new ValidationPipe({ transform: true }))
-  async findAll(@Query() sortDto: SortDto, @Request() req: Req) {
+  async findAll(@Request() req: Req, @Query() sortDto: SortDto) {
     return this.personService.findAll(req, sortDto);
   }
 

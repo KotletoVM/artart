@@ -95,7 +95,6 @@ export class PersonService {
     const qb = this.personRepository.createQueryBuilder('person');
     const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["person","user.id","user.name"]).orderBy(orderBy, sortDto.order).take(take).skip(skip).getManyAndCount();
     const setLiked = await this.setLikedforCurrentUser(currentUserId, persons);
-    console.log(setLiked)
     return [setLiked, count];
   }
 /*
@@ -215,7 +214,6 @@ export class PersonService {
     try {
       persons.forEach(person => {
         person.liked_by.forEach(like => {
-          console.log('userid in f: ' + currentUserId)
           if (like.id == currentUserId){
             person.liked = true;
             return;
