@@ -52,5 +52,4 @@ export class AuthController {
   logOut(@Req() req, @Res() response: Response){
     return  this.authService.logOut(req.user, req, response);
   }
-
 }

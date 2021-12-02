@@ -47,7 +47,7 @@ export class AuthService {
         return null;
     }
     else{
-        throw new ForbiddenException("User was not found.");
+        throw new ForbiddenException("Пользователь не найден");
     }
   }
 
