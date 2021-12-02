@@ -87,7 +87,6 @@ export class PersonService {
         orderBy = "person.likes"
     }
     const currentUserId = await this.isAuth(req);
-    console.log(currentUserId)
     if (!currentUserId){
       const qb = this.personRepository.createQueryBuilder('person');
       const [persons, count] =await qb.leftJoinAndSelect("person.tags", "tag").take(take).skip(skip).orderBy(orderBy, sortDto.order).getManyAndCount();
@@ -95,7 +94,8 @@ export class PersonService {
     }
     const qb = this.personRepository.createQueryBuilder('person');
     const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["person","user.id","user.name"]).orderBy(orderBy, sortDto.order).take(take).skip(skip).getManyAndCount();
-    return [this.setLikedforCurrentUser(currentUserId, persons), count];
+    const setLiked = await this.setLikedforCurrentUser(currentUserId, persons);
+    return [setLiked, count];
   }
 /*
   async getPopular(req: Req, sortDto: SortDto) {

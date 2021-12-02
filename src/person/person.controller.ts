@@ -39,7 +39,6 @@ export class PersonController {
   }
 
   @Get(':id')
-  @UsePipes(new ValidationPipe({ transform: true }))
   async findOne(@Param('id') id: string, @Request() req: Req) {
     if (!+id){throw new BadRequestException('Id must be a number.')}
     const find = await this.personService.findOne(req, +id);
