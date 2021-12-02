@@ -214,16 +214,11 @@ export class PersonService {
   setLikedforCurrentUser(currentUserId, persons: Person[] ){
     try {
       persons.forEach(person => {
+        person.liked = false;
         person.liked_by.forEach(like => {
-          console.log('userid in f: ' + currentUserId)
           if (like.id == currentUserId){
             person.liked = true;
-            return;
           }
-          else {
-            person.liked = false;
-          }
-
         })
       })
       return persons;
