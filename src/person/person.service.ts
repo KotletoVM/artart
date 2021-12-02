@@ -218,6 +218,9 @@ export class PersonService {
             person.liked = true;
             return;
           }
+          else {
+            person.liked = false;
+          }
 
         })
       })
