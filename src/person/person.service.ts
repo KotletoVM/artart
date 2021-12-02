@@ -87,6 +87,7 @@ export class PersonService {
         orderBy = "person.likes"
     }
     const currentUserId = await this.isAuth(req);
+    console.log(currentUserId)
     if (!currentUserId){
       const qb = this.personRepository.createQueryBuilder('person');
       const [persons, count] =await qb.leftJoinAndSelect("person.tags", "tag").take(take).skip(skip).orderBy(orderBy, sortDto.order).getManyAndCount();
