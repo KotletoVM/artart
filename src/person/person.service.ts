@@ -63,14 +63,13 @@ export class PersonService {
         qb.relation(Person, "liked_by").of(personid).remove(userid);
         const upd = await this.personRepository.update(personid, {likes: person.likes - 1});
         const pers = await this.findOneSimple(personid);
-        return pers.likes;
+        return {likes: pers.likes, liked: false}
       }
       else return new Error('Error: ' + e.code)
     }
-
     const upd = await this.personRepository.update(personid, {likes: person.likes + 1});
     const pers = await this.findOneSimple(personid);
-    return pers.likes;
+    return {likes: pers.likes, liked: true}
   }
 
   async findAll(req: Req, sortDto: SortDto) {
