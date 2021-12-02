@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateUserDto } from './create-user.dto';
-import { Length, IsString, IsEmail, IsOptional, IsUrl, IsEmpty } from 'class-validator';
+import { IsString, IsEmail, IsOptional, IsUrl, IsEmpty, MinLength, Length } from 'class-validator';
 import { UserRole } from 'src/enums/role.enum';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -10,8 +10,8 @@ export class UpdateUserDto /*extends PartialType(CreateUserDto)*/ {
     id: number;
     @ApiPropertyOptional()
     @IsOptional()
-    @Length(2)
-    @IsString()
+    @Length(2,10, { message: 'Длина имени должна быть от 2-х до 10-ти символов\n' })
+    @IsString({ message: 'Имя должно быть строкой\n' })
     name?: string;
     @IsEmpty()
     userpic: string;

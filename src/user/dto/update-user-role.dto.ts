@@ -5,6 +5,6 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 export class UpdateUserRoleDto {
     @ApiPropertyOptional()
     @IsOptional()
-    @IsEnum(UserRole)
+    @IsEnum(UserRole, {message: 'Возможно указать 2 роли: admin или user'})
     role?: UserRole;
 }

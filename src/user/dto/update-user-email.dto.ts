@@ -4,6 +4,6 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 export class UpdateUserEmailDto {
     @ApiPropertyOptional()
     @IsOptional()
-    @IsEmail()
+    @IsEmail({}, {message: 'Введите корректный email\n'})
     email?: string;
 }
