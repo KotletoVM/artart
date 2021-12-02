@@ -232,9 +232,9 @@ export class PersonService {
   }
 
   async isAuth(req: Req){
-    if (!req.cookies['access_token'])
+    if (!req.headers.authorization)
       return false;
-    const decodedJwt = await jwtDecode<JwtPayload>(req.cookies['access_token']);
+    const decodedJwt = await jwtDecode<JwtPayload>(req.headers.authorization);
     return Number(decodedJwt['sub']);
   }
 }
