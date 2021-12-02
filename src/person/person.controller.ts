@@ -38,13 +38,6 @@ export class PersonController {
     return this.personService.findAll(req, sortDto);
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string, @Request() req: Req) {
-    if (!+id){throw new BadRequestException('Id must be a number.')}
-    const find = await this.personService.findOne(req, +id);
-    if (!find){throw new NotFoundException('Person not found.');}
-    return find;
-  }
 /*
   @Get('popular')
   getPopular(@Request() req: Req, @Body() sortDto: SortDto) {
@@ -78,6 +71,15 @@ export class PersonController {
     if (!find){throw new NotFoundException('Person not found.');}
     return await this.personService.getSoc(personid);
   }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string, @Request() req: Req) {
+    if (!+id){throw new BadRequestException('Id must be a number.')}
+    const find = await this.personService.findOne(req, +id);
+    if (!find){throw new NotFoundException('Person not found.');}
+    return find;
+  }
+
 
 
   @Roles(UserRole.ADMIN)
