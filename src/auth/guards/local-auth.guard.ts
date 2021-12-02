@@ -3,8 +3,8 @@ import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
 export class LocalAuthGuard extends AuthGuard('local') {
-    handleRequest(err, user) {
-        if (err) {
+    handleRequest(err, user, info) {
+        if (err || !user) {
             throw err || new UnauthorizedException('Необходимо заполнить все поля');
         }
         return user;
