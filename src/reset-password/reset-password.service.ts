@@ -49,7 +49,9 @@ export class ResetPasswordService {
       subject: 'ARTART. Password Reset | ARTART. Сброс пароля ',
       text,
       html
-    })
+    }).then(emailResult => {
+      return {message: "Password reset email sent", emailId: emailResult.messageId}
+    }).catch(err => {throw new BadRequestException('Something went wrong. Email not sent')})
   }
 
   sendMail(options: Mail.Options) {
@@ -61,7 +63,6 @@ export class ResetPasswordService {
       const payload = await this.jwtService.verify(token, {
         secret: this.configService.get('password_reset.secret'),
       });
-
       if (typeof payload === 'object' && 'email' in payload) {
         return payload.email;
       }

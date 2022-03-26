@@ -50,5 +50,9 @@ export const config = () => ({
         region: process.env.AWS_REGION,
         bucket: process.env.AWS_PUBLIC_BUCKET_NAME,
         endpoint: process.env.AWS_ENDPOINT
+    },
+    userConstraints: {
+        email: process.env.USER_EMAIL_CONSTRAINT,
+        name: process.env.USER_NAME_CONSTRAINT
     }
 });

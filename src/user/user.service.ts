@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject, forwardRef, BadRequestException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -41,12 +41,14 @@ export class UserService {
     if (!user.userpic.includes('userpic.png')){
       this.fileService.deleteFile(user.userpic);
     }
-    return this.userRepository.update(user.id, {userpic: newUserpic.Location});
+    await this.userRepository.update(user.id, {userpic: newUserpic.Location});
+    return {message: 'Userpic has been updated', url: newUserpic.Location}
   }
 
   async findAll(take: number = 10, skip: number = 0) {
     const qb = this.userRepository.createQueryBuilder('user');
-    qb.select(["user.id", "user.name", "user.userpic"]).take(take).skip(skip).getManyAndCount();
+    const [users, count] = await qb.select(["user.id", "user.name", "user.userpic"]).take(take).skip(skip).getManyAndCount();
+    return {users, count}
   }
 
   findById(id: number) {
@@ -67,8 +69,8 @@ export class UserService {
     qb.setParameters({
       name: `%${searchUserDto.name}%`
     })
-    let [users, number] = await  qb.select(["user.id", "user.name", "user.userpic", "user.createdAt"]).getManyAndCount();
-    return {users, number};
+    const [users, count] = await  qb.select(["user.id", "user.name", "user.userpic"]).getManyAndCount();
+    return {users, count};
 
   }
 
@@ -93,21 +95,21 @@ export class UserService {
     if (updateUserPasswordDto.password){
       const hash = await bcrypt.hash(updateUserPasswordDto.password, 10);
       const hashUpdate = await this.userRepository.update(id, {hash: hash});
-      if (hashUpdate){response.clearCookie('access_token').clearCookie('refresh_token').send({hashUpdate});
+      if (hashUpdate){response.clearCookie('access_token').clearCookie('refresh_token').send({message: 'Password updated'});
       }
-      else throw new NotFoundException('something wrong');
+      else throw new BadRequestException('Something wrong');
     }
-    else throw new NotFoundException('to update password enter new password');
+    else throw new BadRequestException('To update password enter new password');
   }
 
   async updateEmail(id: number, updateUserEmailDto: UpdateUserEmailDto, response: Response){
     if (updateUserEmailDto.email){
       const emailUpdate = await this.userRepository.update(id, {email: updateUserEmailDto.email, isEmailConfirmed: false});
-      if (emailUpdate){response.clearCookie('access_token').clearCookie('refresh_token').send({emailUpdate});
+      if (emailUpdate){response.clearCookie('access_token').clearCookie('refresh_token').send({message: 'Email updated. Confirm new email.'});
     }
-      else throw new NotFoundException('something wrong');
+      else throw new BadRequestException('Something wrong');
     }
-    else throw new NotFoundException('to update email enter new email');
+    else throw new BadRequestException('To update email enter new email');
 
     //logout
   }
@@ -119,17 +121,20 @@ export class UserService {
 
   async resetPassword(email: string, updateUserPasswordDto: UpdateUserPasswordDto){
     const user = await this.findByEmail(email);
-    if (!user){throw new NotFoundException('user not found');}
-    if (updateUserPasswordDto){
+    if (!user){throw new NotFoundException('User not found.');}
+    if (updateUserPasswordDto['password']){
       const hash = await bcrypt.hash(updateUserPasswordDto.password, 10);
-      return this.userRepository.update(user.id, {hash: hash});
+      await this.userRepository.update(user.id, {hash: hash});
+      return {message: "Password reset complete"}
     }
-    else throw new NotFoundException('to reset password enter new password');
+    else throw new BadRequestException('To reset password enter new password');
   }
 
   async remove(id: number){
     this.tokenRepository.delete({userid: id});
-    return this.userRepository.delete(id);
+    return this.userRepository.delete(id)
+        .then(() => {return {message: "User deleted"}})
+        .catch((err) => { throw new BadRequestException("Something went wrong.")});
   }
 
   async markEmailAsConfirmed(email: string) {

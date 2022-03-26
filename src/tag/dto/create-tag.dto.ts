@@ -1,7 +1,8 @@
 import { IsString, IsNotEmpty } from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiResponseProperty } from "@nestjs/swagger";
 
 export class CreateTagDto {
+    @ApiResponseProperty()
     id: number;
     @ApiProperty()
     @IsNotEmpty({ message: 'Необходимо указать название тега\n' })

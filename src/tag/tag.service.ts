@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,6 +14,8 @@ export class TagService {
 
   async findPersonTags(personid: number){
     const qb = await this.tagRepository.createQueryBuilder('tag');
-    return qb.select('tag').leftJoin("tag.persons", "person").where("person.id = :personid", {personid: personid}).getMany();
+    const tags = await qb.select('tag').leftJoin("tag.persons", "person").where("person.id = :personid", {personid: personid}).getMany();
+    if (tags.length === 0) throw new NotFoundException('Tags not found')
+    return tags
   }
 }

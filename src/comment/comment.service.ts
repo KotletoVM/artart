@@ -17,15 +17,15 @@ export class CommentService {
   ) {}
 
   async create(createCommentDto: CreateCommentDto, userid: number, personid: number) {
-    const person = await this.personRepository.findOne(personid);
-    if (!person) throw new NotFoundException('person not found')
+    const person = await this.personRepository.findOne(personid, {loadEagerRelations: false});
+    if (!person) throw new NotFoundException('Person not found')
     const comment = await this.commentRepository.save({
       text: createCommentDto.text,
       person: {id: personid},
       user: {id: userid}
     });
     this.personRepository.update(personid, {comments: person.comments + 1});
-    return comment;
+    return {message: 'Comment created', text: createCommentDto.text};
   }
 
   findAll(take: number = 10, skip: number = 0) {
@@ -43,18 +43,20 @@ export class CommentService {
   }
 
   async findAllforPerson(personid: number, take: number = 10, skip: number = 0){
-    //return this.commentRepository.find({where: {person: {id: personid}}});
     const qb = this.commentRepository.createQueryBuilder('comment');
-    const [comments, number] = await qb.innerJoinAndSelect('comment.user', 'user').select('comment').addSelect('user.id')
+    const [comments, count] = await qb.innerJoinAndSelect('comment.user', 'user').select('comment').addSelect('user.id')
         .addSelect('user.name').addSelect('user.userpic').where('comment.person.id = :personid', {personid: personid}).take(take).skip(skip).getManyAndCount();
-    return [comments, number];
+    if (count !== 0) return {comments, count}
+    else throw new NotFoundException('Comments not found')
   }
 
-  update(id: number, updateCommentDto: UpdateCommentDto) {
-    return this.commentRepository.update(id, updateCommentDto);
+  async update(id: number, updateCommentDto: UpdateCommentDto) {
+    await this.commentRepository.update(id, updateCommentDto);
+    return {message: 'Comment updated', text: updateCommentDto.text}
   }
 
-  remove(id: number) {
-    return this.commentRepository.delete(id);
+  async remove(id: number) {
+    await this.commentRepository.delete(id);
+    return {message: 'Comment deleted'}
   }
 }

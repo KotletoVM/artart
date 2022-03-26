@@ -116,8 +116,9 @@ export class AuthService {
           return {user, accessToken, refreshToken};
       }
       catch (e) {
-          /*УМЕНЬШИТЬ КОЛИЧЕСТВО ВЫВОДИМЫХ ДАННЫХ*/
-          throw new ForbiddenException(e);
+          if (e.constraint === this.configService.get('userConstraints.email')) throw new ForbiddenException("Пользователь с указанной почтой уже существует.")
+          if (e.constraint === this.configService.get('userConstraints.name')) throw new ForbiddenException("Указанное имя пользователя уже используется.")
+          else throw new ForbiddenException(`Произошла ошибка ${e.code}: ${e.detail}.`)
       }
     }
 
@@ -129,10 +130,6 @@ export class AuthService {
 
     public getJwtAccessToken(user: User) {
         const accessToken = this.generateJwtAccessToken(user, this.configService.get('access_token.secret'), this.configService.get('access_token.expiresIn'));
-        /*response.cookie('access_token', accessToken, {
-            httpOnly: true,
-            domain: this.configService.get('cookie.cookieDomain'),
-            expires: new Date(Date.now() + 20000 * 60 * 60 * 24)}).send({ success: [user.name, user.email] });*/
         return accessToken;
     }
 
@@ -162,7 +159,7 @@ export class AuthService {
                 this.tokenRepository.delete({token: token.token});
             }
         })
-        response.clearCookie('access_token').clearCookie('refresh_token').send({ success: [user.name, user.email] })
+        response.clearCookie('access_token').clearCookie('refresh_token').send({ name: user.name})
     }
 /*
     sign(key: string, string: string){

@@ -16,6 +16,6 @@ export class SortDto {
      order: 'DESC'|'ASC' = 'ASC'
      @ApiPropertyOptional()
      @IsOptional()
-     @Matches(/alphabet|popular|createDate/, {message: "Order must be ASC or DESC"})
+     @Matches(/alphabet|popular|createDate/, {message: "Order must be by alphabet, by popular or by createDate"})
      orderBy: string = 'createDate'
 }

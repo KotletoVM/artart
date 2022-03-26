@@ -12,6 +12,7 @@ import { FileModule } from 'src/file/file.module';
 @Module({
   imports: [TypeOrmModule.forFeature([Art]), TypeOrmModule.forFeature([Person]), TypeOrmModule.forFeature([Comment]), CommentModule, FileModule],
   controllers: [PersonController],
-  providers: [PersonService]
+  providers: [PersonService],
+  exports: [PersonService]
 })
 export class PersonModule {}

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -38,19 +38,33 @@ export class PersonService {
     return {person, tags};
   }
 
-  async updatePersonpic(personid: number, file:  Express.Multer.File){
-    const person = await this.personRepository.findOne({id: personid});
-    const filename = `personpic/${uuid()}-${person.id}.png`;
-    const newPersonpic = await this.fileService.saveFile(filename, file);
-    if (!person.personpic.includes('personpic.png')){
-      this.fileService.deleteFile(person.personpic);
+  async updatePersonpic(personid: number, file: Express.Multer.File){
+    if (personid){
+      const person = await this.findOneSimple(personid)
+          .catch(e => {throw new BadRequestException('Id must be specified as number')})
+      if (person){
+        const filename = `personpic/${uuid()}-${person.id}.png`;
+        const newPersonpic = await this.fileService.saveFile(filename, file);
+        if (!person.personpic.includes('personpic.png')){
+          this.fileService.deleteFile(person.personpic);
+        }
+        await this.update(personid, {personpic: newPersonpic.Location});
+        return {message: 'Person\'s userpic updated', url: newPersonpic.Location}
+      }
+      else {
+        throw new NotFoundException('Person not found')
+      }
     }
-    return this.update(personid, {personpic: newPersonpic.Location});
+    else {
+      throw new BadRequestException('Id must be specified')
+    }
   }
 
   async setLike(userid: number, personid: number) {
     const qb = this.personRepository.createQueryBuilder('person');
-    let person = await this.findOneSimple(personid);
+    let person;
+    try {person = await this.findOneSimple(personid);}
+    catch {throw new BadRequestException('Person id must be number')}
     if (!person){
       throw new NotFoundException('person not found.');
     }
@@ -90,13 +104,12 @@ export class PersonService {
     if (!currentUserId){
       const qb = this.personRepository.createQueryBuilder('person');
       const [persons, count] =await qb.leftJoinAndSelect("person.tags", "tag").take(take).skip(skip).orderBy(orderBy, sortDto.order).getManyAndCount();
-      return [persons, count];
+      return {persons: persons, count: count};
     }
     const qb = this.personRepository.createQueryBuilder('person');
     const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["person","user.id","user.name"]).orderBy(orderBy, sortDto.order).take(take).skip(skip).getManyAndCount();
     const setLiked = await this.setLikedforCurrentUser(currentUserId, persons);
-    console.log(setLiked)
-    return [setLiked, count];
+    return {persons: setLiked, count: count};
   }
 /*
   async getPopular(req: Req, sortDto: SortDto) {
@@ -135,7 +148,7 @@ export class PersonService {
         personids.push(pers.id);
       })
       const [persons, count] = await qb1.leftJoinAndSelect("person.tags", "tag").where(`person.id IN (:...personid)`, {personid: personids}).orderBy('person.views', 'DESC').take(take).skip(skip).getManyAndCount();
-      return [persons, count];
+      return {persons, count};
     }
     const qb = this.personRepository.createQueryBuilder('person');
     const qb1 = this.personRepository.createQueryBuilder('person');
@@ -145,7 +158,7 @@ export class PersonService {
       personids.push(pers.id);
     })
     const [persons, count] = await qb1.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["user.id", "user.name"]).where(`person.id IN (:...personid)`, {personid: personids}).orderBy('person.views', 'DESC').take(take).skip(skip).getManyAndCount();
-    return [this.setLikedforCurrentUser(currentUserId, persons), count];
+    return {persons: this.setLikedforCurrentUser(currentUserId, persons), count};
   }
 
   async findOne(req: Req, id: number) {
@@ -157,8 +170,11 @@ export class PersonService {
     }
     const qb = this.personRepository.createQueryBuilder('person');
     const person = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").leftJoin("person.personArt", "art").addSelect(["user.id", "user.name"]).where("person.id = :id", {id: id}).getOne();
-    if (person) this.personRepository.update(id, {views: person.views + 1});
-    return this.setLikedforCurrentUser(currentUserId, [person]);
+    if (person) {
+      this.personRepository.update(id, {views: person.views + 1});
+      return this.setLikedforCurrentUser(currentUserId, [person])[0]
+    }
+    else throw new NotFoundException('Person not found.');
   }
 
   async getSoc(personid: number){
@@ -176,7 +192,7 @@ export class PersonService {
   async findUsersFavorite(id: number, take: number = 10, skip: number = 0){
     const qb = this.personRepository.createQueryBuilder('person');
     const [persons, count] = await qb.leftJoinAndSelect("person.tags", "tag").leftJoin("person.liked_by", "user").addSelect(["user.id", "user.name"]).where(`user.id = :id`, {id: id}).take(take).skip(skip).orderBy('person.views', 'DESC').getManyAndCount();
-    return [this.setLikedforCurrentUser(id, persons), count];
+    return {persons: this.setLikedforCurrentUser(id, persons), count};
   }
 
   async search(searchPersonDto: SearchPersonDto, take: number = 10, skip: number = 0) {
@@ -195,20 +211,23 @@ export class PersonService {
       fullname:`%${searchPersonDto.fullname}%`,
       pseudonym:`%${searchPersonDto.pseudonym}%`
     })
-    let [persons, number] = await  qb.take(take).skip(skip).getManyAndCount();
-    return {persons, number};
+
+    let [persons, count] = await qb.take(take).skip(skip).getManyAndCount();
+    return {persons, count};
 
   }
 
   update(id: number, updatePersonDto: UpdatePersonDto) {
-    return this.personRepository.update(id, updatePersonDto);
+    this.personRepository.update(id, updatePersonDto);
+    return {message: 'Person\'s information updated'}
   }
 
   async remove(id: number) {
     const qb = this.personRepository.createQueryBuilder('person');
     this.artRepository.delete({personid: id});
     this.commentRepository.delete({person: {id: id}});
-    return this.personRepository.delete(id);
+    this.personRepository.delete(id);
+    return {message: 'Person deleted'}
   }
 
   setLikedforCurrentUser(currentUserId, persons: Person[] ){
@@ -234,4 +253,11 @@ export class PersonService {
     const decodedJwt = await jwtDecode<JwtPayload>(req.headers.authorization);
     return Number(decodedJwt['sub']);
   }
+
+  async updatePreview(id: number, url: string){
+    await this.personRepository.update(id, {previewWork: url})
+    return {message: 'Person\'s preview updated', url: url}
+  }
 }
+
+

@@ -22,7 +22,7 @@ export class CreateUserDto {
     @Matches(/^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})/,
         { message: 'Пароль должен содержать буквы и цифры\n' })
     password: string;
-    @IsOptional()
+    @IsEmpty({message: "Роль указать нельзя!"})
     role: UserRole;
     //hash?: string;
 }

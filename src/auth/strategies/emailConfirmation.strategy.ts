@@ -8,19 +8,16 @@ import { ConfigService } from '@nestjs/config';
 export class EmailConfirmationStrategy extends PassportStrategy(Strategy, 'email-confirm') {
     constructor(private readonly  userService: UserService, private configService: ConfigService) {
         super({
-            jwtFromRequest: /*(req) => {
-                if (!req || !req.cookies) return null;
-                return req.cookies['refresh_token'];}*/
+            jwtFromRequest:
             ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: true,
-            secretOrKey: configService.get('refresh_token.secret'),
+            secretOrKey: configService.get('access_token.secret'),
         });
     }
 
     async validate(payload: {sub: number, email: string }) {
         const data = { id: payload.sub, email: payload.email };
         const user = await this.userService.findByCond(data);
-
         if (!user){
             throw new UnauthorizedException('Пользователь не найден');
         }

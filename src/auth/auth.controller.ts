@@ -10,20 +10,100 @@ import { UserService } from 'src/user/user.service';
 import { Response } from 'express';
 import { EmailConfirmationService } from 'src/email-confirmation/email-confirmation.service';
 import { EmailConfirmationGuard } from './guards/emailConfirmation.guard';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiOkResponse, ApiForbiddenResponse, ApiCreatedResponse, ApiBody, ApiUnauthorizedResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ClientErrorResponseSchema } from 'src/schemas/client-error-response.schema';
 
-@ApiTags('auth')
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService,
               private readonly emailConfirmationService: EmailConfirmationService) {}
 
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        "email": {},
+        "password": {}
+      }
+    }
+  })
+  @ApiCreatedResponse({
+    status: 201,
+    description: "User logged in",
+    schema: {
+      type: 'object',
+      properties: {
+        "payload": {
+          type: 'object',
+          properties: {
+            "email": {
+              type: 'string',
+              format: 'email'
+            },
+            "sub": {
+              type: "integer"
+            }
+          }
+        },
+        "accessToken": {},
+        "refreshToken": {}
+      }
+    }
+  })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: "User login failed",
+    type: ClientErrorResponseSchema
+  })
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Request() req) {
     return this.authService.login(req.user);
   }
 
+  @ApiCreatedResponse({
+    status: 201,
+    description: "User registered",
+    schema: {
+      type: 'object',
+      properties: {
+        "user": {
+          type: 'object',
+          properties: {
+            "name": {},
+            "email": {
+              type: 'string',
+              format: 'email'
+            },
+            "id": {
+              type: "integer"
+            },
+            "createdAt": {
+              type: 'string',
+              format: 'date-time'
+            },
+            "updatedAt": {
+              type: 'string',
+              format: 'date-time'
+            },
+            "role": {},
+            "userpic": {},
+            "isEmailConfirmed": {
+              type: "boolean"
+            }
+          }
+        },
+        "accessToken": {},
+        "refreshToken": {}
+      }
+    }
+  })
+  @ApiForbiddenResponse({
+    status: 403,
+    description: "User registration failed",
+    type: ClientErrorResponseSchema
+  })
   @Post('register')
   @UseInterceptors(FileInterceptor('file'))
   async register(@Body() createUserDto: CreateUserDto, @UploadedFile() userpic?: Express.Multer.File){
@@ -40,13 +120,49 @@ export class AuthController {
     return user;
   }
 
+  @ApiCreatedResponse({
+    status: 201,
+    description: "New access token achieved",
+    schema: {
+      type: 'string'
+    }
+  })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: "User should authorize again",
+    schema: {
+      type: "object",
+      properties: {
+        "statusCode": {
+          type: "integer"
+        },
+        "message": {}
+      }
+    }
+  })
+  @ApiBearerAuth('jwt-refresh-user')
   @UseGuards(JwtRefreshGuard, /*EmailConfirmationGuard*/)
   @Post('refresh')
   refresh(@Req() req) {
-    console.log(req.user)
     return  this.authService.getJwtAccessToken(req.user);
   }
 
+  @ApiCreatedResponse({
+    status: 201,
+    description: "Logout complete",
+    schema: {
+      type: 'object',
+      properties: {
+        "name": {}
+      }
+    }
+  })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: "User already logged out",
+    type: ClientErrorResponseSchema
+  })
+  @ApiBearerAuth('jwt-access-user')
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   logOut(@Req() req, @Res() response: Response){
