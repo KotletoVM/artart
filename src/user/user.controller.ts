@@ -14,7 +14,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Response } from 'express';
 import { EmailConfirmationService } from 'src/email-confirmation/email-confirmation.service';
-import { ApiTags, ApiBearerAuth, ApiOkResponse, ApiUnauthorizedResponse, ApiBadRequestResponse, ApiBody, ApiConsumes, ApiNotFoundResponse } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiOkResponse, ApiUnauthorizedResponse, ApiBadRequestResponse, ApiBody, ApiConsumes, ApiNotFoundResponse, ApiQuery } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ResetPasswordService } from 'src/reset-password/reset-password.service';
 import { ClientErrorResponseSchema } from 'src/schemas/client-error-response.schema';
@@ -61,10 +61,21 @@ export class UserController {
     description: "User should authorize again",
     type: ClientErrorResponseSchema
   })
+  @ApiQuery({
+    name: 'take',
+    type: 'number',
+    required: false
+  })
+  @ApiQuery({
+    name: 'skip',
+    type: 'number',
+    required: false
+  })
   @ApiBearerAuth('jwt-access-user')
   @UseGuards(JwtAuthGuard, /*EmailConfirmationGuard*/)
   @Get()
   findAll(@Query('take') take: number, @Query('skip') skip: number) {
+    if ((take && !+take) || (skip && !+skip)) throw new BadRequestException('Query parameters must be specified as numbers')
     return this.userService.findAll(take, skip);
   }
 

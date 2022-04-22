@@ -18,7 +18,7 @@ import { FileModule } from 'src/file/file.module';
 @Module({
   imports: [UserModule, PassportModule, JwtModule.register({
     secret: "test",
-    signOptions: { expiresIn: '30m' },
+    signOptions: { expiresIn: '30m', algorithm: 'RS256' },
   }),
     TypeOrmModule.forFeature([HashedRefreshToken]),
     TypeOrmModule.forFeature([User]),

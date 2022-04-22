@@ -8,8 +8,10 @@ export class Event {
     title: string;
     @Column()
     description: string;
-    @Column()
-    date: string;
+    @Column({type: 'date', nullable: true})
+    startDate: Date;
+    @Column({type: 'date', nullable: true})
+    endDate: Date;
     @Column()
     place: string;
     @CreateDateColumn({type: 'timestamp'})

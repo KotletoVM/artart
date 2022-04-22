@@ -8,12 +8,10 @@ import { ConfigService } from '@nestjs/config';
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(private readonly  userService: UserService, private configService: ConfigService) {
         super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()/*(req) => {
-                if (!req || !req.cookies) return null;
-                return req.cookies['access_token'];
-            }*/,
+            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: configService.get('access_token.secret'),
+            secretOrKey: configService.get('access_token.publicKey'),
+            algorithms: ['RS256']
         });
     }
 

@@ -7,7 +7,7 @@ import { EmailConfirmationGuard } from 'src/auth/guards/emailConfirmation.guard'
 import { UserRole } from 'src/enums/role.enum';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { ApiTags, ApiCreatedResponse, ApiUnauthorizedResponse, ApiBadRequestResponse, ApiBearerAuth, ApiNotFoundResponse, ApiOkResponse, ApiForbiddenResponse } from '@nestjs/swagger';
+import { ApiTags, ApiCreatedResponse, ApiUnauthorizedResponse, ApiBadRequestResponse, ApiBearerAuth, ApiNotFoundResponse, ApiOkResponse, ApiForbiddenResponse, ApiQuery } from '@nestjs/swagger';
 import { ClientErrorResponseSchema } from 'src/schemas/client-error-response.schema';
 import { CommentResponse } from 'src/schemas/comment-response.schema';
 
@@ -82,6 +82,16 @@ export class CommentController {
     status: 401,
     description: "Comments not found",
     type: ClientErrorResponseSchema
+  })
+  @ApiQuery({
+    name: 'take',
+    type: 'number',
+    required: false
+  })
+  @ApiQuery({
+    name: 'skip',
+    type: 'number',
+    required: false
   })
   @Get()
   findAllforPerson(@Query('personid') personid: number, @Query('take') take: number, @Query('skip') skip: number) {

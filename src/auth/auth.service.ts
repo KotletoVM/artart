@@ -51,14 +51,14 @@ export class AuthService {
     }
   }
 
-    generateJwtAccessToken(data: {id: number, email: string}, secret: string, expiresIn: string){
+    generateJwtAccessToken(data: {id: number, email: string}){
       const payload = { email: data.email, sub: data.id};
-        return this.jwtService.sign(payload, {expiresIn: expiresIn, secret: secret});
+        return this.jwtService.sign(payload, {expiresIn: this.configService.get('access_token.expiresIn'), privateKey: this.configService.get('access_token.privateKey')});
     }
 
-    generateJwtRefreshToken(data: {id: number, email: string}, secret: string, expiresIn: string){
+    generateJwtRefreshToken(data: {id: number, email: string}){
         const payload = { email: data.email, sub: data.id};
-        return this.jwtService.sign(payload, {expiresIn: expiresIn, secret: secret});
+        return this.jwtService.sign(payload, {expiresIn: this.configService.get('refresh_token.expiresIn'), privateKey: this.configService.get('refresh_token.privateKey')});
     }
 
     async generateHash(password: string){
@@ -68,8 +68,8 @@ export class AuthService {
 
     async login(user: User,/* response: Response*/) {
         const payload = { email: user.email, sub: user.id};
-        const accessToken = this.generateJwtAccessToken(user, this.configService.get('access_token.secret'), this.configService.get('access_token.expiresIn'));
-        const refreshToken = this.generateJwtRefreshToken(user, this.configService.get('refresh_token.secret'), this.configService.get('refresh_token.expiresIn'));
+        const accessToken = this.generateJwtAccessToken(user);
+        const refreshToken = this.generateJwtRefreshToken(user);
         const token = await bcrypt.hash(refreshToken, 10);
         this.saveRefreshToken({userid: user.id, token: token})
         /*response.cookie('access_token', accessToken, {
@@ -100,8 +100,8 @@ export class AuthService {
               const filename = `userpic/${uuid()}-${user.id}.png`;
               const userpicUpload = this.saveUserpic(filename, user.id, file);
           }
-          const accessToken = this.generateJwtAccessToken(user, this.configService.get('access_token.secret'), this.configService.get('access_token.expiresIn'));
-          const refreshToken = this.generateJwtRefreshToken(user, this.configService.get('refresh_token.secret'), this.configService.get('refresh_token.expiresIn'));
+          const accessToken = this.generateJwtAccessToken(user);
+          const refreshToken = this.generateJwtRefreshToken(user);
           const token = await bcrypt.hash(refreshToken, 10);
           this.saveRefreshToken({userid: user.id, token: token})
           /*response.cookie('access_token', accessToken, {
@@ -116,8 +116,8 @@ export class AuthService {
           return {user, accessToken, refreshToken};
       }
       catch (e) {
-          if (e.constraint === this.configService.get('userConstraints.email')) throw new ForbiddenException("Пользователь с указанной почтой уже существует.")
-          if (e.constraint === this.configService.get('userConstraints.name')) throw new ForbiddenException("Указанное имя пользователя уже используется.")
+          if (e.constraint === this.configService.get('userConstraints.email')) throw new ForbiddenException("Пользователь с указанной почтой уже существует")
+          if (e.constraint === this.configService.get('userConstraints.name')) throw new ForbiddenException("Пользователь с указанным псевдонимом уже существует")
           else throw new ForbiddenException(`Произошла ошибка ${e.code}: ${e.detail}.`)
       }
     }
@@ -129,7 +129,7 @@ export class AuthService {
     }
 
     public getJwtAccessToken(user: User) {
-        const accessToken = this.generateJwtAccessToken(user, this.configService.get('access_token.secret'), this.configService.get('access_token.expiresIn'));
+        const accessToken = this.generateJwtAccessToken(user);
         return accessToken;
     }
 

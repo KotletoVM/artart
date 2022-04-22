@@ -4,7 +4,8 @@ export const EventResponse = {
     },
     title: {type: 'string'},
     description: {type: 'string'},
-    date: {type: 'string'},
+    startDate: {type: 'string', format: 'date'},
+    endDate: {type: 'string', format: 'date'},
     place: {type: 'string'},
     pics: {
         type: 'array',

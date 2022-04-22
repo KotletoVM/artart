@@ -6,7 +6,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UserRole } from 'src/enums/role.enum';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { ApiTags, ApiCreatedResponse, ApiUnauthorizedResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiBearerAuth, ApiOkResponse, ApiForbiddenResponse } from '@nestjs/swagger';
+import { ApiTags, ApiCreatedResponse, ApiUnauthorizedResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiBearerAuth, ApiOkResponse, ApiForbiddenResponse, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { ClientErrorResponseSchema } from 'src/schemas/client-error-response.schema';
 import { EventResponse } from 'src/schemas/event-response.schema';
 
@@ -71,6 +71,16 @@ export class EventController {
     status: 401,
     description: "Events not found",
     type: ClientErrorResponseSchema
+  })
+  @ApiQuery({
+    name: 'take',
+    type: 'number',
+    required: false
+  })
+  @ApiQuery({
+    name: 'skip',
+    type: 'number',
+    required: false
   })
   @Get()
   findAll(@Query('take') take: number, @Query('skip') skip: number) {

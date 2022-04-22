@@ -14,9 +14,12 @@ export class CreateEventDto {
     @IsNotEmpty()
     @IsString()
     description: string;
-    @ApiProperty()
+    @ApiProperty({type: 'string', format: 'date'})
     @IsNotEmpty()
-    date: string;
+    startDate: Date;
+    @ApiPropertyOptional({type: 'string', format: 'date'})
+    @IsOptional()
+    endDate: Date;
     @ApiProperty()
     place: string;
     @ApiProperty()

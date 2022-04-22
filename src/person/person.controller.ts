@@ -9,7 +9,7 @@ import { EmailConfirmationGuard } from 'src/auth/guards/emailConfirmation.guard'
 import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/enums/role.enum';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { ApiTags, ApiBearerAuth, ApiForbiddenResponse, ApiCreatedResponse, ApiUnauthorizedResponse, ApiNotFoundResponse, ApiOkResponse, ApiBadRequestResponse, ApiConsumes, ApiBody, ApiSecurity } from '@nestjs/swagger';
+import { ApiQuery, ApiTags, ApiBearerAuth, ApiForbiddenResponse, ApiCreatedResponse, ApiUnauthorizedResponse, ApiNotFoundResponse, ApiOkResponse, ApiBadRequestResponse, ApiConsumes, ApiBody, ApiSecurity } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { SortDto } from './dto/sort.dto';
 import { ClientErrorResponseSchema } from 'src/schemas/client-error-response.schema';
@@ -150,10 +150,20 @@ export class PersonController {
     description: "Validation failed",
     type: ClientErrorResponseSchema
   })
+  @ApiQuery({
+    name: 'take',
+    type: 'number',
+    required: false
+  })
+  @ApiQuery({
+    name: 'skip',
+    type: 'number',
+    required: false
+  })
   @Get('search')
   //@UsePipes(new ValidationPipe({ transform: true }))
   search(@Query() searchPersonDto : SearchPersonDto, @Query('take') take: number, @Query('skip') skip: number){
-
+    if ((take && !+take) || (skip && !+skip)) throw new BadRequestException('Query parameters must be specified as numbers')
     return this.personService.search(searchPersonDto, take, skip);
   }
 
@@ -181,8 +191,20 @@ export class PersonController {
     description: "Validation failed",
     type: ClientErrorResponseSchema
   })
+  @ApiQuery({
+    name: 'take',
+    type: 'number',
+    required: false
+  })
+  @ApiQuery({
+    name: 'skip',
+    type: 'number',
+    required: false
+  })
   @Get('tags')
   async findByTag(@Query('tag') tagid: number, @Query('take') take: number, @Query('skip') skip: number, @Request() req: Req){
+    if (!+tagid){throw new BadRequestException('Id must be a number.')}
+    if ((take && !+take) || (skip && !+skip)) throw new BadRequestException('Query parameters must be specified as numbers')
     return this.personService.findByTag(req, tagid, take, skip);
   }
 
@@ -215,10 +237,21 @@ export class PersonController {
     description: "User should authorize again",
     type: ClientErrorResponseSchema
   })
+  @ApiQuery({
+    name: 'take',
+    type: 'number',
+    required: false
+  })
+  @ApiQuery({
+    name: 'skip',
+    type: 'number',
+    required: false
+  })
   @ApiBearerAuth('jwt-access-user')
   @UseGuards(JwtAuthGuard, /*EmailConfirmationGuard*/)
   @Get('favorite')
   async findUsersFavorite(@Request() req, @Query('take') take: number, @Query('skip') skip: number){
+    if ((take && !+take) || (skip && !+skip)) throw new BadRequestException('Query parameters must be specified as numbers')
     return this.personService.findUsersFavorite(req.user.id, take, skip);
   }
 
@@ -263,6 +296,7 @@ export class PersonController {
   })
   @Get('soc')
   async getSoc(@Query('personid') personid: number, @Request() req: Req) {
+    if (!+personid){throw new BadRequestException('Person d must be a number.')}
     const find = await this.personService.findOneSimple(personid);
     if (!find){throw new NotFoundException('Person not found.');}
     return await this.personService.getSoc(personid);

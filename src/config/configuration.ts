@@ -19,11 +19,13 @@ export const config = () => ({
         ssl: { rejectUnauthorized: false }
     },
     access_token: {
-        secret: process.env.ACCESS_JWT_SECRET,
+        privateKey: process.env.ACCESS_JWT_PRIVATE,
+        publicKey: process.env.ACCESS_JWT_PUBLIC,
         expiresIn: process.env.ACCESS_JWT_EXPIRESIN
     },
     refresh_token:{
-        secret: process.env.REFRESH_JWT_SECRET,
+        privateKey: process.env.REFRESH_JWT_PRIVATE,
+        publicKey: process.env.REFRESH_JWT_PUBLIC,
         expiresIn: process.env.REFRESH_JWT_EXPIRESIN
     },
     verification:{

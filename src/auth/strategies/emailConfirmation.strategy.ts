@@ -11,7 +11,8 @@ export class EmailConfirmationStrategy extends PassportStrategy(Strategy, 'email
             jwtFromRequest:
             ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: true,
-            secretOrKey: configService.get('access_token.secret'),
+            secretOrKey: configService.get('access_token.publicKey'),
+            algorithms: ['RS256']
         });
     }
 
