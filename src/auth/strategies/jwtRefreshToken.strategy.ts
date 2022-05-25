@@ -13,7 +13,7 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-ref
                 private readonly  configService: ConfigService) {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            secretOrKey: configService.get('refresh_token.publicKey'),
+            secretOrKey: configService.get('refresh_token.publicKey').replace(/\\n/gm, '\n'),
             algorithms: ['RS256'],
             passReqToCallback: true
         });
