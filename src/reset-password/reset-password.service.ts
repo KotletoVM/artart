@@ -29,7 +29,7 @@ export class ResetPasswordService {
       expiresIn: this.configService.get('password_reset.expiresIn')
     });
 
-    const url = `${this.configService.get('password_reset.url')}?token=${token}`;
+    const url = `${this.configService.get('password_reset.url')}/${token}`;
 
     const text = `Welcome to the ARTART web-application. To reset your password, click here: ${url}`;
     const html = "<h3>Welcome to the ARTART web-application.</h3><h4></h4>" +
