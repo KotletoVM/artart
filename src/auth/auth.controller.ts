@@ -151,6 +151,7 @@ export class AuthController {
   @UseGuards(JwtRefreshGuard, /*EmailConfirmationGuard*/)
   @Post('refresh')
   refresh(@Req() req, @Query('f') fingerprint: string) {
+    if (!fingerprint) throw new ForbiddenException('set fingerprint')
     return this.authService.refreshSession(req.user, fingerprint, req.user.exp);
   }
 

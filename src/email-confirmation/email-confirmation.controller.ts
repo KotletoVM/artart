@@ -8,7 +8,7 @@ import { ApiTags, ApiCreatedResponse, ApiBadRequestResponse, ApiBearerAuth } fro
 import { ClientErrorResponseSchema } from 'src/schemas/client-error-response.schema';
 
 @ApiTags('Email confirmation')
-@Controller('email')
+@Controller('api/email')
 export class EmailConfirmationController {
   constructor(private readonly emailConfirmationService: EmailConfirmationService) {}
 
