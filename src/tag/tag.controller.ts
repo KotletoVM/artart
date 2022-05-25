@@ -5,8 +5,8 @@ import { UpdateTagDto } from './dto/update-tag.dto';
 import { ApiTags, ApiOkResponse, ApiBadRequestResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { ClientErrorResponseSchema } from 'src/schemas/client-error-response.schema';
 
-@ApiTags('tag')
-@Controller('tag')
+@ApiTags('Tag')
+@Controller('api/tag')
 export class TagController {
   constructor(private readonly tagService: TagService) {}
 

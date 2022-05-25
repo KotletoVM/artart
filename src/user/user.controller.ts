@@ -20,7 +20,7 @@ import { ResetPasswordService } from 'src/reset-password/reset-password.service'
 import { ClientErrorResponseSchema } from 'src/schemas/client-error-response.schema';
 
 @ApiTags('User')
-@Controller('user')
+@Controller('api/user')
 export class UserController {
   constructor(
       private readonly emailConfirmationService: EmailConfirmationService,

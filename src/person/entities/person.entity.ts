@@ -31,10 +31,8 @@ export class Person {
     comments: number;
     @Column("jsonb", {nullable: true})
     socNetworks: {
-        instagram: string;
         vk: string;
         tg: string;
-        spotify: string;
         site: string;
     };
     @OneToMany(type => Art, art => art.personid,

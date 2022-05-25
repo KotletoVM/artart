@@ -11,7 +11,7 @@ import { ClientErrorResponseSchema } from 'src/schemas/client-error-response.sch
 import { EventResponse } from 'src/schemas/event-response.schema';
 
 @ApiTags('Event')
-@Controller('event')
+@Controller('api/event')
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 

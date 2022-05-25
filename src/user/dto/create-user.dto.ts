@@ -24,5 +24,7 @@ export class CreateUserDto {
     password: string;
     @IsEmpty({message: "Роль указать нельзя!"})
     role: UserRole;
-    //hash?: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    fingerprint: string;
 }

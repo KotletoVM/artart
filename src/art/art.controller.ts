@@ -11,7 +11,7 @@ import { ClientErrorResponseSchema } from 'src/schemas/client-error-response.sch
 import { ArtResponce } from 'src/schemas/art-response.schema';
 
 @ApiTags('Art')
-@Controller('art')
+@Controller('api/art')
 export class ArtController {
   constructor(private readonly artService: ArtService) {}
 

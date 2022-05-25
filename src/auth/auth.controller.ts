@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Res, Req, Redirect, UseInterceptors, UploadedFile, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Res, Req, Redirect, UseInterceptors, UploadedFile, ForbiddenException, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -12,21 +12,17 @@ import { EmailConfirmationService } from 'src/email-confirmation/email-confirmat
 import { EmailConfirmationGuard } from './guards/emailConfirmation.guard';
 import { ApiTags, ApiOkResponse, ApiForbiddenResponse, ApiCreatedResponse, ApiBody, ApiUnauthorizedResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { ClientErrorResponseSchema } from 'src/schemas/client-error-response.schema';
+import { RefreshSessionDto } from './dto/refreshSession.dto';
+import { LoginDto } from './dto/login.dto';
 
 @ApiTags('Auth')
-@Controller('auth')
+@Controller('api/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService,
               private readonly emailConfirmationService: EmailConfirmationService) {}
 
   @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        "email": {},
-        "password": {}
-      }
-    }
+    type: LoginDto
   })
   @ApiCreatedResponse({
     status: 201,
@@ -58,8 +54,14 @@ export class AuthController {
   })
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req) {
-    return this.authService.login(req.user);
+  async login(@Request() req, @Body() loginDto: LoginDto) {
+    let refreshSessionDto: RefreshSessionDto = {
+      userid: req.user.id,
+      ua: req.get('User-Agent'),
+      fingerprint: loginDto.fingerprint,
+      ip: req.connection.remoteAddress
+    }
+    return this.authService.login(req.user, refreshSessionDto);
   }
 
   @ApiCreatedResponse({
@@ -106,7 +108,7 @@ export class AuthController {
   })
   @Post('register')
   @UseInterceptors(FileInterceptor('file'))
-  async register(@Body() createUserDto: CreateUserDto, @UploadedFile() userpic?: Express.Multer.File){
+  async register(@Request() req, @Body() createUserDto: CreateUserDto, @UploadedFile() userpic?: Express.Multer.File){
     if (userpic){
       if (userpic.mimetype != 'image/jpeg' && userpic.mimetype != 'image/png'){
         throw new ForbiddenException('userpic must be image (jpg, jpeg or png)')
@@ -115,7 +117,12 @@ export class AuthController {
         throw new ForbiddenException('userpic size must be less then 5 Mb');
       }
     }
-    const user = await this.authService.register(createUserDto, userpic);
+    let refreshSessionDto: RefreshSessionDto = {
+      ua: req.get('User-Agent'),
+      fingerprint: createUserDto.fingerprint,
+      ip: req.connection.remoteAddress
+    }
+    const user = await this.authService.register(createUserDto, refreshSessionDto, userpic);
     await this.emailConfirmationService.sendVerificationLink(createUserDto.email);
     return user;
   }
@@ -143,8 +150,8 @@ export class AuthController {
   @ApiBearerAuth('jwt-refresh-user')
   @UseGuards(JwtRefreshGuard, /*EmailConfirmationGuard*/)
   @Post('refresh')
-  refresh(@Req() req) {
-    return  this.authService.getJwtAccessToken(req.user);
+  refresh(@Req() req, @Query('f') fingerprint: string) {
+    return this.authService.refreshSession(req.user, fingerprint, req.user.exp);
   }
 
   @ApiCreatedResponse({

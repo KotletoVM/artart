@@ -18,6 +18,7 @@ export class EmailConfirmationService {
   ) {
     this.nodemailerTransport = createTransport({
       service: configService.get('email.service'),
+      host: "smtp.yandex.ru",
       auth: {
         user: configService.get('email.user'),
         pass: configService.get('email.password'),
@@ -80,6 +81,7 @@ export class EmailConfirmationService {
         `<a href=\"${url}\" >${url}</a>`
 
     return this.sendMail({
+      from: this.configService.get('email.user'),
       to: email,
       subject: 'ARTART. Email confirmation | ARTART. Подтверждение Email ',
       text,

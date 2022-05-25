@@ -16,7 +16,8 @@ import {S3, Endpoint} from 'aws-sdk';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
 import { FileService } from 'src/file/file.service';
 import { v4 as uuid } from 'uuid';
-
+import { RefreshSession } from './entities/refreshSession.entity';
+import { RefreshSessionDto } from './dto/refreshSession.dto';
 @Injectable()
 export class AuthService {
   constructor(private userService: UserService,
@@ -27,7 +28,9 @@ export class AuthService {
               private userRepository: Repository<User>,
               private configService: ConfigService,
               private httpService: HttpService,
-              private fileService: FileService
+              private fileService: FileService,
+              @InjectRepository(RefreshSession)
+              private sessionRepository: Repository<RefreshSession>
               ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
@@ -51,14 +54,12 @@ export class AuthService {
     }
   }
 
-    generateJwtAccessToken(data: {id: number, email: string}){
-      const payload = { email: data.email, sub: data.id};
-        return this.jwtService.sign(payload, {expiresIn: this.configService.get('access_token.expiresIn'), privateKey: this.configService.get('access_token.privateKey')});
+    generateJwtAccessToken(payload: {sub: number, email: string}){
+      return this.jwtService.sign(payload, {expiresIn: this.configService.get('access_token.expiresIn'), privateKey: this.configService.get('access_token.privateKey').replace(/\\n/gm, '\n')});
     }
 
-    generateJwtRefreshToken(data: {id: number, email: string}){
-        const payload = { email: data.email, sub: data.id};
-        return this.jwtService.sign(payload, {expiresIn: this.configService.get('refresh_token.expiresIn'), privateKey: this.configService.get('refresh_token.privateKey')});
+    generateJwtRefreshToken(payload: {sub: number, email: string, sessionid: uuid}){
+        return this.jwtService.sign(payload, {expiresIn: this.configService.get('refresh_token.expiresIn'), privateKey: this.configService.get('refresh_token.privateKey').replace(/\\n/gm, '\n')});
     }
 
     async generateHash(password: string){
@@ -66,33 +67,24 @@ export class AuthService {
         return hash;
     }
 
-    async login(user: User,/* response: Response*/) {
-        const payload = { email: user.email, sub: user.id};
-        const accessToken = this.generateJwtAccessToken(user);
-        const refreshToken = this.generateJwtRefreshToken(user);
-        const token = await bcrypt.hash(refreshToken, 10);
-        this.saveRefreshToken({userid: user.id, token: token})
-        /*response.cookie('access_token', accessToken, {
-                httpOnly: true,
-                domain: this.configService.get('cookie.cookieDomain'),
-                expires: new Date(Date.now() + 20000 * 60 * 60 * 24),
-            }).cookie('refresh_token', refreshToken, {
-            httpOnly: true,
-            domain: this.configService.get('cookie.cookieDomain'),
-            expires: new Date(Date.now() + 20000 * 60 * 60 * 24),
-        }).send({ success: payload });*/
-        return {payload, accessToken, refreshToken}
-        /* {
-            ...payload,
-            token: this.generateJwtToken(user),
-        }*/;
+    async createSession(data: {sessionid: number, exp: number, fingerprint: string, userid: number, ip: string, ua: string}){
+        const qb = this.sessionRepository.createQueryBuilder();
+        return qb.insert().values({id: data.sessionid, expiresin: data.exp, fingerprint: data.fingerprint,
+            userid: data.userid, ip: data.ip, ua: data.ua}).execute();
     }
 
-    saveRefreshToken(createHashedRefreshTokenDto: CreateHashedRefreshTokenDto){
-        this.tokenRepository.save({userid: createHashedRefreshTokenDto.userid, token: createHashedRefreshTokenDto.token});
+    async login(user: User, refreshSessionDto: RefreshSessionDto) {
+        const sessionid = uuid();
+        const payload = {sub: user.id, email: user.email, sessionid: sessionid};
+        const accessToken = this.generateJwtAccessToken(payload);
+        const refreshToken = this.generateJwtRefreshToken(payload);
+        const exp = this.jwtService.decode(refreshToken)["exp"]
+        await this.createSession({sessionid: sessionid, exp: exp, fingerprint: refreshSessionDto.fingerprint,
+            userid: refreshSessionDto.userid, ip: refreshSessionDto.ip, ua: refreshSessionDto.ua})
+        return {payload, accessToken, refreshToken};
     }
 
-    async register(createUserDto: CreateUserDto, file?: Express.Multer.File){
+    async register(createUserDto: CreateUserDto, refreshSessionDto: RefreshSessionDto, file?: Express.Multer.File){
       try {
           createUserDto.password = await this.generateHash(createUserDto.password);
           const {hash, ...user} = await this.userService.create(createUserDto);
@@ -100,19 +92,13 @@ export class AuthService {
               const filename = `userpic/${uuid()}-${user.id}.png`;
               const userpicUpload = this.saveUserpic(filename, user.id, file);
           }
-          const accessToken = this.generateJwtAccessToken(user);
-          const refreshToken = this.generateJwtRefreshToken(user);
-          const token = await bcrypt.hash(refreshToken, 10);
-          this.saveRefreshToken({userid: user.id, token: token})
-          /*response.cookie('access_token', accessToken, {
-              httpOnly: true,
-              domain: this.configService.get('cookie.cookieDomain'),
-              expires: new Date(Date.now() + 20000 * 60 * 60 * 24),
-          }).cookie('refresh_token', refreshToken, {
-              httpOnly: true,
-              domain: this.configService.get('cookie.cookieDomain'),
-              expires: new Date(Date.now() + 20000 * 60 * 60 * 24),
-          }).send({ success: user });*/
+          const sessionid = uuid();
+          const payload = {sub: user.id, email: user.email, sessionid: sessionid};
+          const accessToken = this.generateJwtAccessToken(payload);
+          const refreshToken = this.generateJwtRefreshToken(payload);
+          const exp = this.jwtService.decode(refreshToken)["exp"]
+          await this.createSession({sessionid: sessionid, exp: exp, fingerprint: refreshSessionDto.fingerprint,
+              userid: user.id, ip: refreshSessionDto.ip, ua: refreshSessionDto.ua})
           return {user, accessToken, refreshToken};
       }
       catch (e) {
@@ -129,8 +115,21 @@ export class AuthService {
     }
 
     public getJwtAccessToken(user: User) {
-        const accessToken = this.generateJwtAccessToken(user);
+        const payload = {sub: user.id, email: user.email};
+        const accessToken = this.generateJwtAccessToken(payload);
         return accessToken;
+    }
+
+    public async refreshSession(user: User, fingerprint: string, exp: number){
+        const oldSession = await this.sessionRepository.findOne({userid: user.id, fingerprint: fingerprint, expiresin: exp})
+        if (!oldSession){
+            throw new ForbiddenException('Please login again')
+        }
+        const payload = {sub: user.id, email: user.email, sessionid: oldSession.id};
+        const accessToken = this.generateJwtAccessToken(payload);
+        const refreshToken = this.generateJwtRefreshToken(payload);
+        this.sessionRepository.update({id: oldSession.id}, {expiresin: this.jwtService.decode(refreshToken)["exp"]})
+        return {accessToken, refreshToken};
     }
 
     async getUserIfRefreshTokenMatches(refreshToken: string, userid: number) {

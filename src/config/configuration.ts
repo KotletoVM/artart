@@ -5,6 +5,7 @@ import { Tag } from "src/tag/entities/tag.entity";
 import { Event } from "src/event/entities/event.entity";
 import { Comment } from "src/comment/entities/comment.entity";
 import { HashedRefreshToken } from "src/hashed-refresh-token/entities/hashed-refresh-token.entity";
+import { RefreshSession } from 'src/auth/entities/refreshSession.entity';
 
 export const config = () => ({
     database: {
@@ -14,8 +15,8 @@ export const config = () => ({
         username: process.env.DATABASE_USERNAME,
         password: process.env.DATABASE_PASSWORD,
         database: process.env.DATABASE_NAME,
-        entities: [User, Person, Comment, Art, Event, Tag, HashedRefreshToken],
-        synchronize: true, //true,
+        entities: [User, Person, Comment, Art, Event, Tag, HashedRefreshToken, RefreshSession],
+        synchronize: true,
         ssl: { rejectUnauthorized: false }
     },
     access_token: {

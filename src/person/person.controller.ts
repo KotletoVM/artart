@@ -16,7 +16,7 @@ import { ClientErrorResponseSchema } from 'src/schemas/client-error-response.sch
 import { PersonResponse } from 'src/schemas/person-response.schema';
 
 @ApiTags('Person')
-@Controller('person')
+@Controller('api/person')
 export class PersonController {
   constructor(private readonly personService: PersonService) {}
 

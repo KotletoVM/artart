@@ -14,14 +14,15 @@ import { EmailConfirmationModule } from 'src/email-confirmation/email-confirmati
 import { EmailConfirmationStrategy } from './strategies/emailConfirmation.strategy';
 import {HttpModule} from "@nestjs/axios"
 import { FileModule } from 'src/file/file.module';
+import { RefreshSession } from './entities/refreshSession.entity';
 
 @Module({
   imports: [UserModule, PassportModule, JwtModule.register({
-    secret: "test",
     signOptions: { expiresIn: '30m', algorithm: 'RS256' },
   }),
     TypeOrmModule.forFeature([HashedRefreshToken]),
     TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([RefreshSession]),
     EmailConfirmationModule,
     HttpModule.register({
       timeout: 5000,

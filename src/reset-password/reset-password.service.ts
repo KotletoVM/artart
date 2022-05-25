@@ -14,6 +14,7 @@ export class ResetPasswordService {
               private readonly jwtService: JwtService,) {
     this.nodemailerTransport = createTransport({
       service: configService.get('email.service'),
+      host: "smtp.yandex.ru",
       auth: {
         user: configService.get('email.user'),
         pass: configService.get('email.password'),
@@ -45,6 +46,7 @@ export class ResetPasswordService {
         `<a href=\"${url}\" >${url}</a>`
 
     return this.sendMail({
+      from: this.configService.get('email.user'),
       to: email,
       subject: 'ARTART. Password Reset | ARTART. Сброс пароля ',
       text,
