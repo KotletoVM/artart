@@ -46,9 +46,9 @@ export class EmailConfirmationService {
     return email;
   }
 
-  public async decodeConfirmationToken(confirmEmailDto: ConfirmEmailDto) {
+  public async decodeConfirmationToken(token: string) {
     try {
-      const payload = await this.jwtService.verify(confirmEmailDto.token, {
+      const payload = await this.jwtService.verify(token, {
         secret: this.configService.get('verification.secret'),
       });
 
