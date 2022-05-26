@@ -151,7 +151,7 @@ export class AuthController {
   @UseGuards(JwtRefreshGuard, /*EmailConfirmationGuard*/)
   @Post('refresh')
   refresh(@Req() req, @Query('f') fingerprint: string) {
-    if (!fingerprint) throw new ForbiddenException('set fingerprint')
+    if (!fingerprint) throw new ForbiddenException('Fingerprint must be provided')
     return this.authService.refreshSession(req.user, fingerprint, req.user.exp);
   }
 
@@ -173,7 +173,8 @@ export class AuthController {
   @ApiBearerAuth('jwt-access-user')
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  logOut(@Req() req, @Res() response: Response){
-    return  this.authService.logOut(req.user, req, response);
+  logOut(@Req() req, @Body() body: {fingerprint: string}){
+    if (!body.fingerprint) throw new ForbiddenException('Fingerprint must be provided')
+    return this.authService.logOut(req.user, body.fingerprint);
   }
 }

@@ -8,9 +8,11 @@ import { HashedRefreshToken } from 'src/hashed-refresh-token/entities/hashed-ref
 import { EmailConfirmationModule } from 'src/email-confirmation/email-confirmation.module';
 import { FileModule } from 'src/file/file.module';
 import { ResetPasswordModule } from 'src/reset-password/reset-password.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), TypeOrmModule.forFeature([HashedRefreshToken]), forwardRef(() => EmailConfirmationModule), FileModule, ResetPasswordModule],
+  imports: [TypeOrmModule.forFeature([User]), TypeOrmModule.forFeature([HashedRefreshToken]),
+    forwardRef(() => EmailConfirmationModule), FileModule, ResetPasswordModule],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService]

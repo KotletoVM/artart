@@ -38,11 +38,8 @@ export class AuthService {
     const user = await this.userService.findByCond({
       email
     });
-    /*if (user && user.hash === password) {
-      const { password, ...result } = user;
-      return result;
-    }*/
     if(user){
+        if (!user.isEmailConfirmed) throw new ForbiddenException('Необходимо подтвердить почту');
         if (await bcrypt.compare(password, user.hash)) {
             const {hash, ...result} = user;
             return result;
@@ -54,7 +51,7 @@ export class AuthService {
     }
   }
 
-    generateJwtAccessToken(payload: {sub: number, email: string}){
+    generateJwtAccessToken(payload: {sub: number, email: string, sessionid: uuid}){
       return this.jwtService.sign(payload, {expiresIn: this.configService.get('access_token.expiresIn'), privateKey: this.configService.get('access_token.privateKey').replace(/\\n/gm, '\n')});
     }
 
@@ -71,6 +68,11 @@ export class AuthService {
         const qb = this.sessionRepository.createQueryBuilder();
         return qb.insert().values({id: data.sessionid, expiresin: data.exp, fingerprint: data.fingerprint,
             userid: data.userid, ip: data.ip, ua: data.ua}).execute();
+    }
+
+    async findSession(sessionid: uuid){
+        const qb = this.sessionRepository.createQueryBuilder();
+        return qb.select().where({id: sessionid}).getOne()
     }
 
     async login(user: User, refreshSessionDto: RefreshSessionDto) {
@@ -92,14 +94,7 @@ export class AuthService {
               const filename = `userpic/${uuid()}-${user.id}.png`;
               const userpicUpload = this.saveUserpic(filename, user.id, file);
           }
-          const sessionid = uuid();
-          const payload = {sub: user.id, email: user.email, sessionid: sessionid};
-          const accessToken = this.generateJwtAccessToken(payload);
-          const refreshToken = this.generateJwtRefreshToken(payload);
-          const exp = this.jwtService.decode(refreshToken)["exp"]
-          await this.createSession({sessionid: sessionid, exp: exp, fingerprint: refreshSessionDto.fingerprint,
-              userid: user.id, ip: refreshSessionDto.ip, ua: refreshSessionDto.ua})
-          return {user, accessToken, refreshToken};
+          return {user};
       }
       catch (e) {
           if (e.constraint === this.configService.get('userConstraints.email')) throw new ForbiddenException("Пользователь с указанной почтой уже существует")
@@ -114,11 +109,11 @@ export class AuthService {
         return this.userService.update(userid, user);
     }
 
-    public getJwtAccessToken(user: User) {
+    /*public getJwtAccessToken(user: User) {
         const payload = {sub: user.id, email: user.email};
         const accessToken = this.generateJwtAccessToken(payload);
         return accessToken;
-    }
+    }*/
 
     public async refreshSession(user: User, fingerprint: string, exp: number){
         const oldSession = await this.sessionRepository.findOne({userid: user.id, fingerprint: fingerprint, expiresin: exp})
@@ -149,16 +144,12 @@ export class AuthService {
         }
     }
 
-    async logOut(user: User, req: Request, response: Response){
-        const cookie_token: string = await req.cookies['refresh_token'];
-        const tokens = await this.tokenRepository.find();
-        tokens.forEach(async token => {
-            if (await bcrypt.compare(cookie_token, token.token)){
-                console.log(cookie_token, token.token);
-                this.tokenRepository.delete({token: token.token});
-            }
-        })
-        response.clearCookie('access_token').clearCookie('refresh_token').send({ name: user.name})
+    async logOut(user: User, fingerprint: string){
+        const session = await this.sessionRepository.findOne({userid: user.id, fingerprint: fingerprint})
+        const qb = this.sessionRepository.createQueryBuilder()
+        qb.delete().where({userid: user.id, fingerprint: fingerprint}).execute()
+            .then(result => result.affected == 1 ? {message: 'Logout complete'} : new Error('Logout complete, but session not found'))
+            .catch(e => {throw new Error(e)} )
     }
 /*
     sign(key: string, string: string){

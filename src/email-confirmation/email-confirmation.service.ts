@@ -6,6 +6,8 @@ import * as Mail from 'nodemailer/lib/mailer';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
+import ConfirmEmailDto from './dto/confirmEmail.dto';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class EmailConfirmationService {
@@ -14,7 +16,7 @@ export class EmailConfirmationService {
   constructor(
       private readonly userService: UserService,
       private readonly configService: ConfigService,
-      private readonly jwtService: JwtService,
+      private readonly jwtService: JwtService
   ) {
     this.nodemailerTransport = createTransport({
       service: configService.get('email.service'),
@@ -26,25 +28,34 @@ export class EmailConfirmationService {
     });
   }
 
+  generateJwtAccessToken(payload: {sub: number, email: string, sessionid: uuid}){
+    return this.jwtService.sign(payload, {expiresIn: this.configService.get('access_token.expiresIn'), privateKey: this.configService.get('access_token.privateKey').replace(/\\n/gm, '\n')});
+  }
+
+  generateJwtRefreshToken(payload: {sub: number, email: string, sessionid: uuid}){
+    return this.jwtService.sign(payload, {expiresIn: this.configService.get('refresh_token.expiresIn'), privateKey: this.configService.get('refresh_token.privateKey').replace(/\\n/gm, '\n')});
+  }
+
   public async confirmEmail(email: string) {
     const user = await this.userService.findByEmail(email);
     if (user.isEmailConfirmed) {
       throw new BadRequestException('Email already confirmed');
     }
     await this.userService.markEmailAsConfirmed(email);
+
     return email;
   }
 
-  public async decodeConfirmationToken(token: string) {
+  public async decodeConfirmationToken(confirmEmailDto: ConfirmEmailDto) {
     try {
-      const payload = await this.jwtService.verify(token, {
+      const payload = await this.jwtService.verify(confirmEmailDto.token, {
         secret: this.configService.get('verification.secret'),
       });
 
       if (typeof payload === 'object' && 'email' in payload) {
         return payload.email;
       }
-      throw new BadRequestException('there is no email in JWT');
+      else return new BadRequestException('there is no email in JWT');
     } catch (error) {
       if (error?.name === 'TokenExpiredError') {
         throw new BadRequestException('Email confirmation token expired');

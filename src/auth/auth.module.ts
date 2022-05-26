@@ -18,7 +18,7 @@ import { RefreshSession } from './entities/refreshSession.entity';
 
 @Module({
   imports: [UserModule, PassportModule, JwtModule.register({
-    signOptions: { expiresIn: '30m', algorithm: 'RS256' },
+    signOptions: { algorithm: 'RS256' },
   }),
     TypeOrmModule.forFeature([HashedRefreshToken]),
     TypeOrmModule.forFeature([User]),

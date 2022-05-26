@@ -25,7 +25,7 @@ export class EmailConfirmationController {
     type: ClientErrorResponseSchema
   })
   @Post('confirm')
-  async confirm(@Query('token') confirmEmailDto: string) {
+  async confirm(@Query('token') confirmEmailDto: ConfirmEmailDto) {
     const email = await this.emailConfirmationService.decodeConfirmationToken(confirmEmailDto);
     return await this.emailConfirmationService.confirmEmail(email);
   }

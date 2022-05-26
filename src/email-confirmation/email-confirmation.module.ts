@@ -3,13 +3,16 @@ import { EmailConfirmationService } from './email-confirmation.service';
 import { EmailConfirmationController } from './email-confirmation.controller';
 import { ConfigModule } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt';
+import { JwtModule as JwtModule2 } from '@nestjs/jwt';
 import { UserModule } from 'src/user/user.module';
 
 @Module({
-  imports: [ConfigModule, JwtModule.register({
+  imports: [ConfigModule,
+    JwtModule.register({
     secret: "test",
     signOptions: { expiresIn: '30m' },
-  }), forwardRef(() => UserModule)],
+  }),
+    forwardRef(() => UserModule)],
   controllers: [EmailConfirmationController],
   providers: [EmailConfirmationService],
   exports: [EmailConfirmationService]
