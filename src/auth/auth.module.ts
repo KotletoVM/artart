@@ -7,7 +7,6 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { HashedRefreshToken } from 'src/hashed-refresh-token/entities/hashed-refresh-token.entity';
 import { User } from 'src/user/entities/user.entity';
 import { JwtRefreshTokenStrategy } from './strategies/jwtRefreshToken.strategy';
 import { EmailConfirmationModule } from 'src/email-confirmation/email-confirmation.module';
@@ -20,7 +19,6 @@ import { RefreshSession } from './entities/refreshSession.entity';
   imports: [UserModule, PassportModule, JwtModule.register({
     signOptions: { algorithm: 'RS256' },
   }),
-    TypeOrmModule.forFeature([HashedRefreshToken]),
     TypeOrmModule.forFeature([User]),
     TypeOrmModule.forFeature([RefreshSession]),
     EmailConfirmationModule,

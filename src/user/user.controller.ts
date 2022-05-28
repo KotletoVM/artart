@@ -13,7 +13,6 @@ import { EmailConfirmationGuard } from 'src/auth/guards/emailConfirmation.guard'
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Response } from 'express';
-import { EmailConfirmationService } from 'src/email-confirmation/email-confirmation.service';
 import { ApiTags, ApiBearerAuth, ApiOkResponse, ApiUnauthorizedResponse, ApiBadRequestResponse, ApiBody, ApiConsumes, ApiNotFoundResponse, ApiQuery } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ResetPasswordService } from 'src/reset-password/reset-password.service';
@@ -23,7 +22,6 @@ import { ClientErrorResponseSchema } from 'src/schemas/client-error-response.sch
 @Controller('api/user')
 export class UserController {
   constructor(
-      private readonly emailConfirmationService: EmailConfirmationService,
       private readonly userService: UserService,
       private readonly resetPasswordService: ResetPasswordService) {}
 
@@ -373,11 +371,14 @@ export class UserController {
   @ApiBearerAuth('jwt-access-user')
   @UseGuards(JwtAuthGuard)
   @Patch('me/updateEmail')
-  async updateEmail(@Request() req, @Body() updateUserEmailDto: UpdateUserEmailDto, @Res() responce: Response) {
-    const find = await this.userService.findById(+req.user.id);
-    if (!find){throw new NotFoundException('User not found.');}
-    const user = await this.userService.updateEmail(+req.user.id, updateUserEmailDto, responce);
-    await this.emailConfirmationService.sendVerificationLink(updateUserEmailDto.email);
+  async sendUpdateEmailLink(@Request() req, @Body() updateUserEmailDto: UpdateUserEmailDto) {
+    return await this.userService.sendUpdateEmailLink(req.user, updateUserEmailDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('me/updateEmail/:token')
+  async updateEmail(@Request() req, @Param('token') token: string) {
+    return await this.userService.updateEmail(req.user, token);
   }
 
   @ApiOkResponse({

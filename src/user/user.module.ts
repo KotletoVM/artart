@@ -4,15 +4,15 @@ import { UserController } from './user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {User} from  './entities/user.entity';
 import { AuthModule } from '../auth/auth.module';
-import { HashedRefreshToken } from 'src/hashed-refresh-token/entities/hashed-refresh-token.entity';
 import { EmailConfirmationModule } from 'src/email-confirmation/email-confirmation.module';
 import { FileModule } from 'src/file/file.module';
 import { ResetPasswordModule } from 'src/reset-password/reset-password.module';
 import { JwtModule } from '@nestjs/jwt';
+import { TokenModule } from 'src/jwt/jwt.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), TypeOrmModule.forFeature([HashedRefreshToken]),
-    forwardRef(() => EmailConfirmationModule), FileModule, ResetPasswordModule],
+  imports: [TypeOrmModule.forFeature([User]),
+    forwardRef(() => EmailConfirmationModule), FileModule, ResetPasswordModule, TokenModule],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService]

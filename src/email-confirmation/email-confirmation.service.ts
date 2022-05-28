@@ -5,8 +5,6 @@ import { createTransport } from 'nodemailer';
 import * as Mail from 'nodemailer/lib/mailer';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from '../user/user.service';
-import ConfirmEmailDto from './dto/confirmEmail.dto';
 import { v4 as uuid } from 'uuid';
 
 @Injectable()
@@ -14,7 +12,6 @@ export class EmailConfirmationService {
   private nodemailerTransport: Mail;
 
   constructor(
-      private readonly userService: UserService,
       private readonly configService: ConfigService,
       private readonly jwtService: JwtService
   ) {
@@ -34,16 +31,6 @@ export class EmailConfirmationService {
 
   generateJwtRefreshToken(payload: {sub: number, email: string, sessionid: uuid}){
     return this.jwtService.sign(payload, {expiresIn: this.configService.get('refresh_token.expiresIn'), privateKey: this.configService.get('refresh_token.privateKey').replace(/\\n/gm, '\n')});
-  }
-
-  public async confirmEmail(email: string) {
-    const user = await this.userService.findByEmail(email);
-    if (user.isEmailConfirmed) {
-      throw new BadRequestException('Email already confirmed');
-    }
-    await this.userService.markEmailAsConfirmed(email);
-
-    return email;
   }
 
   public async decodeConfirmationToken(token: string) {
@@ -101,10 +88,11 @@ export class EmailConfirmationService {
   }
 
   public async resendConfirmationLink(userId: number) {
-    const user = await this.userService.findById(userId);
+    return
+    /*const user = await this.userService.findById(userId);
     if (user.isEmailConfirmed) {
       throw new BadRequestException('Email already confirmed');
     }
     await this.sendVerificationLink(user.email);
-  }
+  }*/}
 }

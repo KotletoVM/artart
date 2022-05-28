@@ -18,10 +18,10 @@ import { Tag } from './tag/entities/tag.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { config } from './config/configuration';
 import { DatabaseConfig } from './config/database.config';
-import { HashedRefreshTokenModule } from './hashed-refresh-token/hashed-refresh-token.module';
 import { EmailConfirmationModule } from './email-confirmation/email-confirmation.module';
 import { FileModule } from './file/file.module';
 import { ResetPasswordModule } from './reset-password/reset-password.module';
+import { TokenModule } from './jwt/jwt.module';
 
 
 @Module({
@@ -48,10 +48,10 @@ import { ResetPasswordModule } from './reset-password/reset-password.module';
   ArtModule,
   EventModule,
   TagModule,
-  HashedRefreshTokenModule,
   EmailConfirmationModule,
   FileModule,
-  ResetPasswordModule],
+  ResetPasswordModule,
+  TokenModule],
   controllers: [AppController],
   providers: [AppService],
 })

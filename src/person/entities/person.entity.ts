@@ -34,6 +34,8 @@ export class Person {
         vk: string;
         tg: string;
         site: string;
+        foundation: string;
+        yandexMusic: string;
     };
     @OneToMany(type => Art, art => art.personid,
         /*{ eager: true, cascade: true}*/)

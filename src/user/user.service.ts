@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Inject, forwardRef, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject, forwardRef, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,10 +10,11 @@ import * as bcrypt from 'bcrypt';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserEmailDto } from './dto/update-user-email.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
-import { HashedRefreshToken } from 'src/hashed-refresh-token/entities/hashed-refresh-token.entity';
 import { Response } from 'express';
 import { FileService } from 'src/file/file.service';
 import { v4 as uuid } from 'uuid';
+import { EmailConfirmationService } from 'src/email-confirmation/email-confirmation.service';
+import { TokenService } from 'src/jwt/jwt.service';
 
 @Injectable()
 export class UserService {
@@ -21,9 +22,9 @@ export class UserService {
   constructor(
       @InjectRepository(User)
       private userRepository: Repository<User>,
-      @InjectRepository(HashedRefreshToken)
-      private tokenRepository: Repository<HashedRefreshToken>,
-      private fileService: FileService
+      private fileService: FileService,
+      private readonly emailConfirmationService: EmailConfirmationService,
+      private readonly tokenService: TokenService
   ) {}
 
   create(createUserDto: CreateUserDto) {
@@ -58,8 +59,6 @@ export class UserService {
   findByEmail(email: string) {
     return this.userRepository.findOne({email: email});
   }
-
-
 
   async search(searchUserDto: SearchUserDto) {
     const qb = this.userRepository.createQueryBuilder('user');
@@ -102,18 +101,20 @@ export class UserService {
     else throw new BadRequestException('To update password enter new password');
   }
 
-  async updateEmail(id: number, updateUserEmailDto: UpdateUserEmailDto, response: Response){
-    if (updateUserEmailDto.email){
-      const emailUpdate = await this.userRepository.update(id, {email: updateUserEmailDto.email, isEmailConfirmed: false});
-      if (emailUpdate){response.clearCookie('access_token').clearCookie('refresh_token').send({message: 'Email updated. Confirm new email.'});
-    }
-      else throw new BadRequestException('Something wrong');
-    }
-    else throw new BadRequestException('To update email enter new email');
-
-    //logout
+  async sendUpdateEmailLink(user: User, updateUserEmailDto: UpdateUserEmailDto){
+    if (!await this.findById(user.id))throw new NotFoundException('User not found.')
+    if (await this.findByEmail(updateUserEmailDto.email)) throw new ForbiddenException('User with this email already exists')
+    return await this.emailConfirmationService.sendVerificationLink(updateUserEmailDto.email);
   }
 
+  async updateEmail(user: User, token: string){
+    if (!await this.findById(user.id))throw new NotFoundException('User not found.')
+    const payload = await this.tokenService.decodeToken(token)
+    if (await this.findByEmail(Object(payload).email)) throw new ForbiddenException('User with this email already exists')
+    const result = await this.userRepository.update(user.id, {email: Object(payload).email})
+    if (result.affected == 1) return {message: `Email updated from ${user.email} to ${Object(payload).email}`}
+    else throw new BadRequestException(`Email not updated`)
+  }
   //ограничение на админа
   async updateRole(id: number, updateUserRoleDto: UpdateUserRoleDto){
     return this.userRepository.update(id, {role: updateUserRoleDto.role})
@@ -130,16 +131,18 @@ export class UserService {
     else throw new BadRequestException('To reset password enter new password');
   }
 
+  //доделоть!!!
   async remove(id: number){
-    this.tokenRepository.delete({userid: id});
     return this.userRepository.delete(id)
         .then(() => {return {message: "User deleted"}})
         .catch((err) => { throw new BadRequestException("Something went wrong.")});
   }
 
   async markEmailAsConfirmed(email: string) {
-    return this.userRepository.update({ email: email }, {
+    const result = await this.userRepository.update({ email: email }, {
       isEmailConfirmed: true
     });
+    if (result.affected == 1) return {message: `Email confirmed`}
+    else throw new BadRequestException(`Email not confirmed`)
   }
 }

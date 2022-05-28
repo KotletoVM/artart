@@ -8,8 +8,6 @@ import * as bcrypt from 'bcrypt';
 import { Response, Request } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { HashedRefreshToken } from 'src/hashed-refresh-token/entities/hashed-refresh-token.entity';
-import { CreateHashedRefreshTokenDto } from 'src/hashed-refresh-token/dto/create-hashed-refresh-token.dto';
 import { ConfigService } from "@nestjs/config";
 import { createHmac } from 'crypto';
 import {S3, Endpoint} from 'aws-sdk';
@@ -22,8 +20,6 @@ import { RefreshSessionDto } from './dto/refreshSession.dto';
 export class AuthService {
   constructor(private userService: UserService,
               private jwtService: JwtService,
-              @InjectRepository(HashedRefreshToken)
-              private tokenRepository: Repository<HashedRefreshToken>,
               @InjectRepository(User)
               private userRepository: Repository<User>,
               private configService: ConfigService,
@@ -109,12 +105,6 @@ export class AuthService {
         return this.userService.update(userid, user);
     }
 
-    /*public getJwtAccessToken(user: User) {
-        const payload = {sub: user.id, email: user.email};
-        const accessToken = this.generateJwtAccessToken(payload);
-        return accessToken;
-    }*/
-
     public async refreshSession(user: User, fingerprint: string, exp: number){
         const oldSession = await this.sessionRepository.findOne({userid: user.id, fingerprint: fingerprint, expiresin: exp})
         if (!oldSession){
@@ -125,23 +115,6 @@ export class AuthService {
         const refreshToken = this.generateJwtRefreshToken(payload);
         this.sessionRepository.update({id: oldSession.id}, {expiresin: this.jwtService.decode(refreshToken)["exp"]})
         return {accessToken, refreshToken};
-    }
-
-    async getUserIfRefreshTokenMatches(refreshToken: string, userid: number) {
-        //const user = await this.findById(userId);
-        const token = await this.tokenRepository.find({userid: userid});
-        let isRefreshTokenMatching = false;
-        token.forEach(element => {
-            if (bcrypt.compare(refreshToken, element.token)) {
-                isRefreshTokenMatching = true;
-                return isRefreshTokenMatching;
-            }
-        });
-
-        if (isRefreshTokenMatching) {
-            const user = await this.userRepository.findOne({id: userid});
-            return user;
-        }
     }
 
     async logOut(user: User, fingerprint: string){

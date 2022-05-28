@@ -43,10 +43,10 @@ export class CreatePersonDto {
      @IsOptional()
      @IsObject({ message: 'Соцсети должны быть указаны как Object\n' })
      socNetworks: {
-          instagram: string;
           vk: string;
           tg: string;
-          spotify: string;
           site: string;
+          foundation: string;
+          yandexMusic: string;
      };
 }
