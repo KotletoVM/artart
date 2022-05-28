@@ -104,7 +104,7 @@ export class UserService {
   async sendUpdateEmailLink(user: User, updateUserEmailDto: UpdateUserEmailDto){
     if (!await this.findById(user.id))throw new NotFoundException('User not found.')
     if (await this.findByEmail(updateUserEmailDto.email)) throw new ForbiddenException('User with this email already exists')
-    return await this.emailConfirmationService.sendVerificationLink(updateUserEmailDto.email);
+    return await this.emailConfirmationService.sendUpdateEmailLink(updateUserEmailDto.email);
   }
 
   async updateEmail(user: User, token: string){

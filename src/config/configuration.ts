@@ -33,6 +33,11 @@ export const config = () => ({
         expiresIn: process.env.VERIFICATION_JWT_EXPIRESIN,
         url: process.env.EMAIL_CONFIRMATION_URL
     },
+    updateEmail:{
+        secret: process.env.VERIFICATION_JWT_SECRET,
+        expiresIn: process.env.VERIFICATION_JWT_EXPIRESIN,
+        url: process.env.EMAIL_UPDATE_URL
+    },
     password_reset: {
         secret: process.env.RESET_PASSWORD_JWT_SECRET,
         expiresIn: process.env.RESET_PASSWORD_JWT_EXPIRESIN,

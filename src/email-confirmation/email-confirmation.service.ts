@@ -95,4 +95,36 @@ export class EmailConfirmationService {
     }
     await this.sendVerificationLink(user.email);
   }*/}
+
+  public sendUpdateEmailLink(email: string) {
+    const payload = { email };
+    const token = this.jwtService.sign(payload, {
+      secret: this.configService.get('updateEmail.secret'),
+      expiresIn: this.configService.get('updateEmail.expiresIn')
+    });
+
+    const url = `${this.configService.get('updateEmail.url')}/${token}`;
+
+    const text = `Welcome to the ARTART web-application. To confirm your new email address, click here: ${url}`;
+    const html = "<h3>Welcome to the ARTART web-application.</h3><h4></h4>" +
+        "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color: #00AAFF;  width: 220px; border-collapse: collapse;\">\n" +
+        "<tbody>\n" +
+        "<tr>\n" +
+        "<td style=\"border-collapse: collapse; border-spacing: 0; font-family: ‘Trebuchet MS’, sans-serif; " +
+        "font-size: 18px; text-align: center; color: #FFFFFF;  text-shadow: 1px 1px 0 #ff9444; border: 1px solid #00AAFF; padding: 13px;\">\n" +
+        `<a href=\"${url}\" style=\"text-decoration: none; color: #FFFFFF;\" ` +
+        "target=\"_self\">CONFIRM EMAIL</a></td>\n" +
+        "</tbody>\n" +
+        "</table>" +
+        "<p style='font-size: 15px'>or click on this link:</p>" +
+        `<a href=\"${url}\" >${url}</a>`
+
+    return this.sendMail({
+      from: this.configService.get('email.user'),
+      to: email,
+      subject: 'ARTART. Email confirmation | ARTART. Подтверждение Email ',
+      text,
+      html
+    })
+  }
 }
