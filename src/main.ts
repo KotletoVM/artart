@@ -9,14 +9,9 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import {cors} from 'cors'
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {cors: true});
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser(/*secret дописать*/));
-  app.enableCors({
-    allowedHeaders:"Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Accept",
-    origin: "http://localhost:3000",
-    methods: 'GET,PATCH,POST,DELETE, OPTIONS'
-  });
   const configService: ConfigService = app.get(ConfigService);
   const config = new DocumentBuilder()
       .setTitle('ARTART REST API')
