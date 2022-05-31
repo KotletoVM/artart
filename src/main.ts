@@ -5,16 +5,23 @@ import * as cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { config as awsConfig } from 'aws-sdk';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import {cors} from 'cors'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.useGlobalPipes(new ValidationPipe());
+  app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PATCH,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Accept');
+    next();
+  })
   app.use(cookieParser(/*secret дописать*/));
   app.enableCors({
-    origin: 'http://localhost:3000',
-    methods: "GET,PATCH,POST,DELETE,UPDATE,OPTIONS",
-    credentials: true,
+    allowedHeaders:"*",
+    origin: "*",
+    methods: "*"
   });
   const configService: ConfigService = app.get(ConfigService);
   const config = new DocumentBuilder()
