@@ -14,7 +14,7 @@ async function bootstrap() {
   app.use(cookieParser(/*secret дописать*/));
   app.enableCors({
     allowedHeaders:"Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Accept",
-    origin: "*",
+    origin: "http://localhost:3000",
     methods: 'GET,PATCH,POST,DELETE, OPTIONS'
   });
   const configService: ConfigService = app.get(ConfigService);
