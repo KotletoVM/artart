@@ -305,6 +305,15 @@ export class UserController {
     throw new BadRequestException('to update userpic upload new userpic first.');
   }
 
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  @Patch('me/deleteUserpic')
+  async deleteUserpic(@Request() req) {
+    const find = await this.userService.findById(+req.user.id);
+    if (!find){throw new NotFoundException('User not found.');}
+      return this.userService.deleteUserpic(req.user);
+  }
+
   @ApiOkResponse({
     status: 200,
     description: 'Password updated',

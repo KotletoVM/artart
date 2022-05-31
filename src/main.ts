@@ -9,9 +9,10 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import {cors} from 'cors'
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {cors: true});
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser(/*secret дописать*/));
+  app.enableCors();
   const configService: ConfigService = app.get(ConfigService);
   const config = new DocumentBuilder()
       .setTitle('ARTART REST API')

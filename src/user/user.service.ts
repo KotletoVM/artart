@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, Inject, forwardRef, BadRequestException,
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOneOptions } from 'typeorm';
+import { Repository, FindOneOptions, Column } from 'typeorm';
 import { User } from './entities/user.entity';
 import { LoginUserDto } from './dto/login-user.dto';
 import { SearchUserDto } from './dto/search-user.dto';
@@ -34,16 +34,6 @@ export class UserService {
       hash: createUserDto.password,
       //role: createUserDto.role,
     });
-  }
-
-  async updateUserpic(user: User, userpic: Express.Multer.File){
-    const filename = `userpic/${uuid()}-${user.id}.png`;
-    const newUserpic = await this.fileService.saveFile(filename, userpic);
-    if (!user.userpic.includes('userpic.png')){
-      this.fileService.deleteFile(user.userpic);
-    }
-    await this.userRepository.update(user.id, {userpic: newUserpic.Location});
-    return {message: 'Userpic has been updated', url: newUserpic.Location}
   }
 
   async findAll(take: number = 10, skip: number = 0) {
@@ -118,6 +108,25 @@ export class UserService {
   //ограничение на админа
   async updateRole(id: number, updateUserRoleDto: UpdateUserRoleDto){
     return this.userRepository.update(id, {role: updateUserRoleDto.role})
+  }
+
+  async updateUserpic(user: User, userpic: Express.Multer.File){
+    const filename = `userpic/${uuid()}-${user.id}.png`;
+    const newUserpic = await this.fileService.saveFile(filename, userpic);
+    if (!user.userpic.includes('userpic.png')){
+      this.fileService.deleteFile(user.userpic);
+    }
+    await this.userRepository.update(user.id, {userpic: newUserpic.Location});
+    return {message: 'Userpic has been updated', url: newUserpic.Location}
+  }
+
+  deleteUserpic(user: User){
+    if (!user.userpic.includes('userpic.png')){
+      this.fileService.deleteFile(user.userpic);
+      this.userRepository.update(user.id, {userpic: 'https://storage.yandexcloud.net/artart/userpic/userpic.png'});
+    }
+    else {throw new ForbiddenException('Your userpic is default')}
+
   }
 
   async resetPassword(email: string, updateUserPasswordDto: UpdateUserPasswordDto){
