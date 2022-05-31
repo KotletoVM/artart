@@ -11,17 +11,11 @@ import {cors} from 'cors'
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.useGlobalPipes(new ValidationPipe());
-  app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET,PATCH,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Accept');
-    next();
-  })
   app.use(cookieParser(/*secret дописать*/));
   app.enableCors({
-    allowedHeaders:"*",
+    allowedHeaders:"Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Accept",
     origin: "*",
-    methods: "*"
+    methods: 'GET,PATCH,POST,DELETE, OPTIONS'
   });
   const configService: ConfigService = app.get(ConfigService);
   const config = new DocumentBuilder()
