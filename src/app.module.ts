@@ -6,8 +6,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import {User} from './user/entities/user.entity';
 import { PersonModule } from './person/person.module';
 import { Person } from './person/entities/person.entity';
-import { CommentModule } from './comment/comment.module';
-import { Comment } from './comment/entities/comment.entity';
 import { AuthModule } from './auth/auth.module';
 import { ArtModule } from './art/art.module';
 import { Art } from './art/entities/art.entity';
@@ -43,7 +41,6 @@ import { TokenModule } from './jwt/jwt.module';
       }),
   UserModule,
   PersonModule,
-  CommentModule,
   AuthModule,
   ArtModule,
   EventModule,

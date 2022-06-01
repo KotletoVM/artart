@@ -15,7 +15,7 @@ export class User {
     email: string;
     //@Column({nullable: true})
     //password: string;
-    @Column({nullable: true})
+    @Column({nullable: false})
     hash: string;
     @CreateDateColumn({type: 'timestamp'})
     createdAt: Date;

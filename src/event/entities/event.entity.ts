@@ -8,7 +8,7 @@ export class Event {
     title: string;
     @Column()
     description: string;
-    @Column({type: 'date', nullable: true})
+    @Column({type: 'date', nullable: false})
     startDate: Date;
     @Column({type: 'date', nullable: true})
     endDate: Date;

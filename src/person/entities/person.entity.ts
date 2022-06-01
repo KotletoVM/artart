@@ -27,8 +27,8 @@ export class Person {
     views: number;
     @Column({default: 0})
     likes: number;
-    @Column({default: 0})
-    comments: number;
+    //@Column({default: 0})
+    //comments: number;
     @Column("jsonb", {nullable: true})
     socNetworks: {
         vk: string;

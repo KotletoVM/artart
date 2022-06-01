@@ -7,7 +7,6 @@ import { Repository, Not  } from 'typeorm';
 import { SearchPersonDto } from './dto/search-person.dto';
 import { Art } from 'src/art/entities/art.entity';
 import { Tag } from 'src/tag/entities/tag.entity';
-import { Comment } from 'src/comment/entities/comment.entity';
 import { Request as Req} from 'express';
 import jwtDecode, { JwtPayload } from 'jwt-decode';
 import { v4 as uuid } from 'uuid';
@@ -22,8 +21,6 @@ export class PersonService {
       private personRepository: Repository<Person>,
       @InjectRepository(Art)
       private artRepository: Repository<Art>,
-      @InjectRepository(Comment)
-      private commentRepository: Repository<Comment>,
       private fileService: FileService
   ) {}
 
@@ -225,7 +222,6 @@ export class PersonService {
   async remove(id: number) {
     const qb = this.personRepository.createQueryBuilder('person');
     this.artRepository.delete({personid: id});
-    this.commentRepository.delete({person: {id: id}});
     this.personRepository.delete(id);
     return {message: 'Person deleted'}
   }

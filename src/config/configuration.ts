@@ -3,7 +3,6 @@ import { Person } from "src/person/entities/person.entity";
 import { Art } from "src/art/entities/art.entity";
 import { Tag } from "src/tag/entities/tag.entity";
 import { Event } from "src/event/entities/event.entity";
-import { Comment } from "src/comment/entities/comment.entity";
 import { RefreshSession } from 'src/auth/entities/refreshSession.entity';
 
 export const config = () => ({
@@ -14,7 +13,7 @@ export const config = () => ({
         username: process.env.DATABASE_USERNAME,
         password: process.env.DATABASE_PASSWORD,
         database: process.env.DATABASE_NAME,
-        entities: [User, Person, Comment, Art, Event, Tag, RefreshSession],
+        entities: [User, Person, Art, Event, Tag, RefreshSession],
         synchronize: true,
         ssl: { rejectUnauthorized: false }
     },
