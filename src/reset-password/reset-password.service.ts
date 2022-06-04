@@ -1,6 +1,4 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { CreateResetPasswordDto } from './dto/create-reset-password.dto';
-import { UpdateResetPasswordDto } from './dto/update-reset-password.dto';
 import Mail from 'nodemailer/lib/mailer';
 import { createTransport } from 'nodemailer';
 import { ConfigService } from '@nestjs/config';

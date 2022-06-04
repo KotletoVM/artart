@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ResetPasswordService } from './reset-password.service';
-import { ResetPasswordController } from './reset-password.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 
@@ -9,7 +8,7 @@ import { ConfigModule } from '@nestjs/config';
     secret: "test",
     signOptions: { expiresIn: '30m' },
   }), ConfigModule],
-  controllers: [ResetPasswordController],
+  controllers: [],
   providers: [ResetPasswordService],
   exports: [ResetPasswordService]
 })

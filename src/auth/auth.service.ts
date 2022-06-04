@@ -82,14 +82,10 @@ export class AuthService {
         return {payload, accessToken, refreshToken};
     }
 
-    async register(createUserDto: CreateUserDto, refreshSessionDto: RefreshSessionDto, file?: Express.Multer.File){
+    async register(createUserDto: CreateUserDto){
       try {
           createUserDto.password = await this.generateHash(createUserDto.password);
           const {hash, ...user} = await this.userService.create(createUserDto);
-          if(file){
-              const filename = `userpic/${uuid()}-${user.id}.png`;
-              const userpicUpload = this.saveUserpic(filename, user.id, file);
-          }
           return {user};
       }
       catch (e) {

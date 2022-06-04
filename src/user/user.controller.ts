@@ -13,191 +13,38 @@ import { EmailConfirmationGuard } from 'src/auth/guards/emailConfirmation.guard'
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Response } from 'express';
-import { ApiTags, ApiBearerAuth, ApiOkResponse, ApiUnauthorizedResponse, ApiBadRequestResponse, ApiBody, ApiConsumes, ApiNotFoundResponse, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiOkResponse, ApiUnauthorizedResponse, ApiBadRequestResponse, ApiBody, ApiConsumes, ApiNotFoundResponse, ApiQuery, ApiExcludeController } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ResetPasswordService } from 'src/reset-password/reset-password.service';
 import { ClientErrorResponseSchema } from 'src/schemas/client-error-response.schema';
 
-@ApiTags('User')
+@ApiExcludeController()
 @Controller('api/user')
 export class UserController {
   constructor(
       private readonly userService: UserService,
       private readonly resetPasswordService: ResetPasswordService) {}
 
-  @ApiOkResponse({
-    status: 200,
-    description: 'Users received',
-    schema: {
-      type: 'object',
-      properties: {
-        "users": {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              "id": {
-                type: 'integer'
-              },
-              "name": {
-                type: 'string'
-              },
-              "userpic": {
-                type: 'string'
-              }
-            }
-          }
-        },
-        "count": {
-          type: 'integer'
-        }
-      }
-    }
-  })
-  @ApiUnauthorizedResponse({
-    status: 401,
-    description: "User should authorize again",
-    type: ClientErrorResponseSchema
-  })
-  @ApiQuery({
-    name: 'take',
-    type: 'number',
-    required: false
-  })
-  @ApiQuery({
-    name: 'skip',
-    type: 'number',
-    required: false
-  })
-  @ApiBearerAuth('jwt-access-user')
-  @UseGuards(JwtAuthGuard, /*EmailConfirmationGuard*/)
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll(@Query('take') take: number, @Query('skip') skip: number) {
     if ((take && !+take) || (skip && !+skip)) throw new BadRequestException('Query parameters must be specified as numbers')
     return this.userService.findAll(take, skip);
   }
 
-  @ApiOkResponse({
-    status: 200,
-    description: 'User\'s information received',
-    schema: {
-      type: 'object',
-      properties: {
-        "id": {
-          type: 'integer'
-        },
-        "name": {
-          type: 'string'
-        },
-        "email": {
-          type: 'string',
-          format: 'email'
-        },
-        "createdAt": {
-          type: 'string',
-          format: 'date-time'
-        },
-        "updatedAt": {
-          type: 'string',
-          format: 'date-time'
-        },
-        "userpic": {
-          type: 'string'
-        }
-      }
-    }
-  })
-  @ApiUnauthorizedResponse({
-    status: 401,
-    description: "User should authorize again",
-    type: ClientErrorResponseSchema
-  })
-  @ApiBearerAuth('jwt-access-user')
-  @UseGuards(JwtAuthGuard, /*EmailConfirmationGuard*/)
+  @UseGuards(JwtAuthGuard)
   @Get('me')
   getProfile(@Request() req) {
     return this.userService.getProfile(req.user.id)
   }
 
-  @ApiOkResponse({
-    status: 200,
-    description: 'Users received',
-    schema: {
-      type: 'object',
-      properties: {
-        "users": {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              "id": {
-                type: 'integer'
-              },
-              "name": {
-                type: 'string'
-              },
-              "userpic": {
-                type: 'string'
-              }
-            }
-          }
-        },
-        "count": {
-          type: 'integer'
-        }
-      }
-    }
-  })
-  @ApiUnauthorizedResponse({
-    status: 401,
-    description: "User should authorize again",
-    type: ClientErrorResponseSchema
-  })
-  @ApiBearerAuth('jwt-access-user')
-  @UseGuards(JwtAuthGuard, /*EmailConfirmationGuard*/)
+  @UseGuards(JwtAuthGuard)
   @Get('search')
   search(@Query() searchUserDto: SearchUserDto) {
     return this.userService.search(searchUserDto);
   }
 
-  @ApiOkResponse({
-    status: 200,
-    description: 'User received',
-    schema: {
-      type: 'object',
-      properties: {
-        "id": {
-          type: 'integer'
-        },
-        "name": {
-          type: 'string'
-        },
-        "email": {
-          type: 'string',
-          format: 'email'
-        },
-        "createdAt": {
-          type: 'string',
-          format: 'date-time'
-        },
-        "userpic": {
-          type: 'string'
-        }
-      }
-    }
-  })
-  @ApiUnauthorizedResponse({
-    status: 401,
-    description: "User should authorize again",
-    type: ClientErrorResponseSchema
-  })
-  @ApiNotFoundResponse({
-    status: 404,
-    description: 'User not found',
-    type: ClientErrorResponseSchema
-  })
-  @ApiBearerAuth('jwt-access-user')
-  @UseGuards(JwtAuthGuard, /*EmailConfirmationGuard*/)
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const {hash, role, updatedAt, isEmailConfirmed, ...find} = await this.userService.findById(+id);
@@ -205,37 +52,6 @@ export class UserController {
     return find;
   }
 
-  @ApiOkResponse({
-    status: 200,
-    description: 'User updated',
-    schema: {
-      type: 'object',
-      properties: {
-        "name": {
-          type: 'object'
-        },
-        "userpic": {
-          type: 'object'
-        }
-      }
-    }
-  })
-  @ApiUnauthorizedResponse({
-    status: 401,
-    description: "User should authorize again",
-    type: ClientErrorResponseSchema
-  })
-  @ApiBadRequestResponse({
-    status: 400,
-    description: "Validation failed",
-    type: ClientErrorResponseSchema
-  })
-  @ApiNotFoundResponse({
-    status: 404,
-    description: 'User not found',
-    type: ClientErrorResponseSchema
-  })
-  @ApiBearerAuth('jwt-access-user')
   @UseGuards(JwtAuthGuard)
   @Patch('me')
   async update(@Request() req, @Body() updateUserDto: UpdateUserDto) {
@@ -244,49 +60,6 @@ export class UserController {
     return this.userService.update(+req.user.id, updateUserDto);
   }
 
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        "file": {
-          type: 'string',
-          format: 'binary'
-        }
-      }
-    }
-  })
-  @ApiOkResponse({
-    status: 200,
-    description: 'Userpic updated',
-    schema: {
-      type: 'object',
-      properties: {
-        "message": {
-          type: 'string'
-        },
-        "url": {
-          type: 'string'
-        }
-      }
-    }
-  })
-  @ApiUnauthorizedResponse({
-    status: 401,
-    description: "User should authorize again",
-    type: ClientErrorResponseSchema
-  })
-  @ApiBadRequestResponse({
-    status: 400,
-    description: "Validation failed",
-    type: ClientErrorResponseSchema
-  })
-  @ApiNotFoundResponse({
-    status: 404,
-    description: 'User not found',
-    type: ClientErrorResponseSchema
-  })
-  @ApiBearerAuth('jwt-access-user')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   @Patch('me/updateUserpic')
@@ -314,34 +87,6 @@ export class UserController {
       return this.userService.deleteUserpic(req.user);
   }
 
-  @ApiOkResponse({
-    status: 200,
-    description: 'Password updated',
-    schema: {
-      type: 'object',
-      properties: {
-        "message": {
-          type: 'string'
-        }
-      }
-    }
-  })
-  @ApiUnauthorizedResponse({
-    status: 401,
-    description: "User should authorize again",
-    type: ClientErrorResponseSchema
-  })
-  @ApiBadRequestResponse({
-    status: 400,
-    description: "Validation failed",
-    type: ClientErrorResponseSchema
-  })
-  @ApiNotFoundResponse({
-    status: 404,
-    description: 'User not found',
-    type: ClientErrorResponseSchema
-  })
-  @ApiBearerAuth('jwt-access-user')
   @UseGuards(JwtAuthGuard)
   @Patch('me/updatePass')
   async updatePassword(@Request() req, @Body() updateUserPasswordDto: UpdateUserPasswordDto, @Res() responce: Response) {
@@ -350,34 +95,6 @@ export class UserController {
     return this.userService.updatePassword(+req.user.id, updateUserPasswordDto, responce);
   }
 
-  @ApiOkResponse({
-    status: 200,
-    description: 'Email updated',
-    schema: {
-      type: 'object',
-      properties: {
-        "message": {
-          type: 'string'
-        }
-      }
-    }
-  })
-  @ApiUnauthorizedResponse({
-    status: 401,
-    description: "User should authorize again",
-    type: ClientErrorResponseSchema
-  })
-  @ApiBadRequestResponse({
-    status: 400,
-    description: "Validation failed",
-    type: ClientErrorResponseSchema
-  })
-  @ApiNotFoundResponse({
-    status: 404,
-    description: 'User not found',
-    type: ClientErrorResponseSchema
-  })
-  @ApiBearerAuth('jwt-access-user')
   @UseGuards(JwtAuthGuard)
   @Patch('me/updateEmail')
   async sendUpdateEmailLink(@Request() req, @Body() updateUserEmailDto: UpdateUserEmailDto) {
@@ -390,31 +107,6 @@ export class UserController {
     return await this.userService.updateEmail(req.user, token);
   }
 
-  @ApiOkResponse({
-    status: 200,
-    description: 'Reset password email sent',
-    schema: {
-      type: 'object',
-      properties: {
-        "message": {
-          type: 'string'
-        },
-        "emailId": {
-          type: 'string'
-        }
-      }
-    }
-  })
-  @ApiBadRequestResponse({
-    status: 400,
-    description: "Validation failed",
-    type: ClientErrorResponseSchema
-  })
-  @ApiNotFoundResponse({
-    status: 404,
-    description: 'User not found',
-    type: ClientErrorResponseSchema
-  })
   @Patch('password/reset')
   async sendResetLink(@Body() updateUserEmailDto: UpdateUserEmailDto) {
     const find = await this.userService.findByEmail(updateUserEmailDto.email);
@@ -422,58 +114,12 @@ export class UserController {
     return this.resetPasswordService.sendResetLink(updateUserEmailDto.email);
   }
 
-  @ApiOkResponse({
-    status: 200,
-    description: 'Reset password email sent',
-    schema: {
-      type: 'object',
-      properties: {
-        "message": {
-          type: 'string'
-        }
-      }
-    }
-  })
-  @ApiBadRequestResponse({
-    status: 400,
-    description: "Validation failed",
-    type: ClientErrorResponseSchema
-  })
-  @ApiNotFoundResponse({
-    status: 404,
-    description: 'User not found',
-    type: ClientErrorResponseSchema
-  })
   @Patch('password/reset/:token')
   async resetPassword(@Param('token') token: string, @Body() updateUserPasswordDto: UpdateUserPasswordDto) {
     const email = await this.resetPasswordService.decodeConfirmationToken(token);
     return this.userService.resetPassword(email, updateUserPasswordDto);
   }
 
-  /*-------------------РАЗОБРАТЬСЯ С РОЛЯМИ---------------------*/
-  @ApiOkResponse({
-    status: 200,
-    description: 'Role changed',
-    schema: {
-      type: 'object',
-      properties: {
-        "message": {
-          type: 'string'
-        }
-      }
-    }
-  })
-  @ApiBadRequestResponse({
-    status: 400,
-    description: "Validation failed",
-    type: ClientErrorResponseSchema
-  })
-  @ApiNotFoundResponse({
-    status: 404,
-    description: 'User not found',
-    type: ClientErrorResponseSchema
-  })
-  @ApiBearerAuth('jwt-access-user')
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Patch(':id')
@@ -483,29 +129,6 @@ export class UserController {
     return this.userService.updateRole(+req.user.id, updateUserRoleDto);
   }
 
-  @ApiOkResponse({
-    status: 200,
-    description: 'User deleted',
-    schema: {
-      type: 'object',
-      properties: {
-        "message": {
-          type: 'string'
-        }
-      }
-    }
-  })
-  @ApiBadRequestResponse({
-    status: 400,
-    description: "Validation failed",
-    type: ClientErrorResponseSchema
-  })
-  @ApiNotFoundResponse({
-    status: 404,
-    description: 'User not found',
-    type: ClientErrorResponseSchema
-  })
-  @ApiBearerAuth('jwt-access-user')
   @UseGuards(JwtAuthGuard)
   @Delete('me')
   async remove(@Request() req) {

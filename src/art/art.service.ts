@@ -34,7 +34,6 @@ export class ArtService {
   }
 
   async findOne(id: number) {
-    //return this.artRepository.findOne(id, {relations: ["personid"]});
     const qb = this.artRepository.createQueryBuilder('art');
     const art = await qb.innerJoinAndSelect('art.personid', 'person').select('art').addSelect('person.id').addSelect('person.fullname').where('art.id = :id', {id: id}).getOne();
     if (!art) throw new NotFoundException('Art with specified id not found')
