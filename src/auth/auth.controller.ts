@@ -28,8 +28,9 @@ export class AuthController {
       userid: req.user.id,
       ua: req.get('User-Agent'),
       fingerprint: loginDto.fingerprint || undefined,
-      ip: req.ip || req.connection.remoteAddress
+      ip: req.get("X-Forwarded-For") || req.ip || req.connection.remoteAddress
     }
+    console.log(req.get("X-Forwarded-For"))
     return this.authService.login(req.user, refreshSessionDto);
   }
 
