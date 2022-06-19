@@ -27,8 +27,8 @@ export class AuthController {
     let refreshSessionDto: RefreshSessionDto = {
       userid: req.user.id,
       ua: req.get('User-Agent'),
-      fingerprint: loginDto.fingerprint,
-      ip: req.connection.remoteAddress
+      fingerprint: loginDto.fingerprint || undefined,
+      ip: req.ip || req.connection.remoteAddress
     }
     return this.authService.login(req.user, refreshSessionDto);
   }

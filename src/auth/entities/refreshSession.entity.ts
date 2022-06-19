@@ -11,7 +11,7 @@ export class RefreshSession {
     userid: number;
     @Column()
     ua: string;
-    @Column()
+    @Column({nullable: true})
     fingerprint: string;
     @Column()
     ip: string;

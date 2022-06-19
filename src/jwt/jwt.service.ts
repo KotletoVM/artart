@@ -25,19 +25,3 @@ export class TokenService {
         return this.jwtService.sign(payload, {expiresIn: this.configService.get('refresh_token.expiresIn'), privateKey: this.configService.get('refresh_token.privateKey').replace(/\\n/gm, '\n')});
     }
 }
-
-/*try {
-    const payload = await this.jwtService.verify(token, {
-        secret: this.configService.get('password_reset.secret'),
-    });
-    if (typeof payload === 'object' && 'email' in payload) {
-        return payload.email;
-    }
-    throw new BadRequestException('there is no email in JWT');
-} catch (error) {
-    if (error?.name === 'TokenExpiredError') {
-        throw new BadRequestException('Password reset token expired');
-    }
-    throw new BadRequestException('Bad password reset token');
-}
-}*/

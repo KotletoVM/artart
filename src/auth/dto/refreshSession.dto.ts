@@ -3,11 +3,8 @@ import { ApiProperty, ApiPropertyOptional, ApiResponseProperty } from "@nestjs/s
 
 export class RefreshSessionDto {
     userid?: number;
-
-    //вот это надо
     ua: string;
-    fingerprint: string;
-
+    fingerprint?: string;
     @IsEmpty()
     ip: string;
 }

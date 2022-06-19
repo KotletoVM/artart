@@ -89,10 +89,10 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('me/updatePass')
-  async updatePassword(@Request() req, @Body() updateUserPasswordDto: UpdateUserPasswordDto, @Res() responce: Response) {
+  async updatePassword(@Request() req, @Body() updateUserPasswordDto: UpdateUserPasswordDto) {
     const find = await this.userService.findById(+req.user.id);
     if (!find){throw new NotFoundException('User not found.');}
-    return this.userService.updatePassword(+req.user.id, updateUserPasswordDto, responce);
+    return this.userService.updatePassword(+req.user.id, updateUserPasswordDto);
   }
 
   @UseGuards(JwtAuthGuard)

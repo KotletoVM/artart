@@ -80,13 +80,10 @@ export class UserService {
     return {name, userpic};
   }
 
-  async updatePassword(id: number, updateUserPasswordDto: UpdateUserPasswordDto, response: Response){
+  async updatePassword(id: number, updateUserPasswordDto: UpdateUserPasswordDto){
     if (updateUserPasswordDto.password){
       const hash = await bcrypt.hash(updateUserPasswordDto.password, 10);
       const hashUpdate = await this.userRepository.update(id, {hash: hash});
-      if (hashUpdate){response.clearCookie('access_token').clearCookie('refresh_token').send({message: 'Password updated'});
-      }
-      else throw new BadRequestException('Something wrong');
     }
     else throw new BadRequestException('To update password enter new password');
   }
