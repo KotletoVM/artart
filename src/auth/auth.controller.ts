@@ -30,7 +30,6 @@ export class AuthController {
       fingerprint: loginDto.fingerprint || undefined,
       ip: req.get("X-Forwarded-For") || req.ip || req.connection.remoteAddress
     }
-    console.log(req.get("X-Forwarded-For"))
     return this.authService.login(req.user, refreshSessionDto);
   }
 
