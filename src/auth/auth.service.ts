@@ -124,9 +124,10 @@ export class AuthService {
       else {
           const sessions = await this.sessionRepository.find({userid: user.id})
           const qb = this.sessionRepository.createQueryBuilder()
-          return qb.delete().where({userid: user.id}).execute()
+          const result = await qb.delete().where({userid: user.id}).execute()
               .then(result => result.affected != 0 ? {message: 'Logout complete'} : new Error('Logout complete, but session not found'))
               .catch(e => {throw new Error(e)} )
+          return result
       }
 
     }
