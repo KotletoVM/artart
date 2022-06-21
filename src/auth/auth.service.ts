@@ -113,12 +113,22 @@ export class AuthService {
         return {accessToken, refreshToken};
     }
 
-    async logOut(user: User, fingerprint: string){
-        const session = await this.sessionRepository.findOne({userid: user.id, fingerprint: fingerprint})
-        const qb = this.sessionRepository.createQueryBuilder()
-        qb.delete().where({userid: user.id, fingerprint: fingerprint}).execute()
-            .then(result => result.affected == 1 ? {message: 'Logout complete'} : new Error('Logout complete, but session not found'))
-            .catch(e => {throw new Error(e)} )
+    async logOut(user: User, fingerprint?: string){
+      if (fingerprint){
+          const session = await this.sessionRepository.findOne({userid: user.id, fingerprint: fingerprint})
+          const qb = this.sessionRepository.createQueryBuilder()
+          qb.delete().where({userid: user.id, fingerprint: fingerprint}).execute()
+              .then(result => result.affected == 1 ? {message: 'Logout complete'} : new Error('Logout complete, but session not found'))
+              .catch(e => {throw new Error(e)} )
+      }
+      else {
+          const sessions = await this.sessionRepository.find({userid: user.id})
+          const qb = this.sessionRepository.createQueryBuilder()
+          qb.delete().where({userid: user.id}).execute()
+              .then(result => result.affected != 0 ? {message: 'Logout complete'} : new Error('Logout complete, but session not found'))
+              .catch(e => {throw new Error(e)} )
+      }
+
     }
 /*
     sign(key: string, string: string){

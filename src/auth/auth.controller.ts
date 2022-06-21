@@ -50,7 +50,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   logOut(@Req() req, @Body() body: {fingerprint: string}){
-    if (!body.fingerprint) throw new ForbiddenException('Fingerprint must be provided')
+    if (!body.fingerprint) return this.authService.logOut(req.user);
     return this.authService.logOut(req.user, body.fingerprint);
   }
 }
