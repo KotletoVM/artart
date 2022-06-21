@@ -117,9 +117,10 @@ export class AuthService {
       if (fingerprint){
           const session = await this.sessionRepository.findOne({userid: user.id, fingerprint: fingerprint})
           const qb = this.sessionRepository.createQueryBuilder()
-          return qb.delete().where({userid: user.id, fingerprint: fingerprint}).execute()
+          const result = await qb.delete().where({userid: user.id, fingerprint: fingerprint}).execute()
               .then(result => result.affected == 1 ? {message: 'Logout complete'} : new Error('Logout complete, but session not found'))
               .catch(e => {throw new Error(e)} )
+          return result
       }
       else {
           const sessions = await this.sessionRepository.find({userid: user.id})
